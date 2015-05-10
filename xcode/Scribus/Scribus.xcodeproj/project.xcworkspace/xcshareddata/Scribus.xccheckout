@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>C6969CF6-7A73-4849-AC66-D96CBDBA9852</string>
+	<key>IDESourceControlProjectName</key>
+	<string>project</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>11d20701-8431-0410-a711-e3c959e3b870++505</key>
+		<string>svn+ssh://canvas.scribus.eu/svn/trunk</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>Scribus/xcode/Scribus/Scribus.xcodeproj/project.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>11d20701-8431-0410-a711-e3c959e3b870++505</key>
+		<string>../../../../..</string>
+	</dict>
+	<key>IDESourceControlProjectRepositoryRootDictionary</key>
+	<dict>
+		<key>11d20701-8431-0410-a711-e3c959e3b870++505</key>
+		<string>svn+ssh://canvas.scribus.eu/svn</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>svn+ssh://canvas.scribus.eu/svn/trunk/Scribus/xcode/Scribus/Scribus.xcodeproj/project.xcworkspace</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>11d20701-8431-0410-a711-e3c959e3b870++505</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.subversion</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>11d20701-8431-0410-a711-e3c959e3b870++505</string>
+			<key>IDESourceControlWCCName</key>
+			<string>scribus_trunk</string>
+		</dict>
+	</array>
+</dict>
+</plist>

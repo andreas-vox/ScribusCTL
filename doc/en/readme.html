@@ -1,0 +1,129 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<title>What&rsquo;s New in Scribus 1.6?</title>
+</head>
+<style>
+@import "manual.css";
+</style>
+<body>
+<h2>What&rsquo;s New in Scribus 1.6?</h2>
+<p>This is a cursory overview over the changes in Scribus compared to the latest stable version 1.4.x.</p>
+
+<p><b><i>Please note that the file format has changed and is not backwardly compatible with any prior stable version (1.4.x or earlier). To be precise, you will not be able to open 1.6.0 files with version 1.4.x or any earlier version.</i></b></p>
+<h3>General</h3>
+<ul>
+<li><b>A new snap mode:</b> Items can now be snapped to other items.</li>
+<li><b>&ldquo;Weld&rdquo; feature for objects:</b> Move objects together without grouping them.</li>
+
+</ul>
+
+<h3>Text and Typography</h3>
+<h4>Typography</h4>
+<ul>
+<li><b>Orphans and widows control:</b></li>
+<li><b>More hyphenation options:</b></li>
+</ul>
+<br>
+<h4><b>Text</b></h4>
+<ul>
+<li><b>Foot- and endnotes:</b></li>
+<li><b>Freely defineable text variables:</b></li>
+<li><b>Text references:</b></li>
+<li><b>Anchored text frames</b></li>
+<li><b>Numbering and Bullets:</b></li>
+<li><b>Inline Frames:</b></li>
+<li><b>Auto-adjustment of text frames to text size</b></li>
+</ul>
+
+<h3>Tables</h3>
+<p>The tables feature has been completely rewritten. Tables in Scribus work now more like those in other DTP and wordprocessing software. Basic table and cell styles have also been implemented.</p>
+
+<h3>Graphics</h3>
+
+<h4>Picture Browser</h4>
+
+<h4>Vector Tools</h4>
+<ul>
+<li><b>New vector types: Arcs and Spirals:</b></li>
+<li><b>Calligraphic lines:</b></li>
+<li><b>New Path Tools:</b></li>
+</ul>
+<br>
+
+<h4>Raster Images</h4>
+<ul>
+<li><b>Image cache:</b> To prevent Scribus from slowing down with many high resolution images being loaded into a document, an image cache for raster images has been added.</li>
+<li><b>Embedded images:</b> Raster images can now be embedded in Scribus files. Beware, though, that the resulting SLA or even SLA.GZ files may be huge.</li>
+</ul>
+
+
+<h3>Solid Colors, Gradients and Patterns</h3>
+<ul>
+<li><b>Enhanced resource management:</b></li>
+<li><b>More gradient fills:</b></li>
+<li><b>More supported pattern formats:</b></li>
+</ul>
+<br>
+
+
+<h3>Import Filters</h3>
+<p>A considerable amount of work has been spent on new import filters, as well as improving existing filters.</p>
+<h4>General</h4>
+
+<h4>Improved Import Filters</h4>
+<ul>
+<li><b>Adobe Illustrator:</b></li>
+<li><b>PDF:</b></li>
+<li><b>PostScript:</b></li>
+<li><b>OpenDocument Text:</b> The new text features, like footnotes and lists, will be imported automatically from ODT files.</li>
+</ul>
+<h4>New Import Filters</h4>
+<ul>
+<li><b>Computer Graphics Metafile (CGM):</b> CGM is a 2D vector format standard that has been around for a long time and is still being developed, especially for technical drawings. The new filter is supposed to import most CGM files correctly.</li>
+<li><b>GraphicsMagick Plug-in:</b> Almost all file formats supported by GraphicsMagick can now be imported into Scribus. Note, though, that to save space in the drop-down menu of the file selectors, the many formats aren't listed separately. Also note that Scribus will always use its internal, PoDoFo&rsquo;s or Ghostscript&rsquo;s filters instead of GraphicsMagick if a file format is supported by the latter.</li>
+<li><b>InDesign/InCopy:</b> While reverse-engineering InDesign's binary format (INDD) is still a work in progress, Adobe has released a complete specification of the XML version of that format (IDML). Scribus 1.6 is being shipped with a basic import filter for this format, which will be improved and refined over time. It will also import InDesign XML Snippets (IDMS) and InCopy XML files (ICML).</li>
+<li><b>Micrografx Draw (DRW):</b> This a file format of the once popular Micrografx Draw graphics software for Windows 3 and 95. Since many vector collections using this format are still around, an import filter has been written.</li>
+<li><b>MS Publisher (PUB):</b> An importer for PUB files has been made possible by the creation of <a href="http://cgit.freedesktop.org/libreoffice/libmspub/">libmspub</a>, wich is also used for Publisher import into LibreOffice. It is supposed to import all Publisher versions.</li>
+<li><b>Progressive Graphics File (PGF):</b> This is a fairly new image format, designed to replace JPEG, just like JPEG 2000 does, but emphasizing speed and quality over compression ratio.</li>
+<li><b>UniConvertor Plug-in:</b> As with the GraphicsMagick plug-in, Scribus won&rsquo;t list any of the file types supported by UniConvertor to save space in file selectors. It will also ignore UniConvertor for importing file formats, for which Scribus provides generic importers.</li>
+<li><b>WordPerfect Graphics (WPG):</b> Scribus uses an improved version of libwpg to import the clipart format of WordPerfect Office.</li>
+<li><b>VIVA Designer:</b> Like InDesign, VIVA Designer allows for exporting XML versions of its native format. These can now be imported into Scribus.</li>
+<li><b>Xara Designer (XAR):</b> Xara Designer (formerly known as Xara Xtreme) is known as one of the most powerful vector drawing programs. Its file format (XAR) is well-documented, and thanks to many contributions from professional Xara users, the Scribus Team has been able to create an excellent XAR filter, whose implementation resulted in the addition of many new features in Scribus.</li>
+<li><b>XML Paper Specification (XPS, OXPS):</b> XML is an alternative to PDF originally developed by Microsoft and now maintained and updated by ECMA International. Scribus 1.6 can import both the original Microsoft version (XPS) and the modified versions as standardized by ECMA (OXPS).</li>
+<li><b>XPress Tags (XTG):</b> XTG is a format created by Quark to exchange text layouts between documents. Scribus 1.6 provides a basic import filter for XTG files created by Quark XPress, which will be improved and refined over time. Note that XPress Tags is not identical to Xtags, which is an enhanced version of XPress Tags provided by a third party.</li>
+</ul>
+<br>
+
+
+<h3>PDF Features</h3>
+<ul>
+<li><b>Support for PDF-X1a and PDF-X4:</b></li>
+<li><b>Support for PDF 3D features, using OpenSceneGraph:</b></li>
+<li><b>Substantial improvements for PDF Forms:</b></li>
+</ul>
+
+<h3>Other Export Features</h3>
+<ul>
+<li>A basic XPS exporter has been added.</li>
+</ul>
+
+<br>
+
+<h3>Usability/User Interface</h3>
+<ul>
+<li><b>New Properties Palette:</b> The Properties Palette has been rewritten and is now dockable.</li>
+<li><b>Document Setup/Preferences:</b></li>
+<li><b>File Preview: The preview in file selectors works for all types of graphics files, including vector graphics.</b></li>
+<li><b>Snap Mode:</b> The &ldquo;snap&rdquo; mode for guides is now active by default.</li>
+</ul>
+<br>
+<h3>The Scripter</h3>
+<p>The Scripter has been completely rewritten. Aside from being more flexible to add new scripting languages in the future, it provides many more features to create and modify documents, as well as adding new features by using Python scripts.</p>
+<h3>Help System</h3>
+<p>For the 1.5/1.6 series, the online manual now uses a CSS file to control and enhance the appearance of the text. The file is called <code>manual.css</code>, and like many aspects of Scribus can be modified to your liking. If available, the file will choose the typeface <strong>Fontin</strong> for various headings. This is a freely available font which can easily be added to your system.</p>
+
+<br>
+<br>
+</body>
+</html>

@@ -1,0 +1,224 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<title>Was ist neu in Scribus 1.4.3?</title>
+</head>
+<body>
+<h2>Was ist neu in Scribus 1.4.3?</h2>
+<p>Hier finden Sie einen &Uuml;berblick &uuml;ber die wesentlichen Erweiterungen von Scribus 1.4.3 im Vergleich zur letzten offiziell stabilen Version 1.3.3.14.</p>
+
+<p><b><i>Beachten Sie, da&szlig; sich das Dateiformat ge&auml;ndert hat und nicht r&uuml;ckw&auml;rtskompatibel ist. Sie k&ouml;nnen daher Dateien aus Version 1.4.3 nicht mit 1.3.3.14 oder einer fr&uuml;heren Version &ouml;ffnen.</i></b></p>
+<h3>Allgemeines</h3>
+<ol>
+<li>Beim ersten Start bietet 1.4.3 an, eine bestehende Konfiguration einer fr&uuml;heren Version (soweit relevant) zu &uuml;bernehmen. Die Konfigurationsdaten werden jedoch separat gespeichert, so da&szlig; Sie beide Versionen parallel verwenden k&ouml;nnen.</li>
+<li>Sie k&ouml;nnen beide Versionen nebeneinander installieren und parallel starten, aber Sie m&uuml;ssen darauf achten, sie in verschiedenen Verzeichnissen zu installieren. Unter Linux/UNIX hei&szlig;t das beispielsweise, 1.3.3.x nach <code>/opt</code> und 1.4.3 nach <code>/usr/local</code> oder <code>$home/bin</code> zu installieren. Wenn Sie Scribus aus dem Quellcode kompilieren, k&ouml;nnen Sie dazu <code>-DCMAKE_INSTALL_PREFIX:PATH=</code> verwenden, um das Zielverzeichnis festzulegen. Auf anderen Plattformen k&ouml;nnen Sie das Zielverzeichnis w&auml;hrend des Installationsprozesses der Bin&auml;rpakete ausw&auml;hlen.</li>
+</ol>
+<h3>Neues in Scribus 1.4.3</h3>
+
+<h4>Portierung auf Qt4</h4>
+<p>Die Portierung auf Version 4 des Qt-Toolkits war eine der gr&ouml;&szlig;ten Herausforderungen bei der Entwicklung von Version 1.4.x, doch der Aufwand hat sich gelohnt, denn er hat es uns erm&ouml;glicht, endlich Versionen f&uuml;r Mac OS&nbsp;X, Haiku und OS/2 bzw. eComStation anzubieten, die hinsichtlich ihrer Funktionalit&auml;t nicht mehr hinter den Linux- und Windows-Pendants zur&uuml;ckstehen. Dar&uuml;ber hinaus werden die folgenden Betriebssysteme unterst&uuml;tzt: Debian GNU/Hurd, FreeBSD, PC-BSD, NetBSD, OpenBSD, Solaris, OpenIndiana.</p>
+
+<h4>Objektbehandlung</h4>
+<ul>
+<li>Bedeutdende Erweiterungen zur &raquo;Mehrfach Duplizieren&laquo;-Funktion.</li>
+<li>Transformationswerkzeuge, wie in Illustrator.</li>
+<li>Neue Optionen zum Ausrichten und Verteilen von Objekten.</li>
+<li>Fortgeschrittene Optionen zur mehrfachen Objektauswahl.</li>
+</ul>
+
+<h4>Text und Typographie</h4>
+<h5><b>Typographie:</b></h5>
+<ul>
+<li>Glyphenstauchung.</li>
+<li>Variabler Abstand der ersten Zeile vom Textrahmen.</li>
+<li>Zeichenstile.</li>
+<li>Ein neuer Stilmanager mit Stilhierarchien, geklonten Stilen und Stilvererbung.</li>
+<li>Eine neue Zeichenpalette, die es erm&ouml;glicht, Glyphensammlungen zwischen verschiedenen Anwendern auszutauschen.</li>
+<li>Wichtige Verbesserungen der Silbentrennung.</li>
+<li>Optischer Randausgleich:</li>
+</ul>
+<br>
+<table width="100%">
+  <tbody>
+    <tr>
+      <td align="center"><img src="images/new1.png" title="Optischer Randausgleich" alt="Optischer Randausgleich" /></td>
+    </tr>
+    <tr>
+      <td><div align="center"><i>Optischer Randausgleich</i></div></td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<h5><b>Text</b></h5>
+<ul>
+<li>Rechtschreibpr&uuml;fung mit Hilfe von Hunspell.</li>
+<li>Neue Textvariable: Anzahl der Seiten.</li>
+<li>R&uuml;ckg&auml;ngig/Wiederherstellen steht nun auch f&uuml;r textbezogene Aktionen zur Verf&uuml;gung.</li>
+</ul>
+
+<h4>Vektorwerkzeuge</h4>
+
+<ul>
+<li>Neue Grundformen.</li>
+<li>Neue Pfadwerkzeuge, z.B. Boolesche Pfadoperationen, Linseneffekte oder Gitterverzerrung.</li>
+<li>Mehr Optionen f&uuml;r Text entlang Pfad.</li>
+</ul>
+<br>
+<table width="100%">
+  <tbody>
+    <tr>
+      <td align="center"><img src="images/new2.png" title="Boolsche Pfadoperationen" alt="Boolsche Pfadoperationen" /></td>
+    </tr>
+    <tr>
+      <td><div align="center"><i>Boolsche Pfadoperationen</i></div></td>
+    </tr>
+  </tbody>
+</table>
+<br>
+
+<h4>Linien</h4>
+<ul>
+<li>Neue Linienstile.</li>
+<li>Linienstil-Editor.</li>
+</ul>
+
+
+<h4>F&uuml;llfarben, Verl&auml;ufe und F&uuml;llmuster</h4>
+<ul>
+<li>Wesentliche Verbesserungen des Farbrades (Unterst&uuml;tzung f&uuml;r verschiedene Farbmodelle).</li>
+<li>Eine Option, s&auml;mtliche F&uuml;llfarben in einem Dokument in einem Schritt zu ersetzen.</li>
+<li>Unterst&uuml;tzung f&uuml;r externe Farbpalettenformate (EPS, AI, PS, SOC, GPL).</li>
+<li>Sperrung von Standardpaletten gegen versehentliche Modifikation.</li>
+<li>Viele neue Farbpaletten, darunter die nationalen bzw. Regierungsstandards von Australien, Frankreich, Japan, Gro&szlig;britannien und den USA; dazu Farbsysteme von Resene&#0174;, dtp studio, GiveLife Color System&reg; und Galaxy Gauge&trade;.</li>
+<li>Neue Verlaufstypen.</li>
+<li>Unterst&uuml;tzung f&uuml;r F&uuml;llmuster: Alle Grafikformate, die Scribus importieren kann, lassen sich als F&uuml;llmuster verwenden.</li>
+<li>Simulation von Farbenblindheit f&uuml;r alle Farben im Dokument.</li>
+</ul>
+<br>
+<table width="100%">
+  <tbody>
+    <tr>
+      <td align="center"><img src="images/new5.png" title="Das Ersetzen von F&uuml;llfarben" alt="Das Ersetzen von F&uuml;llfarben" /></td>
+    </tr>
+    <tr>
+      <td><div align="center"><i>Das Ersetzen von F&uuml;llfarben</i></div></td>
+    </tr>
+  </tbody>
+</table>
+<br>
+
+<h4>Transparenz</h4>
+<ul>
+<li>Transparenzeffekte, wie sie aus Photoshop oder GIMP bekannt sind, lassen sich nun auf alle Objekte und Ebenen anwenden.</li>
+</ul>
+
+<h4>Renderrahmen</h4>
+<ul>
+<li>Eines der wichtigsten neuen Features ist die Einf&uuml;hrung von Renderrahmen, einem besonderen Rahmentyp, in dem die Ausgabe von Programmen wie LaTeX, Lilypond oder POV-Ray in Scribus gerendert werden kann.</li></ul>
+<br>
+<table width="100%">
+  <tbody>
+    <tr>
+      <td align="center"><img src="images/new3.png" title="Editor f&uuml;r Renderrahmen" alt="Editor f&uuml;r Renderrahmen" /></td>
+    </tr>
+    <tr>
+      <td><div align="center"><i>Editor f&uuml;r Renderrahmen</i></div></td>
+    </tr>
+  </tbody>
+</table>
+<br>
+
+<h4>Strichcodes</h4>
+<p>
+<ul>
+<li>Der Strichcode-Genrator wurde gr&uuml;ndlich und unterst&uuml;tzt jetzt alle wichtigen Formate, darunter auch QR.</li>
+</ul>
+</p>
+
+<h4>Importfilter</h4>
+<ul>
+<li>Sehr viel Arbeit wurde auf neue Importfilter f&uuml;r Vektordaten verwendet, besonders auf den Filter f&uuml;r Adobe Illustrator (AI). Scribus kann nun sowohl EPS- als auch PDF-basierte AI-Dateien importieren. Weitere Filter sind: Windows Metafile (WMF), Xfig (FIG), Calamus Vector Graphics (CVG), Macintosh PICT (PICT), Kivio Stencils (SML) und Dia Shapes (SHAPE).</li></ul>
+
+<br>
+<table width="100%">
+  <tbody>
+    <tr>
+      <td align="center"><img src="images/new4.png" title="Adobe-Illustrator-Import" alt="Adobe-Illustrator-Import" /></td>
+    </tr>
+    <tr>
+      <td><div align="center"><i>Adobe-Illustrator-Import</i></div></td>
+    </tr>
+  </tbody>
+</table>
+<br>
+
+<h4>Bildbehandlung</h4>
+<ul>
+<li>Neue nichtdestruktive Bildeffekte.</li>
+<li>Bessere Unterst&uuml;tzung f&uuml;r PSD-spezifische Features wie Beschneidungspfade und Ebenen.</li>
+<li>Bedeutende Erweiterungen des Bildmanagers.</li>
+</ul>
+<br>
+<table width="100%">
+  <tbody>
+    <tr>
+      <td align="center"><img src="images/new6.png" title="Der neue Bildmanager" alt="Der neue Bildmanager" /></td>
+    </tr>
+    <tr>
+      <td><div align="center"><i>Der neue Bildmanager</i></div></td>
+    </tr>
+  </tbody>
+</table>
+<br>
+
+
+<h4>Ebenen</h4>
+<ul>
+<li>Scribus-Ebenen k&ouml;nnen jetzt als PDF-Ebenen exportiert werden.</li>
+<li>Ebenen lassen sich jetzt duplizieren.</li>
+<li>Umri&szlig;modus f&uuml;r Ebenen, um die Arbeitsgeschwindigkeit zu erh&ouml;hen.</li>
+<li>Textumflu&szlig; kann um Objekte auf einer tieferliegenden Ebene erzwungen werden.</li>
+</ul>
+
+<h4>Druckvorstufe</h4>
+<ul>
+<li>Erweiterungen der Druckvorschau, z.B. Anzeige des Farbauftrags.</li>
+<li>Verbesserungen der Druckvorstufen&uuml;berpr&uuml;fung.</li>
+<li>Neue Ausgabefunktion wie Beschnittzugabe und Passermarken.</li>
+<li>Optionale Umwandlung von Schmuck- in Proze&szlig;farben.</li>
+</ul>
+
+<h4>PDF-Export</h4>
+<ul>
+<li>Unterst&uuml;tzung f&uuml;r PDF-1.5-Features, z.B. Folieneffekte f&uuml;r Pr&auml;sentationen oder PDF-Ebenen.</li>
+<li>Optionales Einbetten von PDF- und EPS-Dateien in PDF-Dateien.</li>
+<li>Bessere Schrifteinbettung bzw. -umwandlung beim PDF-Export.</li>
+</ul>
+
+<h4>Benutzerfreundlichkeit</h4>
+<p>Viel Arbeit wurde auf zahllose gro&szlig;e und kleine Verbesserungen der Bedienbarkeit &uuml;berall im Programm verwendet, z.B.:</p>
+<ul>
+<li>Eine Suchfunktion f&uuml;r die Dokumentstruktur.</li>
+<li>Viel mehr Ansichtsoptionen, darunter die Vorschau des Dokuments ohne Hilfslinien und Rahmenr&auml;nder.</li>
+<li>Aktivierung des Farbmangements mit nur einem Klick.</li>
+<li>Kontextmen&uuml; f&uuml;r die Montagefl&auml;che, um Vektorgrafiken direkt einzuf&uuml;gen oder Ansichtsoptionen zu aktivieren.</li>
+<li>Viel mehr Optionen, um das Einf&uuml;gen von Rahmen zu automatisieren und zu beschleunigen (z.B. der &raquo;Einf&uuml;gen > Rahmen&laquo;-Dialog oder der &ldquo;Werkzeugmodus&rdquo;).</li>
+<li>Erweiterungen der Objektbibliothek.</li>
+</ul>
+
+<h4>Vorlagen</h4>
+<ul>
+<li>Viele Vorlagen, die von K&uuml;nstlern gespendet worden waren, wurden hinzugef&uuml;gt.</li>
+<li>Wir haben endlich damit begonnen, die Vorlagenkategorien und -beschreibungen in andere Sprachen zu &uuml;bersetzen.</li>
+</ul>
+
+<h4>Hilfesystem</h4>
+<ul>
+<li>Der Inhalt des Hilfesystems hat sich seit der Ver&ouml;ffentlichung der letzten stabilen Version 1.3.3.14 nahezu verdoppelt. Au&szlig;erdem wurden gro&szlig;e Teile der bestehenden Dokumentation aktualisiert oder vollkommmen neu geschrieben, um dem Funktionsumfang von Scribus 1.4 gerecht zu werden.</li>
+<li>Viele neue Tooltips wurden hinzugefügt, und existierende wurden erweitert.</li>
+<li>Hilferessourcen im Internet sind nun direkt &uuml;ber einen Men&uuml;punkt zug&auml;nglich.</li>
+</ul>
+<br>
+<br>
+</body>
+</html>

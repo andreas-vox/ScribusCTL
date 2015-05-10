@@ -1,0 +1,29 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<title>Scripting in Scribus mit Python</title>
+</head>
+<body>
+<h2>Scripting in Scribus mit Python</h2>
+
+<h3>&Uuml;bersicht</h3>
+<p>Mit Hilfe des Scripters k&ouml;nnen Sie die m&auml;chtige Programmiersprache Python als Scriptsprache in Scribus verwenden, etwa um sich wiederholende Aufgaben zu automatisieren oder neue Funktionen zu hinzuzuf&uuml;gen.</p>
+
+<p>Beachten Sie, da&szlig; der Scripter h&auml;ufig erweitert wird, so da&szlig; die hier verf&uuml;gbare Dokumentation teilweise unvollst&auml;ndig sein k&ouml;nnte.</p>
+
+
+<h3>Nutzung des Plug-ins</h3>
+<p>Scribus wird mit einigen &raquo;festverdrahteten&laquo; Scripten ausgeliefert, die Sie im Men&uuml; <i>Script&nbsp;&gt; Scripte f&uuml;r Scribus</i> finden:</p>
+
+<table width="100%"><tr><td align="center"><img src="images/Scripter.png" align="center" alt="Running a script" title="Running a script" /></td></tr></table>
+
+<p>Ein paar einfache Beispielscripte finden Sie im Unterverzeichnis <code>samples</code>. Wo sich dieses im einzelnen befindet, h&auml;ngt vom verwendeten Betriebssystem ab, z.B. <code>/usr/local/share/scribus</code> oder <code>/usr/share/scribus</code> unter Linux. Wenn Sie ein Script geschrieben haben, von dem Sie glauben, da&szlig; es f&uuml;r andere n&uuml;tzlich sein k&ouml;nnte, z&ouml;gern Sie nicht, es zum <a href="http://wiki.scribus.net/">Wiki</a> hinzuzuf&uuml;gen oder es an eine der <a href="mailing_lists.html">Mailinglisten</a> zu senden.</p>
+
+<p>Um ein externes Python-Script auszuf&uuml;hren, verwenden Sie <i>Script&nbsp;&gt; Script ausf&uuml;hren</i>. Scribus &ouml;ffnet dann einen Auswahldialog, in dem Sie das Script (Datei-Endung: *.py) ausw&auml;hlen k&ouml;nnen. <i>Script&nbsp;&gt; Zuletzt verwendete Scripte</i> zeigt eine Liste der zuletzt ausgef&uuml;hrten Scripte an.</p> 
+
+<p>Mit dem Scripter-Plug-in k&ouml;nnen Sie zahlreiche Python-Module verwenden. Die einzigen Ausnahmen sind solche, die die Eingabe von Parametern auf der Kommandozeile erwarten. Sie werden nicht funktionieren, weil das Plug-in dem Python-Interpreter eine leere Kommandozeile pr&auml;sentiert.</p>
+
+<p>Der Men&uuml;punkt <i>Script&nbsp;&gt; Konsole zeigen</i> startet eine interaktive Python-Konsole, in der Sie Befehle direkt ausf&uuml;hren k&ouml;nnen. Es ist nicht notwendig <code>from scribus import *</code> zu benutzen, weil dies schon automatisch geschehen ist. Sie k&ouml;nnen alle Befehle, die auf den folgenden Seiten beschrieben sind, ohne Pr&auml;fix verwenden.</p>
+<br>
+</body>
+</html>
