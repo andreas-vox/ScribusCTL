@@ -100,10 +100,11 @@ private:
     
     PdfId PDF_WriteFontDescriptor(const QByteArray& fontName, ScFace& face, ScFace::FontFormat fformat, PdfId embeddedFontObject);
     PdfFont PDF_WriteTtfSubsetFont(const QByteArray& fontName, ScFace& face, const QMap<uint,FPointArray>& RealGlyphs);
+    PdfFont PDF_WriteCffSubsetFont(const QByteArray& fontName, ScFace& face, const QMap<uint,FPointArray>& RealGlyphs);
     PdfFont PDF_EncodeSimpleFont(const QByteArray& fontname, ScFace& face,  const QByteArray& baseFont, const QByteArray& subtype, bool isEmbedded, PdfId fontDes, const ScFace::FaceEncoding& gl);
     PdfFont PDF_EncodeCidFont(const QByteArray& fontname, ScFace& face, const QByteArray& baseFont, PdfId fontDes, const ScFace::FaceEncoding& gl, const QMap<uint,uint> glyphmap);
     PdfId PDF_EmbedFontObject(const QString& fontName, ScFace &face);
-    PdfId PDF_EmbedTtfFontObject(const QByteArray& ttf);
+    PdfId PDF_EmbedFontObject(const QByteArray& ttf, const QByteArray& subtype);
     PdfId PDF_EmbedType1AsciiFontObject(const QByteArray& fontData);
     PdfId PDF_EmbedType1BinaryFontObject(const QByteArray& fontData);
     void PDF_Begin_Colors();

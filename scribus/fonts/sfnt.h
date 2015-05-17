@@ -32,6 +32,7 @@ namespace sfnt {
     void  appendWord16(QByteArray& bb, quint16 val);
     bool  copy(QByteArray & dst, uint to, const QByteArray & src, uint from, uint len);
     const QByteArray tag(QByteArray const & bb, uint pos);
+    const QByteArray getTable(const QByteArray& ttf, const QByteArray& ttfTag);
     
 
     QByteArray subsetFace(const QByteArray& ttf, QList<uint>& glyphs);
@@ -44,7 +45,7 @@ class SCRIBUS_API PostTable {
 public:
     bool usable;
     QString errorMsg;
-    int numberOfGlyphs() const;
+    uint numberOfGlyphs() const;
     QString nameFor(uint glyphId) const;
     void readFrom(FT_Face face);
 private:

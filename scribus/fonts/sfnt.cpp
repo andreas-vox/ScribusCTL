@@ -307,7 +307,7 @@ static const char* post_format10_names[] = {
 
 
 
-int PostTable::numberOfGlyphs() const
+uint PostTable::numberOfGlyphs() const
 {
     if (names.length() > 0)
         return names.length();
@@ -437,6 +437,7 @@ void PostTable::readFrom(FT_Face face)
 QByteArray extractFace(const QByteArray& coll, int faceIndex)
 {
     QByteArray result;
+    
     const int numFonts = word(coll, ttc_numFonts);
     if (faceIndex >= static_cast<int>(numFonts))
     {
@@ -1036,30 +1037,41 @@ QByteArray extractFace(const QByteArray& coll, int faceIndex)
     {
         QMap<QByteArray,QByteArray> tables;
         
-        QList<uint> oldLoca = readLoca(ttf);
-        const QByteArray oldGlyf = getTable(ttf, "glyf");
         
 //        qDebug() << "loca table:" << (void*) oldLoca[0] << (void*) oldLoca[1] << (void*) oldLoca[2] << (void*) oldLoca[3] << (void*) oldLoca[4] << (void*) oldLoca[5] << (void*) oldLoca[6] << (void*) oldLoca[7];
         
-        QList<quint32> newLoca;
-        QByteArray newGlyf;
 
-        glyphs.removeAll(0);
-        glyphs.prepend(0);
         QMap<uint,uint> newForOldGid;
-        uint nextFreeGid = glyphs.length();
-        for (int i = 0; i < glyphs.length(); ++i)
+        if (glyphs.length() == 0)
         {
-            uint oldGid = glyphs[i];
-            newForOldGid[oldGid] = i;
-            glyphs.append(copyGlyph(newLoca, newGlyf, i,
-                                    oldLoca, oldGlyf, oldGid,
-                                    newForOldGid, nextFreeGid));
+            tables["loca"] = getTable(ttf, "loca");
+            tables["glyf"] = getTable(ttf, "glyf");
         }
-        newLoca.append(newGlyf.length());
+        else
+        {
+            QList<uint> oldLoca = readLoca(ttf);
+            const QByteArray oldGlyf = getTable(ttf, "glyf");
+
+            QList<quint32> newLoca;
+            QByteArray newGlyf;
+            glyphs.removeAll(0);
+            glyphs.prepend(0);
+            
+            uint nextFreeGid = glyphs.length();
+            for (int i = 0; i < glyphs.length(); ++i)
+            {
+                uint oldGid = glyphs[i];
+                newForOldGid[oldGid] = i;
+                glyphs.append(copyGlyph(newLoca, newGlyf, i,
+                                        oldLoca, oldGlyf, oldGid,
+                                        newForOldGid, nextFreeGid));
+            }
+            newLoca.append(newGlyf.length());
+            
+            tables["loca"] = writeLoca(newLoca, hasLongLocaFormat(ttf));
+            tables["glyf"] = newGlyf;
+        }
         
-        tables["loca"] = writeLoca(newLoca, hasLongLocaFormat(ttf));
-        tables["glyf"] = newGlyf;
         
         QMap<uint,uint> cmap = readCMap(ttf);
         QMap<uint,uint>::iterator it;
@@ -1067,14 +1079,17 @@ QByteArray extractFace(const QByteArray& coll, int faceIndex)
         uint lastChar = 0;
         for (it = cmap.begin(); it != cmap.end(); ++it)
         {
-            if (!glyphs.contains(it.value()))
+            if (glyphs.length() > 0 && !glyphs.contains(it.value()))
             {
                 it.value() = 0;
             }
             else if (it.value() != 0)
             {
-                qDebug() << "MAP" << QChar(it.key()) << it.value() << "-->" << newForOldGid[it.value()];
-                it.value() = newForOldGid[it.value()];
+                if (glyphs.length() > 0)
+                {
+                    qDebug() << "MAP" << QChar(it.key()) << it.value() << "-->" << newForOldGid[it.value()];
+                    it.value() = newForOldGid[it.value()];
+                }
                 if (it.key() < firstChar)
                     firstChar = it.key();
                 else if (it.key() > lastChar)
@@ -1093,25 +1108,38 @@ QByteArray extractFace(const QByteArray& coll, int faceIndex)
             tables["OS/2"] = os2;
         }
         
-        QList<std::pair<qint16, quint16> > oldHmtx = readHmtx(ttf);
-        QList<std::pair<qint16, quint16> > newHmtx;
-        newHmtx.append(std::pair<qint16, quint16>(1234, 123));
-        for (int i = 1; i < glyphs.length(); ++i)
-            newHmtx.append(newHmtx[0]);
-        QMap<uint,uint>::const_iterator iter;
-        for (iter = newForOldGid.cbegin(); iter != newForOldGid.cend(); ++iter)
+        if (glyphs.length() > 0)
         {
-            qDebug() << "hmtx" << iter.key() << " -> " << iter.value() << "=" << oldHmtx[iter.key()].first;
-            newHmtx[iter.value()] = oldHmtx[iter.key()];
+            QList<std::pair<qint16, quint16> > oldHmtx = readHmtx(ttf);
+            QList<std::pair<qint16, quint16> > newHmtx;
+            newHmtx.append(std::pair<qint16, quint16>(1234, 123));
+            for (int i = 1; i < glyphs.length(); ++i)
+                newHmtx.append(newHmtx[0]);
+            QMap<uint,uint>::const_iterator iter;
+            for (iter = newForOldGid.cbegin(); iter != newForOldGid.cend(); ++iter)
+            {
+                qDebug() << "hmtx" << iter.key() << " -> " << iter.value() << "=" << oldHmtx[iter.key()].first;
+                newHmtx[iter.value()] = oldHmtx[iter.key()];
+            }
+            tables["hmtx"] = writeHmtx(newHmtx);
         }
-        tables["hmtx"] = writeHmtx(newHmtx);
+        else
+        {
+            tables["hmtx"] = getTable(ttf, "hmtx");
+        }
         
         QByteArray maxp = getTable(ttf, "maxp");
-        putWord16(maxp, ttf_maxp_numGlyphs, glyphs.length());
+        if (glyphs.length() > 0)
+        {
+            putWord16(maxp, ttf_maxp_numGlyphs, glyphs.length());
+        }
         tables["maxp"] = maxp;
         
         QByteArray hhea = getTable(ttf, "hhea");
-        putWord16(hhea, ttf_hhea_numOfLongHorMetrics, glyphs.length());
+        if (glyphs.length() > 0)
+        {
+            putWord16(hhea, ttf_hhea_numOfLongHorMetrics, glyphs.length());
+        }
         tables["hhea"] = hhea;
         
         QByteArray post = getTable(ttf, "post");
@@ -1121,6 +1149,8 @@ QByteArray extractFace(const QByteArray& coll, int faceIndex)
             post.truncate(ttf_post_header_length);
         }
         tables["post"] = post;
+        
+        // TODO: kern table
         
         QByteArray name = getTable(ttf, "name");
         if (name.length() > 0)
@@ -1157,7 +1187,6 @@ QByteArray extractFace(const QByteArray& coll, int faceIndex)
         putWord(font, headTable + ttf_head_checkSumAdjustment, checkSumAdjustment);
         
         // done!
-        // TODO: kern tables
         
         return font;
     }
