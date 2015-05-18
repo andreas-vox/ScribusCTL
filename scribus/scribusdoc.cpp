@@ -174,7 +174,7 @@ public:
 		if (doLayout)
 			it->layout();
 		double x, y, w, h;
-		QTransform t = it->getCombinedTransform();
+		QTransform t = it->getTransform();
 		w = it->visualWidth();
 		h = it->visualHeight();
 		x = -it->visualLineWidth() / 2.0;
@@ -4418,31 +4418,17 @@ QMap<QString,int> ScribusDoc::reorganiseFonts()
 
 void ScribusDoc::getUsedFonts(QMap<QString, QMap<uint, FPointArray> > & Really)
 {
-	QList<PageItem*> allItems;
+	QList<PageItem*>  allItems;
+	QList<PageItem*>* itemLists[] = { &MasterItems, &DocItems };
 	PageItem* it = NULL;
 	uint counter = 0;
 	for (uint lc = 0; lc < 2; ++lc)
 	{
-		switch (lc)
-		{
-			case 0:
-				counter = MasterItems.count();
-				break;
-			case 1:
-				counter = DocItems.count();
-				break;
-		}
+		QList<PageItem*>* itemList = itemLists[lc];
+		counter = itemList->count();
 		for (uint d = 0; d < counter; ++d)
 		{
-			switch (lc)
-			{
-				case 0:
-					it = MasterItems.at(d);
-					break;
-				case 1:
-					it = DocItems.at(d);
-					break;
-			}
+			it = itemList->at(d);
 			if (it->isGroup())
 				allItems = it->asGroupFrame()->getItemList();
 			else
@@ -6012,7 +5998,7 @@ int ScribusDoc::OnPage(PageItem *currItem)
 		double y = currentPage()->yOffset() - docPrefsData.docSetupPrefs.bleeds.top();
 		double w = currentPage()->width() + docPrefsData.docSetupPrefs.bleeds.left() + docPrefsData.docSetupPrefs.bleeds.right();
 		double h1 = currentPage()->height() + docPrefsData.docSetupPrefs.bleeds.bottom() + docPrefsData.docSetupPrefs.bleeds.top();
-		QTransform t = currItem->getCombinedTransform();
+		QTransform t = currItem->getTransform();
 		double w2 = currItem->visualWidth();
 		double h2 = currItem->visualHeight();
 		double x2 = -currItem->visualLineWidth() / 2.0;
@@ -6033,7 +6019,7 @@ int ScribusDoc::OnPage(PageItem *currItem)
 			double y = Pages->at(a)->yOffset() - pageBleeds.top();
 			double w = Pages->at(a)->width() + pageBleeds.left() + pageBleeds.right();
 			double h1 = Pages->at(a)->height() + pageBleeds.bottom() + pageBleeds.top();
-			QTransform t = currItem->getCombinedTransform();
+			QTransform t = currItem->getTransform();
 			double w2 = currItem->visualWidth();
 			double h2 = currItem->visualHeight();
 			double x2 = -currItem->visualLineWidth() / 2.0;
@@ -6108,7 +6094,7 @@ void  ScribusDoc::fixItemPageOwner()
 			double y1 = page->yOffset() - pageBleeds.top();
 			double w1 = page->width()   + pageBleeds.left() + pageBleeds.right();
 			double h1 = page->height()  + pageBleeds.bottom() + pageBleeds.top();
-			QTransform t = currItem->getCombinedTransform();
+			QTransform t = currItem->getTransform();
 			double w2 = currItem->visualWidth();
 			double h2 = currItem->visualHeight();
 			double x2 = -currItem->visualLineWidth() / 2.0;

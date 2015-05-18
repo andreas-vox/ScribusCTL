@@ -1179,7 +1179,7 @@ void ScribusMainWindow::addDefaultWindowMenuItems()
 	scrMenuMgr->addMenuItemString("toolsPages", "Windows");
 	scrMenuMgr->addMenuItemString("toolsLayers", "Windows");
 	scrMenuMgr->addMenuItemString("toolsBookmarks", "Windows");
-	scrMenuMgr->addMenuItemString("toolsDownloads", "Windows");
+//	scrMenuMgr->addMenuItemString("toolsDownloads", "Windows");
 	scrMenuMgr->addMenuItemString("toolsResources", "Windows");
 	scrMenuMgr->addMenuItemString("SEPARATOR", "Windows");
 	scrMenuMgr->addMenuItemString("toolsScrapbook", "Windows");
@@ -2693,8 +2693,8 @@ void ScribusMainWindow::HaveNewSel()
 	charPalette->setEnabled(false, 0);
 	view->horizRuler->textMode(false);
 	view->horizRuler->update();
-
-	appModeHelper->enableActionsForSelection(this, doc);
+	if (!doc->inAnEditMode())
+		appModeHelper->enableActionsForSelection(this, doc);
 
 	switch (SelectedType)
 	{
@@ -6436,44 +6436,39 @@ void ScribusMainWindow::selectItemsFromOutlines(PageItem* ite, bool single, int 
 	view->Deselect(true);
 	if (!doc->symbolEditMode() && !doc->inlineEditMode())
 	{
-		if ((ite->OwnPage != -1) && (ite->OwnPage != static_cast<int>(doc->currentPage()->pageNr())))
-			view->GotoPage(ite->OwnPage);
+		int itemPage = ite->OwnPage;
+		PageItem* parentItem = ite->Parent;
+		while (parentItem && parentItem->isGroup())
+		{
+			itemPage = parentItem->OwnPage;
+			parentItem = parentItem->Parent;
+		}
+		if ((itemPage != -1) && (itemPage != static_cast<int>(doc->currentPage()->pageNr())))
+			view->GotoPage(itemPage);
 	}
 	doc->m_Selection->delaySignalsOn();
 	view->SelectItem(ite, true, single);
 	doc->m_Selection->delaySignalsOff();
-	doc->m_Selection->connectItemToGUI();
-	if (!doc->m_Selection->isEmpty())
-	{
-		PageItem *currItem = doc->m_Selection->itemAt(0);
-	 	double rotation=currItem->rotation();
-		if ( rotation != 0.0 )
-		{
-			double MPI180=1.0/(180.0*M_PI);
-			double y1 = sin(rotation*MPI180) * currItem->width();
-			double x1 = cos(rotation*MPI180) * currItem->width();
-			double y2 = sin((rotation+90.0)*MPI180) * currItem->height();
-			double x2 = cos((rotation+90.0)*MPI180) * currItem->height();
-			double mx = currItem->xPos() + ((x1 + x2)/2.0);
-			double my = currItem->yPos() + ((y1 + y2)/2.0);
-			view->SetCCPo(mx, my);
-		}
-		else
-		{
-			double xOffset=0.0,yOffset=0.0;
-			switch (position)
-			{
-				case 1: //top left
-					break;
-				default: //center
-					xOffset = currItem->width() / 2.0;
-					yOffset = currItem->height() / 2.0;
-					break;
-			}
 
-			view->SetCCPo(currItem->xPos() + xOffset, currItem->yPos() + yOffset);
-		}
+	if (doc->m_Selection->isEmpty())
+		return;
+	doc->m_Selection->connectItemToGUI();
+
+	PageItem *currItem = doc->m_Selection->itemAt(0);
+	QTransform itemTrans = currItem->getTransform();
+	double xOffset=0.0,yOffset=0.0;
+	switch (position)
+	{
+		case 1: //top left
+			break;
+		default: //center
+			xOffset = currItem->width() / 2.0;
+			yOffset = currItem->height() / 2.0;
+			break;
 	}
+
+	QPointF point = itemTrans.map(QPointF(xOffset, yOffset));
+	view->SetCCPo(point.x(), point.y());
 }
 
 void ScribusMainWindow::selectItemFromOutlines(PageItem *ite, bool single, int cPos)
@@ -7234,10 +7229,10 @@ QStringList ScribusMainWindow::scrapbookNames()
 
 void ScribusMainWindow::updateLayerMenu()
 {
-	bool b = layerMenu->blockSignals(true);
-	layerMenu->clear();
 	if (doc==NULL)
 		return;
+	bool b = layerMenu->blockSignals(true);
+	layerMenu->clear();
 	QStringList newNames;
 	doc->orderedLayerList(&newNames);
 	for (QStringList::Iterator it=newNames.begin(); it!=newNames.end(); ++it)

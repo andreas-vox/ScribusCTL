@@ -128,7 +128,9 @@ PDFLibCore::PDFLibCore(ScribusDoc & docu)
 	spotCount(0),
 	progressDialog(0),
 	abortExport(false),
-	usingGUI(ScCore->usingGUI())
+	usingGUI(ScCore->usingGUI()),
+	bleedDisplacementX(0),
+	bleedDisplacementY(0)
 {
 //	KeyGen.resize(32);
 //	OwnerKey.resize(32);
@@ -2190,8 +2192,13 @@ bool PDFLibCore::PDF_TemplatePage(const ScPage* pag, bool )
 	ll.isPrintable = false;
 	ll.ID = 0;
 	Content = "";
+
+	double bLeft, bRight, bBottom, bTop;
+	getBleeds(pag, bLeft, bRight, bBottom, bTop);
+
 	pageData.AObjects.clear();
-	for (int la = 0; la < doc.Layers.count(); ++la)
+
+    for (int la = 0; la < doc.Layers.count(); ++la)
 	{
 		doc.Layers.levelToLayer(ll, Lnr);
 		PItems = doc.MasterItems;
@@ -2205,8 +2212,6 @@ bool PDFLibCore::PDF_TemplatePage(const ScPage* pag, bool )
 				ite =PItems.at(a);
 				if (ite->LayerID != ll.ID)
 					continue;
-				double bLeft, bRight, bBottom, bTop;
-				getBleeds(pag, bLeft, bRight, bBottom, bTop);
 				double x  = pag->xOffset() - bLeft;
 				double y  = pag->yOffset() - bTop;
 				double w  = pag->width() + bLeft + bRight;
@@ -2774,8 +2779,8 @@ bool PDFLibCore::PDF_TemplatePage(const ScPage* pag, bool )
 							QTransform trans;
 							trans.scale(ite->width() / ite->groupWidth, ite->height() / ite->groupHeight);
 							trans.translate(0.0, -ite->height());
-							//trans.translate(ite->groupItemList.at(0)->gXpos, -ite->groupItemList.at(0)->gYpos);
 							PutPage(FToStr(trans.m11())+" "+FToStr(trans.m12())+" "+FToStr(trans.m21())+" "+FToStr(trans.m22())+" "+FToStr(trans.dx())+" "+FToStr(trans.dy())+" cm\n");
+							groupStackPos.push(QPointF(ite->xPos(), ite->height()));
 							for (int em = 0; em < ite->groupItemList.count(); ++em)
 							{
 								PageItem* embedded = ite->groupItemList.at(em);
@@ -2783,7 +2788,7 @@ bool PDFLibCore::PDF_TemplatePage(const ScPage* pag, bool )
 								tmpD +=  "1 0 0 1 "+FToStr(embedded->gXpos)+" "+FToStr(ite->height() - embedded->gYpos)+" cm\n";
 								QByteArray output;
 								if (inPattern > 0)
-									patternStackPos.push(QPointF(embedded->gXpos, -(embedded->gYpos - ite->height())));
+									patternStackPos.push(QPointF(embedded->gXpos, ite->height() - embedded->gYpos));
 								if (!PDF_ProcessItem(output, embedded, pag, pag->pageNr(), true, true))
 									return "";
 								if (inPattern)
@@ -2791,10 +2796,11 @@ bool PDFLibCore::PDF_TemplatePage(const ScPage* pag, bool )
 								tmpD += output;
 								tmpD += "Q\n";
 							}
+							groupStackPos.pop();
 							if (Options.Version >= PDFOptions::PDFVersion_14 || Options.Version == PDFOptions::PDFVersion_X4)
 								PutPage(Write_TransparencyGroup(ite->fillTransparency(), ite->fillBlendmode(), tmpD, ite));
 							else
-								PutPage(tmpD);
+								PutPage(Write_FormXObject(tmpD, ite));
 							PutPage("Q\n");
 						}
 						break;
@@ -3371,7 +3377,7 @@ bool PDFLibCore::PDF_ProcessPage(const ScPage* pag, uint PNr, bool clip)
 bool PDFLibCore::PDF_ProcessMasterElements(const ScLayer& layer, const ScPage* pag, uint PNr)
 {
 	PageItem* ite;
-	QByteArray output;
+	QByteArray content, output;
 	QList<PageItem*> PItems;
 
 	if (pag->MPageNam.isEmpty())
@@ -3400,7 +3406,12 @@ bool PDFLibCore::PDF_ProcessMasterElements(const ScLayer& layer, const ScPage* p
                                          .replace("%1", Pdf::toPdf(mPageIndex))
                                          .replace("%2", Pdf::toPdf(qHash(ite)));
 			if ((!ite->asTextFrame()) && (!ite->asPathText()) && (!ite->asTable()))
-				PutPage(name + " Do\n");
+			{
+				if (((layer.transparency != 1) || (layer.blendMode != 0)) && ((Options.Version >= PDFOptions::PDFVersion_14) || (Options.Version == PDFOptions::PDFVersion_X4)))
+					content += (name + " Do\n");
+				else
+					PutPage(name + " Do\n");
+			}
 			else
 			{
 				double oldX = ite->xPos();
@@ -3411,11 +3422,56 @@ bool PDFLibCore::PDF_ProcessMasterElements(const ScLayer& layer, const ScPage* p
 				ite->setYPos(ite->yPos() - mPage->yOffset() + pag->yOffset(), true);
 				if (!PDF_ProcessItem(output, ite, pag, pag->pageNr()))
 					return false;
-				PutPage(output);
+				if (((layer.transparency != 1) || (layer.blendMode != 0)) && ((Options.Version >= PDFOptions::PDFVersion_14) || (Options.Version == PDFOptions::PDFVersion_X4)))
+					content += output;
+				else
+					PutPage(output);
 				ite->setXYPos(oldX, oldY, true);
 				ite->BoundingX = OldBX;
 				ite->BoundingY = OldBY;
 			}
+		}
+		// Couldn't we use Write_TransparencyGroup() here?
+		if (((layer.transparency != 1) || (layer.blendMode != 0)) && ((Options.Version >= PDFOptions::PDFVersion_14) ||(Options.Version == PDFOptions::PDFVersion_X4)))
+		{
+			PdfId Gobj = writer.newObject();
+			writer.startObj(Gobj);
+			PutDoc("<< /Type /Group\n");
+			PutDoc("/S /Transparency\n");
+			PutDoc("/I false\n");
+			PutDoc("/K false\n");
+            PutDoc(">>");
+            writer.endObj(Gobj);
+			QByteArray ShName = ResNam+QByteArray::number(ResCount);
+			ResCount++;
+			Transpar[ShName] = writeGState("/CA "+FToStr(layer.transparency)+"\n"
+										   + "/ca "+FToStr(layer.transparency)+"\n"
+										   + "/SMask /None\n/AIS false\n/OPM 1\n"
+										   + "/BM /" + blendMode(layer.blendMode) + "\n");
+			PdfId formObject = writer.newObject();
+			writer.startObj(formObject);
+			PutDoc("<<\n/Type /XObject\n/Subtype /Form\n/FormType 1\n");
+			double bleedRight = 0.0;
+			double bleedLeft  = 0.0;
+			getBleeds(ActPageP, bleedLeft, bleedRight);
+			double maxBoxX = ActPageP->width()+bleedRight+bleedLeft;
+			double maxBoxY = ActPageP->height()+Options.bleeds.top()+Options.bleeds.bottom();
+			PutDoc("/BBox [ "+FToStr(-bleedLeft)+" "+FToStr(-Options.bleeds.bottom())+" "+FToStr(maxBoxX)+" "+FToStr(maxBoxY)+" ]\n");
+			PutDoc("/Group "+QByteArray::number(Gobj)+" 0 R\n");
+			if (Options.Compress)
+				content = CompressArray(content);
+			PutDoc("/Length "+QByteArray::number(content.length()+1));
+			if (Options.Compress)
+				PutDoc("\n/Filter /FlateDecode");
+            PutDoc(" >>\nstream\n"+EncStream(content, formObject)+"\nendstream");
+            writer.endObj(formObject);
+            QByteArray name = ResNam+QByteArray::number(ResCount);
+			ResCount++;
+			pageData.XObjects[name] = formObject;
+			PutPage("q\n");
+			PutPage("/"+ShName+" gs\n");
+			PutPage("/"+name+" Do\n");
+			PutPage("Q\n");
 		}
 		if (((Options.Version == PDFOptions::PDFVersion_15) || (Options.Version == PDFOptions::PDFVersion_X4)) && (Options.useLayers))
 			PutPage("EMC\n");
@@ -3453,6 +3509,7 @@ bool PDFLibCore::PDF_ProcessPageElements(const ScLayer& layer, const ScPage* pag
 			else
 				PutPage(output);
 		}
+		// Couldn't we use Write_TransparencyGroup() here?
 		if (((layer.transparency != 1) || (layer.blendMode != 0)) && ((Options.Version >= PDFOptions::PDFVersion_14) ||(Options.Version == PDFOptions::PDFVersion_X4)))
 		{
 			int Gobj = writer.newObject();
@@ -3497,6 +3554,78 @@ bool PDFLibCore::PDF_ProcessPageElements(const ScLayer& layer, const ScPage* pag
 			PutPage("EMC\n");
 	}
 	return true;
+}
+
+QByteArray PDFLibCore::Write_FormXObject(QByteArray &data, PageItem *controlItem)
+{
+	QByteArray retString = "";
+	PdfId formObject = writer.newObject();
+	writer.startObj(formObject);
+	PutDoc("<<\n/Type /XObject\n/Subtype /Form\n/FormType 1\n");
+	double bleedRight = 0.0;
+	double bleedLeft  = 0.0;
+	getBleeds(ActPageP, bleedLeft, bleedRight);
+	double maxBoxX = ActPageP->width()+bleedRight+bleedLeft;
+	double maxBoxY = ActPageP->height()+Options.bleeds.top()+Options.bleeds.bottom();
+	if (controlItem != NULL)
+	{
+		double scaleW, scaleH;
+		if (controlItem->isGroup())
+		{
+			if (controlItem->groupWidth > controlItem->width())
+				scaleW = controlItem->groupWidth / controlItem->width();
+			else
+				scaleW = 1.0 / (controlItem->groupWidth / controlItem->width());
+			if (controlItem->groupHeight > controlItem->height())
+				scaleH = controlItem->groupHeight / controlItem->height();
+			else
+				scaleH = 1.0 / (controlItem->groupHeight / controlItem->height());
+		//	PutDoc("/BBox [ "+FToStr(0)+" "+FToStr(-controlItem->height() * scaleH)+" "+FToStr(controlItem->groupWidth * scaleW)+" "+FToStr(controlItem->groupHeight * scaleH)+" ]\n");
+			PutDoc("/BBox [ "+FToStr(0)+" "+FToStr(-controlItem->height() * scaleH)+" "+FToStr(ActPageP->width())+" "+FToStr(controlItem->groupHeight * scaleH)+" ]\n");
+		}
+		if (controlItem->isSymbol())
+		{
+			ScPattern pat = doc.docPatterns[controlItem->pattern()];
+			if (pat.width > controlItem->width())
+				scaleW = pat.width / controlItem->width();
+			else
+				scaleW = 1.0 / (pat.width / controlItem->width());
+			if (pat.height > controlItem->height())
+				scaleH = pat.height / controlItem->height();
+			else
+				scaleH = 1.0 / (pat.height / controlItem->height());
+			PutDoc("/BBox [ "+FToStr(0)+" "+FToStr(-controlItem->height() * scaleH)+" "+FToStr(pat.width * scaleW)+" "+FToStr(pat.height * scaleH)+" ]\n");
+		}
+	}
+	else
+		PutDoc("/BBox [ "+FToStr(-bleedLeft)+" "+FToStr(-Options.bleeds.bottom())+" "+FToStr(maxBoxX)+" "+FToStr(maxBoxY)+" ]\n");
+    PutDoc("/Resources ");
+    Pdf::ResourceDictionary dict;
+    dict.XObject.unite(pageData.ImgObjects);
+    dict.XObject.unite(pageData.XObjects);
+    dict.Font = pageData.FObjects;
+    dict.Shading = Shadings;
+    dict.Pattern = Patterns;
+    dict.ExtGState = Transpar;
+    dict.ColorSpace.append(asColorSpace(ICCProfiles.values()));
+    dict.ColorSpace.append(asColorSpace(spotMap.values()));
+    writer.write(dict);
+        
+	PutDoc(">>\n");
+	if (Options.Compress)
+		data = CompressArray(data);
+	PutDoc("/Length "+QByteArray::number(data.length()+1));
+	if (Options.Compress)
+		PutDoc("\n/Filter /FlateDecode");
+    PutDoc(" >>\nstream\n"+EncStream(data, formObject)+"\nendstream");
+    writer.endObj(formObject);
+	QByteArray name = ResNam+QByteArray::number(ResCount);
+	ResCount++;
+	pageData.XObjects[name] = formObject;
+	retString += "q\n";
+	retString += "/"+name+" Do\n";
+	retString += "Q\n";
+	return retString;
 }
 
 QByteArray PDFLibCore::Write_TransparencyGroup(double trans, int blend, QByteArray &data, PageItem *controlItem)
@@ -3612,19 +3741,57 @@ QByteArray PDFLibCore::PDF_PutSoftShadow(PageItem* ite, const ScPage *pag)
 	maxSize = qMin(3000.0, maxSize * (softShadowDPI / 72.0));
 	bool savedShadow = ite->hasSoftShadow();
 	ite->setHasSoftShadow(false);
+	bool tmpFillNeeded = false;
+	if (!ite->hasFill())
+	{
+		tmpFillNeeded = true;
+		ite->setFillColor("White");
+	}
 	QImage imgC = ite->DrawObj_toImage(maxSize, PageItem::NoRotation);
-	ite->setHasSoftShadow(savedShadow);
-
 	imgC = imgC.copy(-pixelRadius,-pixelRadius,imgC.width()+2*pixelRadius,imgC.height()+2*pixelRadius); // Add border
-	ScImage img = imgC.alphaChannel().convertToFormat(QImage::Format_RGB32);
+	ScPainter *p = new ScPainter(&imgC, imgC.width(), imgC.height(), 1, 0);
+	p->setZoomFactor(softShadowDPI / 72.0);
+	p->save();
+	p->blur(pixelRadius);
+	p->restore();
+	p->end();
+	delete p;
+	if (tmpFillNeeded)
+	{
+		ScPainter *p = new ScPainter(&imgC, imgC.width(), imgC.height(), 1, 0);
+		p->setZoomFactor(softShadowDPI / 72.0);
+		p->save();
+		FPointArray sh = ite->PoLine.copy();
+		p->setupPolygon(&sh);
+		p->setBrush(Qt::white);
+		p->setFillMode(ScPainter::Solid);
+		p->setBlendModeFill(19);
+		p->fillPath();
+		if (ite->hasStroke())
+		{
+			p->setBlendModeStroke(19);
+			p->setStrokeMode(ScPainter::Solid);
+			p->setPen(Qt::white);
+			p->setLineWidth(ite->lineWidth());
+			p->strokePath();
+		}
+		p->restore();
+		p->end();
+		delete p;
+	}
 
+	ite->setHasSoftShadow(savedShadow);
+	if (tmpFillNeeded)
+		ite->setFillColor(CommonStrings::None);
+	ScImage img = imgC.alphaChannel().convertToFormat(QImage::Format_RGB32);
+/*
 	ImageEffect eff;
 	ScImageEffectList el;
 	eff.effectCode = ScImage::EF_BLUR;
     eff.effectParameters = Pdf::toPdf(pixelRadius) + " 1.0";
 	el.append(eff);
 	img.applyEffect(el,ite->doc()->PageColors,false);
-
+*/
 	PdfId maskObj = writer.newObject();
 	writer.startObj(maskObj);
 	PutDoc("<<\n/Type /XObject\n/Subtype /Image\n");
@@ -4543,7 +4710,7 @@ bool PDFLibCore::PDF_ProcessItem(QByteArray& output, PageItem* ite, const ScPage
 					tmpD +=  "1 0 0 1 "+FToStr(embedded->gXpos)+" "+FToStr(ite->height() - embedded->gYpos)+" cm\n";
 					QByteArray output;
 					if (inPattern > 0)
-						patternStackPos.push(QPointF(embedded->gXpos, -(embedded->gYpos - ite->height())));
+						patternStackPos.push(QPointF(embedded->gXpos, ite->height() - embedded->gYpos));
 					if (!PDF_ProcessItem(output, embedded, pag, PNr, true))
 						return "";
 					if (inPattern > 0)
@@ -4555,7 +4722,7 @@ bool PDFLibCore::PDF_ProcessItem(QByteArray& output, PageItem* ite, const ScPage
 				if (Options.Version >= PDFOptions::PDFVersion_14 || Options.Version == PDFOptions::PDFVersion_X4)
 					tmp += Write_TransparencyGroup(ite->fillTransparency(), ite->fillBlendmode(), tmpD, ite);
 				else
-					tmp += tmpD;
+					tmp += Write_FormXObject(tmpD, ite);
 				tmp += "Q\n";
 			}
 			break;
@@ -6503,7 +6670,10 @@ QByteArray PDFLibCore::PDF_TransparenzFill(PageItem *currItem)
 	}
 	else
 	{
-		Transpar[ShName] = writeGState("/ca "+FToStr(1.0 - currItem->fillTransparency())+"\n/SMask /None\n/AIS false\n/OPM 1\n/BM /" + blendMode(currItem->fillBlendmode()) + "\n");
+		if (currItem->GrType == 14)
+			Transpar[ShName] = writeGState("/CA "+FToStr(1.0 - currItem->fillTransparency())+"\n/ca "+FToStr(1.0 - currItem->fillTransparency())+"\n/SMask /None\n/AIS false\n/OPM 1\n/BM /" + blendMode(currItem->fillBlendmode()) + "\n");
+		else
+			Transpar[ShName] = writeGState("/ca "+FToStr(1.0 - currItem->fillTransparency())+"\n/SMask /None\n/AIS false\n/OPM 1\n/BM /" + blendMode(currItem->fillBlendmode()) + "\n");
 		tmp = Pdf::toName(ShName) + " gs\n";
 	}
 	return tmp;

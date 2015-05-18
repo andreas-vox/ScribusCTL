@@ -52,8 +52,8 @@ void ImportSmlPlugin::languageChange()
 {
 	importAction->setText( tr("Import Sml..."));
 	FileFormat* fmt = getFormatByExt("sml");
-	fmt->trName = tr("Kivio Stencils \"*.sml\" File");
-	fmt->filter = tr("Kivio Stencils \"*.sml\" File (*.sml *.SML)");
+	fmt->trName = tr("Kivio Stencils");
+	fmt->filter = tr("Kivio Stencils (*.sml *.SML)");
 }
 
 ImportSmlPlugin::~ImportSmlPlugin()

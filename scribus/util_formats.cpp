@@ -75,30 +75,30 @@ FormatsManager::FormatsManager()
 	m_fmts.insert(FormatsManager::UNICONV, QStringList() << "cdt" << "ccx" << "cmx" << "aff" << "sk" << "sk1" << "plt" << "dxf" << "dst" << "pes" << "exp" << "pcs");
 	m_fmts.insert(FormatsManager::PCT,  QStringList() << "pct" << "pic" << "pict");
 
-	m_fmtNames[FormatsManager::EPS]  = QObject::tr("Encapsulated PostScript \"*.eps\"");
+	m_fmtNames[FormatsManager::EPS]  = QObject::tr("Encapsulated PostScript");
 	m_fmtNames[FormatsManager::GIF]  = QObject::tr("GIF");
 	m_fmtNames[FormatsManager::JPEG] = QObject::tr("JPEG");
 	m_fmtNames[FormatsManager::PAT]  = QObject::tr("Pattern Files");
 	m_fmtNames[FormatsManager::PDF]  = QObject::tr("PDF Document");
 	m_fmtNames[FormatsManager::PGF]  = QObject::tr("PGF");
 	m_fmtNames[FormatsManager::PNG]  = QObject::tr("PNG");
-	m_fmtNames[FormatsManager::PS]   = QObject::tr("PostScript \"*.ps\"");
-	m_fmtNames[FormatsManager::PSD]  = QObject::tr("Adobe Photoshop \"*.psd\"");
+	m_fmtNames[FormatsManager::PS]   = QObject::tr("PostScript");
+	m_fmtNames[FormatsManager::PSD]  = QObject::tr("Adobe Photoshop");
 	m_fmtNames[FormatsManager::TIFF] = QObject::tr("TIFF");
 	m_fmtNames[FormatsManager::XPM]  = QObject::tr("XPM");
-	m_fmtNames[FormatsManager::WMF]  = QObject::tr("Windows Meta File \"*.wmf\"");
-	m_fmtNames[FormatsManager::SVG]  = QObject::tr("Scalable Vector Graphics \"*.svg\"");
-	m_fmtNames[FormatsManager::AI]   = QObject::tr("Adobe Illustrator \"*.ai\"");
+	m_fmtNames[FormatsManager::WMF]  = QObject::tr("Windows Meta File");
+	m_fmtNames[FormatsManager::SVG]  = QObject::tr("Scalable Vector Graphics");
+	m_fmtNames[FormatsManager::AI]   = QObject::tr("Adobe Illustrator");
 	m_fmtNames[FormatsManager::XFIG] = QObject::tr("Xfig File");
-	m_fmtNames[FormatsManager::CVG]  = QObject::tr("Calamus CVG File");
-	m_fmtNames[FormatsManager::WPG]  = QObject::tr("Word Perfect WPG File");
+	m_fmtNames[FormatsManager::CVG]  = QObject::tr("Calamus CVG");
+	m_fmtNames[FormatsManager::WPG]  = QObject::tr("Word Perfect WPG");
 	m_fmtNames[FormatsManager::BMP]  = QObject::tr("BMP");
-	m_fmtNames[FormatsManager::ORA]  = QObject::tr("Open Raster Files");
+	m_fmtNames[FormatsManager::ORA]  = QObject::tr("Open Raster");
 #ifdef GMAGICK_FOUND
-	m_fmtNames[FormatsManager::GMAGICK] = QObject::tr("GraphicsMagick File");
+	m_fmtNames[FormatsManager::GMAGICK] = QObject::tr("GraphicsMagick");
 #endif
-	m_fmtNames[FormatsManager::UNICONV] = QObject::tr("UniConvertor File");
-	m_fmtNames[FormatsManager::PCT]  = QObject::tr("Macintosh Pict File");
+	m_fmtNames[FormatsManager::UNICONV] = QObject::tr("UniConvertor");
+	m_fmtNames[FormatsManager::PCT]  = QObject::tr("Macintosh Pict");
 	m_fmtNames[FormatsManager::QT]  = QObject::tr("Qt supported File");
 
 	m_fmtMimeTypes.insert(FormatsManager::EPS,  QStringList() << "application/postscript");
@@ -321,10 +321,10 @@ void FormatsManager::fileTypeStrings(int type, QString& formatList, QString& for
 
 bool extensionIndicatesPDF(const QString &ext)
 {
-// 	QStringList strl;
-// 	strl << "pdf";
-// 	return strl.contains(ext, Qt::CaseInsensitive);
-	return (QString::compare("pdf", ext, Qt::CaseInsensitive) == 0);
+	QStringList strl;
+	strl << "ai" << "pdf";
+	return strl.contains(ext, Qt::CaseInsensitive);
+//	return (QString::compare("pdf", ext, Qt::CaseInsensitive) == 0);
 }
 
 bool extensionIndicatesEPS(const QString &ext)

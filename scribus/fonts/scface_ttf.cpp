@@ -19,6 +19,8 @@ for which a new license (GPL+exception) is in place.
 #include "sfnt.h"
 
 #include FT_TRUETYPE_IDS_H
+
+
 ScFace_ttf::ScFace_ttf ( QString fam, QString sty, QString alt, QString scname, QString psname, QString path, int face )
 		: FtFace ( fam, sty, alt, scname, psname, path, face )
 {
@@ -48,10 +50,10 @@ void ScFace_ttf::load() const
 	sfnt::PostTable checkPost;
 	FT_Face face = ftFace();
 	checkPost.readFrom(face);
-	if (!checkPost.usable)
-		qDebug() << "can't use post table for " << face->family_name << face->style_name << ":" << checkPost.errorMsg;
-	else
-		qDebug() << face->family_name << face->style_name << "post table has names for" << checkPost.numberOfGlyphs() << "glyphs from" << maxGlyph;
+//	if (!checkPost.usable)
+//		qDebug() << "can't use post table from " << face->family_name << face->style_name << ":" << checkPost.errorMsg;
+//	else
+//		qDebug() << "posttable from" << face->family_name << face->style_name << "has names for" << checkPost.numberOfGlyphs() << "glyphs and" << maxGlyph << "glyphs in charmap";
 	const_cast<bool&>(hasGlyphNames) = checkPost.usable && checkPost.numberOfGlyphs() >= maxGlyph;
 }
 

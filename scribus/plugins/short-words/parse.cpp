@@ -41,7 +41,7 @@ SWParse::SWParse()
 void SWParse::parseItem(PageItem *aFrame)
 {
 	// the content of the frame - text itself
-	QString content = QString();
+	QString content;
 	int changes = 0;
 	// list of the short words
 	QStringList shorts;
@@ -57,17 +57,13 @@ void SWParse::parseItem(PageItem *aFrame)
 		return;
 
 	// an ugly hack to get the language code from the item language property
-	if (lang.isNull() || lang.isEmpty())
+	if (lang.isEmpty())
 	{
 		lang = aFrame->itemText.charStyle(0).language();
-		if (lang.isNull() || lang.isEmpty())
+		if (lang.isEmpty())
 			qDebug("SWParse::parseItem - variable lang is still empty. No changes are made.");
 	}
-/* IL
-	QString langCode;
-// 	if (aFrame->doc()->scMW()->Sprachen.contains(lang))
-		langCode = cfg->getLangCodeFromHyph(LanguageManager::instance()->getHyphFilename(lang,false));
-*/
+
 	// apply spaces after shorts
 	shorts = cfg->getShortWords(lang);
 	if (shorts.count()==0)
@@ -134,7 +130,7 @@ void SWParse::parseSelection(ScribusDoc* doc)
 	doc->scMW()->mainWindowProgressBar->setMaximum(docSelectionCount);
 	for (uint i=0; i < docSelectionCount; ++i)
 	{
-	doc->scMW()->mainWindowProgressBar->setValue(i);
+		doc->scMW()->mainWindowProgressBar->setValue(i);
 		parseItem(doc->m_Selection->itemAt(i));
 	} // for items
 	doc->scMW()->mainWindowProgressBar->setValue(docSelectionCount);
@@ -148,30 +144,30 @@ void SWParse::parsePage(ScribusDoc* doc)
 
 void SWParse::parsePage(ScribusDoc* doc, int page)
 {
-	uint cnt = 0;
+	uint count = 0;
 	uint docItemsCount=doc->Items->count();
 	if (docItemsCount == 0)
 		return;
 
-	for (uint a = 0; a < docItemsCount; ++a)
+	for (uint i = 0; i < docItemsCount; ++i)
 	{
-		PageItem* b = doc->Items->at(a);
-		if (b->OwnPage == page)
-			++cnt;
+		PageItem* pi = doc->Items->at(i);
+		if (pi->OwnPage == page)
+			++count;
 	}
-	doc->scMW()->mainWindowProgressBar->setMaximum(cnt);
+	doc->scMW()->mainWindowProgressBar->setMaximum(count);
 	doc->view()->GotoPage(page);
-	uint i = 0;
-	for (uint a = 0; a < docItemsCount; ++a)
+	uint j = 0;
+	for (uint i = 0; i < docItemsCount; ++i)
 	{
-		PageItem* b = doc->Items->at(a);
-		if (b->OwnPage == page)
+		PageItem* pi = doc->Items->at(i);
+		if (pi->OwnPage == page)
 		{
-			doc->scMW()->mainWindowProgressBar->setValue(++i);
-			parseItem(b);
+			doc->scMW()->mainWindowProgressBar->setValue(++j);
+			parseItem(pi);
 		}
 	}
-	doc->scMW()->mainWindowProgressBar->setValue(cnt);
+	doc->scMW()->mainWindowProgressBar->setValue(count);
 }
 
 void SWParse::parseAll(ScribusDoc* doc)

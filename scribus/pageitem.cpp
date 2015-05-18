@@ -43,7 +43,6 @@ for which a new license (GPL+exception) is in place.
 #include "canvas.h"
 #include "cmsettings.h"
 #include "colorblind.h"
-#include "commonstrings.h"
 #include "desaxe/saxXML.h"
 #include "marks.h"
 #include "pageitem_arc.h"
@@ -1752,7 +1751,7 @@ void PageItem::DrawObj_Pre(ScPainter *p)
 	if (isGroup())
 		return;
 
-	if (hasSoftShadow())
+	if ((hasSoftShadow()) && (m_Doc->appMode != modeEdit))
 		DrawSoftShadow(p);
 	p->setBlendModeFill(fillBlendmode());
 	p->setLineWidth(lwCorr);
@@ -2338,11 +2337,30 @@ void PageItem::DrawSoftShadow(ScPainter *p)
 	p->setupPolygon(&sh);
 	p->setBrush(tmp);
 	p->setFillMode(ScPainter::Solid);
-	p->setStrokeMode(ScPainter::Solid);
-	p->setPen(tmp, lwCorr, PLineArt, PLineEnd, PLineJoin);
 	p->fillPath();
-	p->strokePath();
+	if (hasStroke())
+	{
+		p->setStrokeMode(ScPainter::Solid);
+		p->setPen(tmp, lwCorr, PLineArt, PLineEnd, PLineJoin);
+		p->strokePath();
+	}
 	p->blur(m_softShadowBlurRadius * sc);
+	if (!hasFill())
+	{
+		sh = PoLine.copy();
+		p->setupPolygon(&sh);
+		p->setBrush(tmp);
+		p->setFillMode(ScPainter::Solid);
+		p->setBlendModeFill(19);
+		p->fillPath();
+		if (hasStroke())
+		{
+			p->setBlendModeStroke(19);
+			p->setStrokeMode(ScPainter::Solid);
+			p->setPen(tmp, lwCorr, PLineArt, PLineEnd, PLineJoin);
+			p->strokePath();
+		}
+	}
 	p->endLayer();
 	p->restore();
 }
@@ -8906,13 +8924,6 @@ void PageItem::getTransform(QTransform& mat) const
 
 QTransform PageItem::getTransform() const
 {
-//	QTransform result;
-//	getTransform(result);
-	return getCombinedTransform();
-}
-
-QTransform PageItem::getCombinedTransform() const
-{
 	QTransform result;
 	if (isGroupChild())
 	{
@@ -9859,7 +9870,7 @@ QRect PageItem::getRedrawBounding(const double viewScale)
 	int w = qRound(ceil(BoundingW + Oldm_lineWidth + 10) * viewScale);
 	int h = qRound(ceil(BoundingH + Oldm_lineWidth + 10) * viewScale);
 	QRect ret = QRect(0, 0, w - x, h - y);
-	QTransform t = getCombinedTransform();
+	QTransform t = getTransform();
 	ret = t.mapRect(ret);
 	ret.translate(qRound(-m_Doc->minCanvasCoordinate.x() * viewScale), qRound(-m_Doc->minCanvasCoordinate.y() * viewScale));
 	return ret;
