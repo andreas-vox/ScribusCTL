@@ -2787,12 +2787,12 @@ bool PDFLibCore::PDF_TemplatePage(const ScPage* pag, bool )
 								tmpD += "q\n";
 								tmpD +=  "1 0 0 1 "+FToStr(embedded->gXpos)+" "+FToStr(ite->height() - embedded->gYpos)+" cm\n";
 								QByteArray output;
-								if (inPattern > 0)
-									patternStackPos.push(QPointF(embedded->gXpos, ite->height() - embedded->gYpos));
+								patternStackPos.push(QPointF(embedded->gXpos, ite->height() - embedded->gYpos));
+								inPattern++; // We are not really exporting a pattern, but that fix gradient export
 								if (!PDF_ProcessItem(output, embedded, pag, pag->pageNr(), true, true))
 									return "";
-								if (inPattern)
-									patternStackPos.pop();
+								inPattern--;
+								patternStackPos.pop();
 								tmpD += output;
 								tmpD += "Q\n";
 							}
@@ -3610,7 +3610,7 @@ QByteArray PDFLibCore::Write_FormXObject(QByteArray &data, PageItem *controlItem
     dict.ColorSpace.append(asColorSpace(ICCProfiles.values()));
     dict.ColorSpace.append(asColorSpace(spotMap.values()));
     writer.write(dict);
-        
+
 	PutDoc(">>\n");
 	if (Options.Compress)
 		data = CompressArray(data);
