@@ -17,3 +17,5 @@ After each phase it's planned to merge the changes back into 1.5.1svn.
 Contributors:
 * Andreas Vox
 * you
+
+See ScribusCTL [Wiki](https://github.com/andreas-vox/ScribusCTL/wiki)
