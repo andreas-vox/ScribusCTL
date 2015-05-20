@@ -3,7 +3,7 @@
 #include "rc4.h"
 #include "scstreamfilter_rc4.h"
 #include "util.h"
-#include <QCryptoGraphicHash>
+#include <QCryptographicHash>
 
 namespace Pdf
 {
@@ -270,6 +270,16 @@ namespace Pdf
     }
     
     QByteArray toPdf(uint v)
+    {
+        return QByteArray::number(v);
+    }
+    
+    QByteArray toPdf(qlonglong v)
+    {
+        return QByteArray::number(v);
+    }
+    
+    QByteArray toPdf(qulonglong v)
     {
         return QByteArray::number(v);
     }
