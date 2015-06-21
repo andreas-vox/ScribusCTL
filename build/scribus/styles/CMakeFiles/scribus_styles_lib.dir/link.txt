@@ -1,0 +1,2 @@
+/usr/bin/ar cr libscribus_styles_lib.a  CMakeFiles/scribus_styles_lib.dir/style.cpp.o CMakeFiles/scribus_styles_lib.dir/stylecontext.cpp.o CMakeFiles/scribus_styles_lib.dir/stylecontextproxy.cpp.o CMakeFiles/scribus_styles_lib.dir/linestyle.cpp.o CMakeFiles/scribus_styles_lib.dir/charstyle.cpp.o CMakeFiles/scribus_styles_lib.dir/paragraphstyle.cpp.o CMakeFiles/scribus_styles_lib.dir/tablestyle.cpp.o CMakeFiles/scribus_styles_lib.dir/cellstyle.cpp.o
+/usr/bin/ranlib libscribus_styles_lib.a

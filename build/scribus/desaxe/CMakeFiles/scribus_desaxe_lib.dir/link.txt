@@ -1,0 +1,2 @@
+/usr/bin/ar cr libscribus_desaxe_lib.a  CMakeFiles/scribus_desaxe_lib.dir/saxXML.cpp.o CMakeFiles/scribus_desaxe_lib.dir/saxiohelper.cpp.o CMakeFiles/scribus_desaxe_lib.dir/saxfilter.cpp.o CMakeFiles/scribus_desaxe_lib.dir/uniqueid.cpp.o CMakeFiles/scribus_desaxe_lib.dir/digester.cpp.o CMakeFiles/scribus_desaxe_lib.dir/digester_parse.cpp.o
+/usr/bin/ranlib libscribus_desaxe_lib.a

@@ -1,0 +1,352 @@
+The system is: Darwin - 14.3.0 - x86_64
+Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+Compiler: /usr/bin/cc 
+Build flags: 
+Id flags: 
+
+The output was:
+0
+
+
+Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "a.out"
+
+The C compiler identification is AppleClang, found in "/Users/vox/Scribus/ScribusCTL/build/CMakeFiles/3.0.2/CompilerIdC/a.out"
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
+Compiler: /usr/bin/c++ 
+Build flags: 
+Id flags: 
+
+The output was:
+0
+
+
+Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "a.out"
+
+The CXX compiler identification is AppleClang, found in "/Users/vox/Scribus/ScribusCTL/build/CMakeFiles/3.0.2/CompilerIdCXX/a.out"
+
+Determining if the C compiler works passed with the following output:
+Change Dir: /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/opt/local/bin/gmake" "cmTryCompileExec2844533997/fast"
+/opt/local/bin/gmake -f CMakeFiles/cmTryCompileExec2844533997.dir/build.make CMakeFiles/cmTryCompileExec2844533997.dir/build
+gmake[1]: Verzeichnis „/Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp“ wird betreten
+/opt/local/bin/cmake -E cmake_progress_report /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec2844533997.dir/testCCompiler.c.o
+/usr/bin/cc    -o CMakeFiles/cmTryCompileExec2844533997.dir/testCCompiler.c.o   -c /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp/testCCompiler.c
+Linking C executable cmTryCompileExec2844533997
+/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec2844533997.dir/link.txt --verbose=1
+/usr/bin/cc    -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTryCompileExec2844533997.dir/testCCompiler.c.o  -o cmTryCompileExec2844533997  
+gmake[1]: Verzeichnis „/Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp“ wird verlassen
+
+
+Detecting C compiler ABI info compiled with the following output:
+Change Dir: /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/opt/local/bin/gmake" "cmTryCompileExec3810121788/fast"
+/opt/local/bin/gmake -f CMakeFiles/cmTryCompileExec3810121788.dir/build.make CMakeFiles/cmTryCompileExec3810121788.dir/build
+gmake[1]: Verzeichnis „/Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp“ wird betreten
+/opt/local/bin/cmake -E cmake_progress_report /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec3810121788.dir/CMakeCCompilerABI.c.o
+/usr/bin/cc    -o CMakeFiles/cmTryCompileExec3810121788.dir/CMakeCCompilerABI.c.o   -c /opt/local/share/cmake-3.0/Modules/CMakeCCompilerABI.c
+Linking C executable cmTryCompileExec3810121788
+/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec3810121788.dir/link.txt --verbose=1
+/usr/bin/cc    -Wl,-search_paths_first -Wl,-headerpad_max_install_names -v -Wl,-v CMakeFiles/cmTryCompileExec3810121788.dir/CMakeCCompilerABI.c.o  -o cmTryCompileExec3810121788   
+Apple LLVM version 6.1.0 (clang-602.0.53) (based on LLVM 3.6.0svn)
+Target: x86_64-apple-darwin14.3.0
+Thread model: posix
+ "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld" -demangle -dynamic -arch x86_64 -macosx_version_min 10.10.0 -o cmTryCompileExec3810121788 -search_paths_first -headerpad_max_install_names -v CMakeFiles/cmTryCompileExec3810121788.dir/CMakeCCompilerABI.c.o -lSystem /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/6.1.0/lib/darwin/libclang_rt.osx.a
+@(#)PROGRAM:ld  PROJECT:ld64-242
+configured to support archs: armv6 armv7 armv7s arm64 i386 x86_64 x86_64h armv6m armv7m armv7em
+Library search paths:
+	/usr/lib
+	/usr/local/lib
+Framework search paths:
+	/Library/Frameworks/
+	/System/Library/Frameworks/
+gmake[1]: Verzeichnis „/Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp“ wird verlassen
+
+
+Parsed C implicit link information from above output:
+  link line regex: [^( *|.*[/\])(ld|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command:"/opt/local/bin/gmake" "cmTryCompileExec3810121788/fast"]
+  ignore line: [/opt/local/bin/gmake -f CMakeFiles/cmTryCompileExec3810121788.dir/build.make CMakeFiles/cmTryCompileExec3810121788.dir/build]
+  ignore line: [gmake[1]: Verzeichnis „/Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp“ wird betreten]
+  ignore line: [/opt/local/bin/cmake -E cmake_progress_report /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp/CMakeFiles 1]
+  ignore line: [Building C object CMakeFiles/cmTryCompileExec3810121788.dir/CMakeCCompilerABI.c.o]
+  ignore line: [/usr/bin/cc    -o CMakeFiles/cmTryCompileExec3810121788.dir/CMakeCCompilerABI.c.o   -c /opt/local/share/cmake-3.0/Modules/CMakeCCompilerABI.c]
+  ignore line: [Linking C executable cmTryCompileExec3810121788]
+  ignore line: [/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec3810121788.dir/link.txt --verbose=1]
+  ignore line: [/usr/bin/cc    -Wl,-search_paths_first -Wl,-headerpad_max_install_names -v -Wl,-v CMakeFiles/cmTryCompileExec3810121788.dir/CMakeCCompilerABI.c.o  -o cmTryCompileExec3810121788   ]
+  ignore line: [Apple LLVM version 6.1.0 (clang-602.0.53) (based on LLVM 3.6.0svn)]
+  ignore line: [Target: x86_64-apple-darwin14.3.0]
+  ignore line: [Thread model: posix]
+  link line: [ "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld" -demangle -dynamic -arch x86_64 -macosx_version_min 10.10.0 -o cmTryCompileExec3810121788 -search_paths_first -headerpad_max_install_names -v CMakeFiles/cmTryCompileExec3810121788.dir/CMakeCCompilerABI.c.o -lSystem /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/6.1.0/lib/darwin/libclang_rt.osx.a]
+    arg [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld] ==> ignore
+    arg [-demangle] ==> ignore
+    arg [-dynamic] ==> ignore
+    arg [-arch] ==> ignore
+    arg [x86_64] ==> ignore
+    arg [-macosx_version_min] ==> ignore
+    arg [10.10.0] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTryCompileExec3810121788] ==> ignore
+    arg [-search_paths_first] ==> ignore
+    arg [-headerpad_max_install_names] ==> ignore
+    arg [-v] ==> ignore
+    arg [CMakeFiles/cmTryCompileExec3810121788.dir/CMakeCCompilerABI.c.o] ==> ignore
+    arg [-lSystem] ==> lib [System]
+    arg [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/6.1.0/lib/darwin/libclang_rt.osx.a] ==> lib [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/6.1.0/lib/darwin/libclang_rt.osx.a]
+  Library search paths: [;/usr/lib;/usr/local/lib]
+  Framework search paths: [;/Library/Frameworks/;/System/Library/Frameworks/]
+  remove lib [System]
+  collapse lib [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/6.1.0/lib/darwin/libclang_rt.osx.a] ==> [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/6.1.0/lib/darwin/libclang_rt.osx.a]
+  collapse library dir [/usr/lib] ==> [/usr/lib]
+  collapse library dir [/usr/local/lib] ==> [/usr/local/lib]
+  collapse framework dir [/Library/Frameworks/] ==> [/Library/Frameworks]
+  collapse framework dir [/System/Library/Frameworks/] ==> [/System/Library/Frameworks]
+  implicit libs: [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/6.1.0/lib/darwin/libclang_rt.osx.a]
+  implicit dirs: [/usr/lib;/usr/local/lib]
+  implicit fwks: [/Library/Frameworks;/System/Library/Frameworks]
+
+
+Determining if the CXX compiler works passed with the following output:
+Change Dir: /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/opt/local/bin/gmake" "cmTryCompileExec4046518085/fast"
+/opt/local/bin/gmake -f CMakeFiles/cmTryCompileExec4046518085.dir/build.make CMakeFiles/cmTryCompileExec4046518085.dir/build
+gmake[1]: Verzeichnis „/Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp“ wird betreten
+/opt/local/bin/cmake -E cmake_progress_report /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building CXX object CMakeFiles/cmTryCompileExec4046518085.dir/testCXXCompiler.cxx.o
+/usr/bin/c++     -o CMakeFiles/cmTryCompileExec4046518085.dir/testCXXCompiler.cxx.o -c /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp/testCXXCompiler.cxx
+Linking CXX executable cmTryCompileExec4046518085
+/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec4046518085.dir/link.txt --verbose=1
+/usr/bin/c++     -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTryCompileExec4046518085.dir/testCXXCompiler.cxx.o  -o cmTryCompileExec4046518085  
+gmake[1]: Verzeichnis „/Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp“ wird verlassen
+
+
+Detecting CXX compiler ABI info compiled with the following output:
+Change Dir: /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/opt/local/bin/gmake" "cmTryCompileExec655905923/fast"
+/opt/local/bin/gmake -f CMakeFiles/cmTryCompileExec655905923.dir/build.make CMakeFiles/cmTryCompileExec655905923.dir/build
+gmake[1]: Verzeichnis „/Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp“ wird betreten
+/opt/local/bin/cmake -E cmake_progress_report /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building CXX object CMakeFiles/cmTryCompileExec655905923.dir/CMakeCXXCompilerABI.cpp.o
+/usr/bin/c++     -o CMakeFiles/cmTryCompileExec655905923.dir/CMakeCXXCompilerABI.cpp.o -c /opt/local/share/cmake-3.0/Modules/CMakeCXXCompilerABI.cpp
+Linking CXX executable cmTryCompileExec655905923
+/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec655905923.dir/link.txt --verbose=1
+/usr/bin/c++     -Wl,-search_paths_first -Wl,-headerpad_max_install_names -v -Wl,-v CMakeFiles/cmTryCompileExec655905923.dir/CMakeCXXCompilerABI.cpp.o  -o cmTryCompileExec655905923   
+Apple LLVM version 6.1.0 (clang-602.0.53) (based on LLVM 3.6.0svn)
+Target: x86_64-apple-darwin14.3.0
+Thread model: posix
+ "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld" -demangle -dynamic -arch x86_64 -macosx_version_min 10.10.0 -o cmTryCompileExec655905923 -search_paths_first -headerpad_max_install_names -v CMakeFiles/cmTryCompileExec655905923.dir/CMakeCXXCompilerABI.cpp.o -lc++ -lSystem /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/6.1.0/lib/darwin/libclang_rt.osx.a
+gmake[1]: Verzeichnis „/Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp“ wird verlassen
+@(#)PROGRAM:ld  PROJECT:ld64-242
+configured to support archs: armv6 armv7 armv7s arm64 i386 x86_64 x86_64h armv6m armv7m armv7em
+Library search paths:
+	/usr/lib
+	/usr/local/lib
+Framework search paths:
+	/Library/Frameworks/
+	/System/Library/Frameworks/
+
+
+Parsed CXX implicit link information from above output:
+  link line regex: [^( *|.*[/\])(ld|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command:"/opt/local/bin/gmake" "cmTryCompileExec655905923/fast"]
+  ignore line: [/opt/local/bin/gmake -f CMakeFiles/cmTryCompileExec655905923.dir/build.make CMakeFiles/cmTryCompileExec655905923.dir/build]
+  ignore line: [gmake[1]: Verzeichnis „/Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp“ wird betreten]
+  ignore line: [/opt/local/bin/cmake -E cmake_progress_report /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp/CMakeFiles 1]
+  ignore line: [Building CXX object CMakeFiles/cmTryCompileExec655905923.dir/CMakeCXXCompilerABI.cpp.o]
+  ignore line: [/usr/bin/c++     -o CMakeFiles/cmTryCompileExec655905923.dir/CMakeCXXCompilerABI.cpp.o -c /opt/local/share/cmake-3.0/Modules/CMakeCXXCompilerABI.cpp]
+  ignore line: [Linking CXX executable cmTryCompileExec655905923]
+  ignore line: [/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec655905923.dir/link.txt --verbose=1]
+  ignore line: [/usr/bin/c++     -Wl,-search_paths_first -Wl,-headerpad_max_install_names -v -Wl,-v CMakeFiles/cmTryCompileExec655905923.dir/CMakeCXXCompilerABI.cpp.o  -o cmTryCompileExec655905923   ]
+  ignore line: [Apple LLVM version 6.1.0 (clang-602.0.53) (based on LLVM 3.6.0svn)]
+  ignore line: [Target: x86_64-apple-darwin14.3.0]
+  ignore line: [Thread model: posix]
+  link line: [ "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld" -demangle -dynamic -arch x86_64 -macosx_version_min 10.10.0 -o cmTryCompileExec655905923 -search_paths_first -headerpad_max_install_names -v CMakeFiles/cmTryCompileExec655905923.dir/CMakeCXXCompilerABI.cpp.o -lc++ -lSystem /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/6.1.0/lib/darwin/libclang_rt.osx.a]
+    arg [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld] ==> ignore
+    arg [-demangle] ==> ignore
+    arg [-dynamic] ==> ignore
+    arg [-arch] ==> ignore
+    arg [x86_64] ==> ignore
+    arg [-macosx_version_min] ==> ignore
+    arg [10.10.0] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTryCompileExec655905923] ==> ignore
+    arg [-search_paths_first] ==> ignore
+    arg [-headerpad_max_install_names] ==> ignore
+    arg [-v] ==> ignore
+    arg [CMakeFiles/cmTryCompileExec655905923.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
+    arg [-lc++] ==> lib [c++]
+    arg [-lSystem] ==> lib [System]
+    arg [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/6.1.0/lib/darwin/libclang_rt.osx.a] ==> lib [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/6.1.0/lib/darwin/libclang_rt.osx.a]
+  Library search paths: [;/usr/lib;/usr/local/lib]
+  Framework search paths: [;/Library/Frameworks/;/System/Library/Frameworks/]
+  remove lib [System]
+  collapse lib [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/6.1.0/lib/darwin/libclang_rt.osx.a] ==> [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/6.1.0/lib/darwin/libclang_rt.osx.a]
+  collapse library dir [/usr/lib] ==> [/usr/lib]
+  collapse library dir [/usr/local/lib] ==> [/usr/local/lib]
+  collapse framework dir [/Library/Frameworks/] ==> [/Library/Frameworks]
+  collapse framework dir [/System/Library/Frameworks/] ==> [/System/Library/Frameworks]
+  implicit libs: [c++;/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/6.1.0/lib/darwin/libclang_rt.osx.a]
+  implicit dirs: [/usr/lib;/usr/local/lib]
+  implicit fwks: [/Library/Frameworks;/System/Library/Frameworks]
+
+
+Determining if the function FT_Get_First_Char exists in the /opt/local/lib/libfreetype.dylib passed with the following output:
+Change Dir: /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/opt/local/bin/gmake" "cmTryCompileExec3679670552/fast"
+/opt/local/bin/gmake -f CMakeFiles/cmTryCompileExec3679670552.dir/build.make CMakeFiles/cmTryCompileExec3679670552.dir/build
+gmake[1]: Verzeichnis „/Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp“ wird betreten
+/opt/local/bin/cmake -E cmake_progress_report /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec3679670552.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=FT_Get_First_Char -arch x86_64   -o CMakeFiles/cmTryCompileExec3679670552.dir/CheckFunctionExists.c.o   -c /opt/local/share/cmake-3.0/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec3679670552
+/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec3679670552.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=FT_Get_First_Char -arch x86_64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTryCompileExec3679670552.dir/CheckFunctionExists.c.o  -o cmTryCompileExec3679670552  /opt/local/lib/libfreetype.dylib 
+gmake[1]: Verzeichnis „/Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp“ wird verlassen
+
+
+Determining if the function FT_Get_Next_Char exists in the /opt/local/lib/libfreetype.dylib passed with the following output:
+Change Dir: /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/opt/local/bin/gmake" "cmTryCompileExec4095852561/fast"
+/opt/local/bin/gmake -f CMakeFiles/cmTryCompileExec4095852561.dir/build.make CMakeFiles/cmTryCompileExec4095852561.dir/build
+gmake[1]: Verzeichnis „/Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp“ wird betreten
+/opt/local/bin/cmake -E cmake_progress_report /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec4095852561.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=FT_Get_Next_Char -arch x86_64   -o CMakeFiles/cmTryCompileExec4095852561.dir/CheckFunctionExists.c.o   -c /opt/local/share/cmake-3.0/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec4095852561
+/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec4095852561.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=FT_Get_Next_Char -arch x86_64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTryCompileExec4095852561.dir/CheckFunctionExists.c.o  -o cmTryCompileExec4095852561  /opt/local/lib/libfreetype.dylib 
+gmake[1]: Verzeichnis „/Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp“ wird verlassen
+
+
+Determining if the include file sys/types.h exists passed with the following output:
+Change Dir: /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/opt/local/bin/gmake" "cmTryCompileExec742104662/fast"
+/opt/local/bin/gmake -f CMakeFiles/cmTryCompileExec742104662.dir/build.make CMakeFiles/cmTryCompileExec742104662.dir/build
+gmake[1]: Verzeichnis „/Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp“ wird betreten
+/opt/local/bin/cmake -E cmake_progress_report /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec742104662.dir/CheckIncludeFile.c.o
+/usr/bin/cc   -arch x86_64   -o CMakeFiles/cmTryCompileExec742104662.dir/CheckIncludeFile.c.o   -c /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTryCompileExec742104662
+/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec742104662.dir/link.txt --verbose=1
+/usr/bin/cc    -arch x86_64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTryCompileExec742104662.dir/CheckIncludeFile.c.o  -o cmTryCompileExec742104662  
+gmake[1]: Verzeichnis „/Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp“ wird verlassen
+
+
+Determining if the include file stdint.h exists passed with the following output:
+Change Dir: /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/opt/local/bin/gmake" "cmTryCompileExec3408177060/fast"
+/opt/local/bin/gmake -f CMakeFiles/cmTryCompileExec3408177060.dir/build.make CMakeFiles/cmTryCompileExec3408177060.dir/build
+gmake[1]: Verzeichnis „/Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp“ wird betreten
+/opt/local/bin/cmake -E cmake_progress_report /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec3408177060.dir/CheckIncludeFile.c.o
+/usr/bin/cc   -arch x86_64   -o CMakeFiles/cmTryCompileExec3408177060.dir/CheckIncludeFile.c.o   -c /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTryCompileExec3408177060
+/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec3408177060.dir/link.txt --verbose=1
+/usr/bin/cc    -arch x86_64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTryCompileExec3408177060.dir/CheckIncludeFile.c.o  -o cmTryCompileExec3408177060  
+gmake[1]: Verzeichnis „/Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp“ wird verlassen
+
+
+Determining if the include file stddef.h exists passed with the following output:
+Change Dir: /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/opt/local/bin/gmake" "cmTryCompileExec544197697/fast"
+/opt/local/bin/gmake -f CMakeFiles/cmTryCompileExec544197697.dir/build.make CMakeFiles/cmTryCompileExec544197697.dir/build
+gmake[1]: Verzeichnis „/Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp“ wird betreten
+/opt/local/bin/cmake -E cmake_progress_report /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec544197697.dir/CheckIncludeFile.c.o
+/usr/bin/cc   -arch x86_64   -o CMakeFiles/cmTryCompileExec544197697.dir/CheckIncludeFile.c.o   -c /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTryCompileExec544197697
+/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec544197697.dir/link.txt --verbose=1
+/usr/bin/cc    -arch x86_64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTryCompileExec544197697.dir/CheckIncludeFile.c.o  -o cmTryCompileExec544197697  
+gmake[1]: Verzeichnis „/Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp“ wird verlassen
+
+
+Determining size of unsigned short passed with the following output:
+Change Dir: /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/opt/local/bin/gmake" "cmTryCompileExec989859930/fast"
+/opt/local/bin/gmake -f CMakeFiles/cmTryCompileExec989859930.dir/build.make CMakeFiles/cmTryCompileExec989859930.dir/build
+gmake[1]: Verzeichnis „/Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp“ wird betreten
+/opt/local/bin/cmake -E cmake_progress_report /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec989859930.dir/CMAKE_SIZEOF_UNSIGNED_SHORT.c.o
+/usr/bin/cc   -arch x86_64   -o CMakeFiles/cmTryCompileExec989859930.dir/CMAKE_SIZEOF_UNSIGNED_SHORT.c.o   -c /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CheckTypeSize/CMAKE_SIZEOF_UNSIGNED_SHORT.c
+Linking C executable cmTryCompileExec989859930
+/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec989859930.dir/link.txt --verbose=1
+/usr/bin/cc    -arch x86_64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTryCompileExec989859930.dir/CMAKE_SIZEOF_UNSIGNED_SHORT.c.o  -o cmTryCompileExec989859930  
+gmake[1]: Verzeichnis „/Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp“ wird verlassen
+
+
+Determining if the include file dlfcn.h exists passed with the following output:
+Change Dir: /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/opt/local/bin/gmake" "cmTryCompileExec119887527/fast"
+/opt/local/bin/gmake -f CMakeFiles/cmTryCompileExec119887527.dir/build.make CMakeFiles/cmTryCompileExec119887527.dir/build
+gmake[1]: Verzeichnis „/Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp“ wird betreten
+/opt/local/bin/cmake -E cmake_progress_report /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec119887527.dir/CheckIncludeFile.c.o
+/usr/bin/cc   -arch x86_64   -o CMakeFiles/cmTryCompileExec119887527.dir/CheckIncludeFile.c.o   -c /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTryCompileExec119887527
+/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec119887527.dir/link.txt --verbose=1
+/usr/bin/cc    -arch x86_64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTryCompileExec119887527.dir/CheckIncludeFile.c.o  -o cmTryCompileExec119887527  
+gmake[1]: Verzeichnis „/Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp“ wird verlassen
+
+
+Determining if the include file unistd.h exists passed with the following output:
+Change Dir: /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/opt/local/bin/gmake" "cmTryCompileExec2788266657/fast"
+/opt/local/bin/gmake -f CMakeFiles/cmTryCompileExec2788266657.dir/build.make CMakeFiles/cmTryCompileExec2788266657.dir/build
+gmake[1]: Verzeichnis „/Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp“ wird betreten
+/opt/local/bin/cmake -E cmake_progress_report /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec2788266657.dir/CheckIncludeFile.c.o
+/usr/bin/cc   -arch x86_64   -o CMakeFiles/cmTryCompileExec2788266657.dir/CheckIncludeFile.c.o   -c /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTryCompileExec2788266657
+/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec2788266657.dir/link.txt --verbose=1
+/usr/bin/cc    -arch x86_64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTryCompileExec2788266657.dir/CheckIncludeFile.c.o  -o cmTryCompileExec2788266657  
+gmake[1]: Verzeichnis „/Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp“ wird verlassen
+
+
+Determining if the include file sys/stat.h exists passed with the following output:
+Change Dir: /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/opt/local/bin/gmake" "cmTryCompileExec103252994/fast"
+/opt/local/bin/gmake -f CMakeFiles/cmTryCompileExec103252994.dir/build.make CMakeFiles/cmTryCompileExec103252994.dir/build
+gmake[1]: Verzeichnis „/Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp“ wird betreten
+/opt/local/bin/cmake -E cmake_progress_report /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec103252994.dir/CheckIncludeFile.c.o
+/usr/bin/cc   -arch x86_64   -o CMakeFiles/cmTryCompileExec103252994.dir/CheckIncludeFile.c.o   -c /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTryCompileExec103252994
+/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec103252994.dir/link.txt --verbose=1
+/usr/bin/cc    -arch x86_64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTryCompileExec103252994.dir/CheckIncludeFile.c.o  -o cmTryCompileExec103252994  
+gmake[1]: Verzeichnis „/Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp“ wird verlassen
+
+
+Determining if files fcntl.h exist passed with the following output:
+Change Dir: /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/opt/local/bin/gmake" "cmTryCompileExec2584671736/fast"
+/opt/local/bin/gmake -f CMakeFiles/cmTryCompileExec2584671736.dir/build.make CMakeFiles/cmTryCompileExec2584671736.dir/build
+gmake[1]: Verzeichnis „/Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp“ wird betreten
+/opt/local/bin/cmake -E cmake_progress_report /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec2584671736.dir/CheckIncludeFiles.c.o
+/usr/bin/cc   -arch x86_64   -o CMakeFiles/cmTryCompileExec2584671736.dir/CheckIncludeFiles.c.o   -c /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp/CheckIncludeFiles.c
+Linking C executable cmTryCompileExec2584671736
+/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec2584671736.dir/link.txt --verbose=1
+/usr/bin/cc    -arch x86_64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTryCompileExec2584671736.dir/CheckIncludeFiles.c.o  -o cmTryCompileExec2584671736  
+gmake[1]: Verzeichnis „/Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp“ wird verlassen
+
+

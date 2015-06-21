@@ -1853,6 +1853,23 @@
 		881004C91AF9AA5C00F15514 /* pdfexportdialog.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = pdfexportdialog.cpp; sourceTree = "<group>"; };
 		881004CA1AF9AA5C00F15514 /* pdfexportdialog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pdfexportdialog.h; sourceTree = "<group>"; };
 		881004CB1AF9AA5C00F15514 /* tabpdfoptions.ui */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = tabpdfoptions.ui; sourceTree = "<group>"; };
+		885794AC1B10DB710066A4B5 /* cdr */ = {isa = PBXFileReference; lastKnownFileType = folder; path = cdr; sourceTree = "<group>"; };
+		885794AD1B10DB710066A4B5 /* emf */ = {isa = PBXFileReference; lastKnownFileType = folder; path = emf; sourceTree = "<group>"; };
+		885794AE1B10DB710066A4B5 /* idml_old */ = {isa = PBXFileReference; lastKnownFileType = folder; path = idml_old; sourceTree = "<group>"; };
+		885794AF1B10DB710066A4B5 /* odg */ = {isa = PBXFileReference; lastKnownFileType = folder; path = odg; sourceTree = "<group>"; };
+		885794B01B10DB710066A4B5 /* pages */ = {isa = PBXFileReference; lastKnownFileType = folder; path = pages; sourceTree = "<group>"; };
+		885794B11B10DB710066A4B5 /* pdf */ = {isa = PBXFileReference; lastKnownFileType = folder; path = pdf; sourceTree = "<group>"; };
+		885794B21B10DB710066A4B5 /* pm */ = {isa = PBXFileReference; lastKnownFileType = folder; path = pm; sourceTree = "<group>"; };
+		885794B31B10DB710066A4B5 /* pub */ = {isa = PBXFileReference; lastKnownFileType = folder; path = pub; sourceTree = "<group>"; };
+		885794B41B10DB710066A4B5 /* revenge */ = {isa = PBXFileReference; lastKnownFileType = folder; path = revenge; sourceTree = "<group>"; };
+		885794B51B10DB710066A4B5 /* shape */ = {isa = PBXFileReference; lastKnownFileType = folder; path = shape; sourceTree = "<group>"; };
+		885794B61B10DB710066A4B5 /* sml */ = {isa = PBXFileReference; lastKnownFileType = folder; path = sml; sourceTree = "<group>"; };
+		885794B71B10DB710066A4B5 /* svm */ = {isa = PBXFileReference; lastKnownFileType = folder; path = svm; sourceTree = "<group>"; };
+		885794B81B10DB710066A4B5 /* viva */ = {isa = PBXFileReference; lastKnownFileType = folder; path = viva; sourceTree = "<group>"; };
+		885794B91B10DB710066A4B5 /* vsd */ = {isa = PBXFileReference; lastKnownFileType = folder; path = vsd; sourceTree = "<group>"; };
+		885794BA1B10DB710066A4B5 /* xps */ = {isa = PBXFileReference; lastKnownFileType = folder; path = xps; sourceTree = "<group>"; };
+		885794BB1B1107AB0066A4B5 /* boxes.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = boxes.cpp; sourceTree = "<group>"; };
+		885794BC1B1107AB0066A4B5 /* boxes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = boxes.h; sourceTree = "<group>"; };
 		88628C1C18EEE57700325969 /* api_color.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = api_color.cpp; sourceTree = "<group>"; };
 		88628C1D18EEE57700325969 /* api_color.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = api_color.h; sourceTree = "<group>"; };
 		88628C1E18EEE57700325969 /* api_imageexport.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = api_imageexport.cpp; sourceTree = "<group>"; };
@@ -2938,6 +2955,21 @@
 		8808D9CC123238CF00B95A3F /* import */ = {
 			isa = PBXGroup;
 			children = (
+				885794AC1B10DB710066A4B5 /* cdr */,
+				885794AD1B10DB710066A4B5 /* emf */,
+				885794AE1B10DB710066A4B5 /* idml_old */,
+				885794AF1B10DB710066A4B5 /* odg */,
+				885794B01B10DB710066A4B5 /* pages */,
+				885794B11B10DB710066A4B5 /* pdf */,
+				885794B21B10DB710066A4B5 /* pm */,
+				885794B31B10DB710066A4B5 /* pub */,
+				885794B41B10DB710066A4B5 /* revenge */,
+				885794B51B10DB710066A4B5 /* shape */,
+				885794B61B10DB710066A4B5 /* sml */,
+				885794B71B10DB710066A4B5 /* svm */,
+				885794B81B10DB710066A4B5 /* viva */,
+				885794B91B10DB710066A4B5 /* vsd */,
+				885794BA1B10DB710066A4B5 /* xps */,
 				8808D9CD123238CF00B95A3F /* ai */,
 				8808D9D3123238CF00B95A3F /* cgm */,
 				8808D9D9123238CF00B95A3F /* CMakeLists.txt */,
@@ -3766,6 +3798,8 @@
 				8808DC5D123238D000B95A3F /* specialchars.h */,
 				8808DC5E123238D000B95A3F /* storytext.cpp */,
 				8808DC5F123238D000B95A3F /* storytext.h */,
+				885794BB1B1107AB0066A4B5 /* boxes.cpp */,
+				885794BC1B1107AB0066A4B5 /* boxes.h */,
 			);
 			name = text;
 			path = ../../scribus/text;

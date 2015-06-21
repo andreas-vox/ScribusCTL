@@ -2510,387 +2510,403 @@ void PageItem::SetQColor(QColor *tmp, QString colorName, double shad)
     sets xadvance to the advance width without kerning. If more than one glyph
     is generated, kerning is included in all but the last xadvance.
 */
-double PageItem::layoutGlyphs(const CharStyle& style, const QString& chars, LayoutFlags flags, GlyphLayout& layout)
+double PageItem::layoutGlyphs(const QString& chars, GlyphRun& glyphrun)
 {
 	double retval = 0.0;
+
+	LayoutFlags flags = glyphrun.flags();
+	const CharStyle& style(glyphrun.style());
 	const ScFace font = style.font();
 	double asce = font.ascent(style.fontSize() / 10.0);
 	int chst = style.effects() & ScStyle_UserStyles;
-/*	if (chars[0] == SpecialChars::ZWSPACE ||
-		chars[0] == SpecialChars::ZWNBSPACE ||
-		chars[0] == SpecialChars::NBSPACE ||
-		chars[0] == SpecialChars::NBHYPHEN ||
-		chars[0] == SpecialChars::SHYPHEN ||
-		chars[0] == SpecialChars::PARSEP ||
-		chars[0] == SpecialChars::COLBREAK ||
-		chars[0] == SpecialChars::LINEBREAK ||
-		chars[0] == SpecialChars::FRAMEBREAK ||
-		chars[0] == SpecialChars::TAB)
-	{
-		layout.glyph = ScFace::CONTROL_GLYPHS + chars[0].unicode();
-	}
-	else */
-	{
-		layout.glyph = font.char2CMap(chars[0].unicode());
-	}
-	double tracking = 0.0;
-	if ( (flags & ScLayout_StartOfLine) == 0)
-		tracking = style.fontSize() * style.tracking() / 10000.0;
 
-	layout.xoffset = tracking;
-	layout.yoffset = 0;
-	if (chst != ScStyle_Default)
+	for (int i = 0; i < chars.length(); ++i)
 	{
-		if (chst & ScStyle_Superscript)
+		GlyphLayout layout;
+		
+		/*	if (chars[0] == SpecialChars::ZWSPACE ||
+		 chars[0] == SpecialChars::ZWNBSPACE ||
+		 chars[0] == SpecialChars::NBSPACE ||
+		 chars[0] == SpecialChars::NBHYPHEN ||
+		 chars[0] == SpecialChars::SHYPHEN ||
+		 chars[0] == SpecialChars::PARSEP ||
+		 chars[0] == SpecialChars::COLBREAK ||
+		 chars[0] == SpecialChars::LINEBREAK ||
+		 chars[0] == SpecialChars::FRAMEBREAK ||
+		 chars[0] == SpecialChars::TAB)
+		 {
+		 layout.glyph = ScFace::CONTROL_GLYPHS + chars[0].unicode();
+		 }
+		 else */
 		{
-			retval -= asce * m_Doc->typographicPrefs().valueSuperScript / 100.0;
-			layout.yoffset -= asce * m_Doc->typographicPrefs().valueSuperScript / 100.0;
-			layout.scaleV = layout.scaleH = qMax(m_Doc->typographicPrefs().scalingSuperScript / 100.0, 10.0 / style.fontSize());
+			layout.glyph = font.char2CMap(chars[0].unicode());
 		}
-		else if (chst & ScStyle_Subscript)
+		double tracking = 0.0;
+		if ( (flags & ScLayout_StartOfLine) == 0)
+			tracking = style.fontSize() * style.tracking() / 10000.0;
+		
+		layout.xoffset = tracking;
+		layout.yoffset = 0;
+		if (chst != ScStyle_Default)
 		{
-			retval += asce * m_Doc->typographicPrefs().valueSubScript / 100.0;
-			layout.yoffset += asce * m_Doc->typographicPrefs().valueSubScript / 100.0;
-			layout.scaleV = layout.scaleH = qMax(m_Doc->typographicPrefs().scalingSubScript / 100.0, 10.0 / style.fontSize());
-		}
-		else {
-			layout.scaleV = layout.scaleH = 1.0;
-		}
-		layout.scaleH *= style.scaleH() / 1000.0;
-		layout.scaleV *= style.scaleV() / 1000.0;
-		if (chst & ScStyle_AllCaps)
-		{
-			layout.glyph = font.char2CMap(chars[0].toUpper().unicode());
-		}
-		if (chst & ScStyle_SmallCaps)
-		{
-			double smallcapsScale = m_Doc->typographicPrefs().valueSmallCaps / 100.0;
-			QChar uc = chars[0].toUpper();
-			if (uc != chars[0])
+			if (chst & ScStyle_Superscript)
+			{
+				retval -= asce * m_Doc->typographicPrefs().valueSuperScript / 100.0;
+				layout.yoffset -= asce * m_Doc->typographicPrefs().valueSuperScript / 100.0;
+				layout.scaleV = layout.scaleH = qMax(m_Doc->typographicPrefs().scalingSuperScript / 100.0, 10.0 / style.fontSize());
+			}
+			else if (chst & ScStyle_Subscript)
+			{
+				retval += asce * m_Doc->typographicPrefs().valueSubScript / 100.0;
+				layout.yoffset += asce * m_Doc->typographicPrefs().valueSubScript / 100.0;
+				layout.scaleV = layout.scaleH = qMax(m_Doc->typographicPrefs().scalingSubScript / 100.0, 10.0 / style.fontSize());
+			}
+			else {
+				layout.scaleV = layout.scaleH = 1.0;
+			}
+			layout.scaleH *= style.scaleH() / 1000.0;
+			layout.scaleV *= style.scaleV() / 1000.0;
+			if (chst & ScStyle_AllCaps)
 			{
 				layout.glyph = font.char2CMap(chars[0].toUpper().unicode());
-				layout.scaleV *= smallcapsScale;
-				layout.scaleH *= smallcapsScale;
+			}
+			if (chst & ScStyle_SmallCaps)
+			{
+				double smallcapsScale = m_Doc->typographicPrefs().valueSmallCaps / 100.0;
+				QChar uc = chars[0].toUpper();
+				if (uc != chars[0])
+				{
+					layout.glyph = font.char2CMap(chars[0].toUpper().unicode());
+					layout.scaleV *= smallcapsScale;
+					layout.scaleH *= smallcapsScale;
+				}
 			}
 		}
-	}
-	else {
-		layout.scaleH = style.scaleH() / 1000.0;
-		layout.scaleV = style.scaleV() / 1000.0;
-	}	
-	
-/*	if (layout.glyph == (ScFace::CONTROL_GLYPHS + SpecialChars::NBSPACE.unicode())) {
-		uint replGlyph = font.char2CMap(QChar(' '));
-		layout.xadvance = font.glyphWidth(replGlyph, style.fontSize() / 10) * layout.scaleH;
-		layout.yadvance = font.glyphBBox(replGlyph, style.fontSize() / 10).ascent * layout.scaleV;
-	}
-	else if (layout.glyph == (ScFace::CONTROL_GLYPHS + SpecialChars::NBHYPHEN.unicode())) {
-		uint replGlyph = font.char2CMap(QChar('-'));
-		layout.xadvance = font.glyphWidth(replGlyph, style.fontSize() / 10) * layout.scaleH;
-		layout.yadvance = font.glyphBBox(replGlyph, style.fontSize() / 10).ascent * layout.scaleV;
-	}
-	else if (layout.glyph >= ScFace::CONTROL_GLYPHS) {
-		layout.xadvance = 0;
-		layout.yadvance = 0;
-	}
-	else */
-	{
-		layout.xadvance = font.glyphWidth(layout.glyph, style.fontSize() / 10) * layout.scaleH;
-		layout.yadvance = font.glyphBBox(layout.glyph, style.fontSize() / 10).ascent * layout.scaleV;
-	}
-	if (layout.xadvance > 0)
-		layout.xadvance += tracking;
-
-	if (chars.length() > 1) {
-		layout.grow();
-		layoutGlyphs(style, chars.mid(1), ScLayout_None, *layout.more);
-		layout.xadvance += font.glyphKerning(layout.glyph, layout.more->glyph, style.fontSize() / 10) * layout.scaleH;
-		if (layout.more->yadvance > layout.yadvance)
-			layout.yadvance = layout.more->yadvance;
-	}
-	else {
-		layout.shrink();
+		else {
+			layout.scaleH = style.scaleH() / 1000.0;
+			layout.scaleV = style.scaleV() / 1000.0;
+		}
+		
+		/*	if (layout.glyph == (ScFace::CONTROL_GLYPHS + SpecialChars::NBSPACE.unicode())) {
+		 uint replGlyph = font.char2CMap(QChar(' '));
+		 layout.xadvance = font.glyphWidth(replGlyph, style.fontSize() / 10) * layout.scaleH;
+		 layout.yadvance = font.glyphBBox(replGlyph, style.fontSize() / 10).ascent * layout.scaleV;
+		 }
+		 else if (layout.glyph == (ScFace::CONTROL_GLYPHS + SpecialChars::NBHYPHEN.unicode())) {
+		 uint replGlyph = font.char2CMap(QChar('-'));
+		 layout.xadvance = font.glyphWidth(replGlyph, style.fontSize() / 10) * layout.scaleH;
+		 layout.yadvance = font.glyphBBox(replGlyph, style.fontSize() / 10).ascent * layout.scaleV;
+		 }
+		 else if (layout.glyph >= ScFace::CONTROL_GLYPHS) {
+		 layout.xadvance = 0;
+		 layout.yadvance = 0;
+		 }
+		 else */
+		{
+			layout.xadvance = font.glyphWidth(layout.glyph, style.fontSize() / 10) * layout.scaleH;
+			layout.yadvance = font.glyphBBox(layout.glyph, style.fontSize() / 10).ascent * layout.scaleV;
+		}
+		if (layout.xadvance > 0)
+			layout.xadvance += tracking;
+		
+		glyphrun.glyphs().append(layout);
+		
+		if (i>0)
+		{
+			GlyphLayout& lastLayout(glyphrun.glyphs().last());
+			lastLayout.xadvance += font.glyphKerning(lastLayout.glyph, layout.glyph, style.fontSize() / 10) * lastLayout.scaleH;
+// TODO: set yadvance to max yadvance?
+//			if (layout.yadvance > lastLayout.yadvance)
+//				lastLayout.yadvance = layout.yadvance;
+		}
 	}
 	return retval;
 }
 
-void PageItem::drawGlyphs(ScPainter *p, const CharStyle& style, LayoutFlags flags, GlyphLayout& glyphs)
+
+static void drawControlGlyph(ScPainter* p, const GlyphLayout& glyphs, LayoutFlags flags, const ScFace& font, qreal fontSize, ScribusDoc* m_Doc)
 {
+	bool stroke = false;
+
 	uint glyph = glyphs.glyph;
+	if (glyph >=  ScFace::CONTROL_GLYPHS)
+		glyph -= ScFace::CONTROL_GLYPHS;
+	else
+		glyph = 32;
+	QTransform chma, chma4, chma5;
+	FPointArray points;
+	if (glyph == SpecialChars::TAB.unicode())
+	{
+		points = m_Doc->symTab.copy();
+		chma4.translate(glyphs.xoffset + glyphs.xadvance - ((fontSize / 10.0) * glyphs.scaleH * 0.7), glyphs.yoffset - ((fontSize / 10.0) * glyphs.scaleV * 0.5));
+	}
+	else if (glyph == SpecialChars::COLBREAK.unicode())
+	{
+		points = m_Doc->symNewCol.copy();
+		chma4.translate(glyphs.xoffset, glyphs.yoffset-((fontSize / 10.0) * glyphs.scaleV * 0.6));
+	}
+	else if (glyph == SpecialChars::FRAMEBREAK.unicode())
+	{
+		points = m_Doc->symNewFrame.copy();
+		chma4.translate(glyphs.xoffset, glyphs.yoffset-((fontSize / 10.0) * glyphs.scaleV * 0.6));
+	}
+	else if (glyph == SpecialChars::PARSEP.unicode())
+	{
+		points = m_Doc->symReturn.copy();
+		chma4.translate(glyphs.xoffset, glyphs.yoffset-((fontSize / 10.0) * glyphs.scaleV * 0.8));
+	}
+	else if (glyph == SpecialChars::LINEBREAK.unicode())
+	{
+		points = m_Doc->symNewLine.copy();
+		chma4.translate(glyphs.xoffset, glyphs.yoffset-((fontSize / 10.0) * glyphs.scaleV * 0.4));
+	}
+	else if (glyph == SpecialChars::NBSPACE.unicode() ||
+			 glyph == 32)
+	{
+		stroke = (glyph == 32);
+		points = m_Doc->symNonBreak.copy();
+		chma4.translate(glyphs.xoffset, glyphs.yoffset-((fontSize / 10.0) * glyphs.scaleV * 0.4));
+	}
+	else if (glyph == SpecialChars::NBHYPHEN.unicode())
+	{
+		points = font.glyphOutline(font.char2CMap(QChar('-')), fontSize / 100);
+		chma4.translate(glyphs.xoffset, glyphs.yoffset-((fontSize / 10.0) * glyphs.scaleV));
+	}
+	else if (glyph == SpecialChars::SHYPHEN.unicode())
+	{
+		points.resize(0);
+		points.addQuadPoint(0, -10, 0, -10, 0, -6, 0, -6);
+		stroke = true;
+	}
+	else if (glyph == SpecialChars::OBJECT.unicode())
+	{
+		//for showing marks entries as control chars
+		points.resize(0);
+		points.addQuadPoint(0, -8, 1, -8, 0, -6, 1, -6);
+		stroke = true;
+	}
+	else // ???
+	{
+		points.resize(0);
+		points.addQuadPoint(0, -10, 0, -10, 0, -9, 0, -9);
+		points.addQuadPoint(0, -9, 0, -9, 1, -9, 1, -9);
+		points.addQuadPoint(1, -9, 1, -9, 1, -10, 1, -10);
+		points.addQuadPoint(1, -10, 1, -10, 0, -10, 0, -10);
+	}
+	chma.scale(glyphs.scaleH * fontSize / 100.0, glyphs.scaleV * fontSize / 100.0);
+	points.map(chma * chma4);
+	p->setupPolygon(&points, true);
+	QColor oldBrush = p->brush();
+	p->setBrush( (flags & ScLayout_SuppressSpace) ? Qt::green
+				: PrefsManager::instance()->appPrefs.displayPrefs.controlCharColor);
+	if (stroke)
+	{
+		QColor tmp = p->pen();
+		p->setPen(p->brush(), 1, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
+		p->setLineWidth(fontSize * glyphs.scaleV / 200.0);
+		p->strokePath();
+		p->setPen(tmp, 1, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
+	}
+	else
+	{
+		p->setFillMode(1);
+		p->fillPath();
+	}
+	p->setBrush(oldBrush);
+}
+
+
+void PageItem::drawGlyphs(ScPainter *p, const GlyphRun& layout)
+{
+	const CharStyle& style(layout.style());
 	const ScFace font = style.font();
-	if ((m_Doc->guidesPrefs().showControls) &&
-		(glyph == font.char2CMap(QChar(' ')) || glyph >=  ScFace::CONTROL_GLYPHS))
+
+	for (int i = 0; i < layout.glyphs().count(); ++i)
 	{
-		bool stroke = false;
-		if (glyph >=  ScFace::CONTROL_GLYPHS)
-			glyph -= ScFace::CONTROL_GLYPHS;
-		else
-			glyph = 32;
-		QTransform chma, chma4, chma5;
-		FPointArray points;
-		if (glyph == SpecialChars::TAB.unicode())
+		const GlyphLayout& glyphLayout(layout.glyphs()[i]);
+		uint glyph = glyphLayout.glyph;
+		
+		if ((m_Doc->guidesPrefs().showControls) &&
+			(glyph == font.char2CMap(QChar(' ')) || glyph >=  ScFace::CONTROL_GLYPHS))
 		{
-			points = m_Doc->symTab.copy();
-			chma4.translate(glyphs.xoffset + glyphs.xadvance - ((style.fontSize() / 10.0) * glyphs.scaleH * 0.7), glyphs.yoffset - ((style.fontSize() / 10.0) * glyphs.scaleV * 0.5));
+			drawControlGlyph(p, glyphLayout, layout.flags(), font, style.fontSize(), m_Doc);
+			p->translate(glyphLayout.xadvance, 0);
+			continue;
 		}
-		else if (glyph == SpecialChars::COLBREAK.unicode())
+		else if (glyph == (ScFace::CONTROL_GLYPHS + SpecialChars::NBSPACE.unicode()) ||
+				 glyph == (ScFace::CONTROL_GLYPHS + 32))
 		{
-			points = m_Doc->symNewCol.copy();
-			chma4.translate(glyphs.xoffset, glyphs.yoffset-((style.fontSize() / 10.0) * glyphs.scaleV * 0.6));
+			glyph = font.char2CMap(QChar(' '));
 		}
-		else if (glyph == SpecialChars::FRAMEBREAK.unicode())
+		else if (glyph == (ScFace::CONTROL_GLYPHS + SpecialChars::NBHYPHEN.unicode()))
 		{
-			points = m_Doc->symNewFrame.copy();
-			chma4.translate(glyphs.xoffset, glyphs.yoffset-((style.fontSize() / 10.0) * glyphs.scaleV * 0.6));
+			glyph = font.char2CMap(QChar('-'));
 		}
-		else if (glyph == SpecialChars::PARSEP.unicode())
+		else if (glyph >= ScFace::CONTROL_GLYPHS || (style.effects() & ScLayout_SuppressSpace))
 		{
-			points = m_Doc->symReturn.copy();
-			chma4.translate(glyphs.xoffset, glyphs.yoffset-((style.fontSize() / 10.0) * glyphs.scaleV * 0.8));
+			//		qDebug("drawGlyphs: skipping %d", glyph);
+			// all those are empty
+			p->translate(glyphLayout.xadvance, 0);
+			continue;
 		}
-		else if (glyph == SpecialChars::LINEBREAK.unicode())
+
+		//	if (font.canRender(QChar(glyph)))
 		{
-			points = m_Doc->symNewLine.copy();
-			chma4.translate(glyphs.xoffset, glyphs.yoffset-((style.fontSize() / 10.0) * glyphs.scaleV * 0.4));
-		}
-		else if (glyph == SpecialChars::NBSPACE.unicode() ||
-				 glyph == 32)
-		{
-			stroke = (glyph == 32);
-			points = m_Doc->symNonBreak.copy();
-			chma4.translate(glyphs.xoffset, glyphs.yoffset-((style.fontSize() / 10.0) * glyphs.scaleV * 0.4));
-		}
-		else if (glyph == SpecialChars::NBHYPHEN.unicode())
-		{
-			points = font.glyphOutline(font.char2CMap(QChar('-')), style.fontSize() / 100);
-			chma4.translate(glyphs.xoffset, glyphs.yoffset-((style.fontSize() / 10.0) * glyphs.scaleV));
-		}
-		else if (glyph == SpecialChars::SHYPHEN.unicode())
-		{
-			points.resize(0);
-			points.addQuadPoint(0, -10, 0, -10, 0, -6, 0, -6);
-			stroke = true;
-		}
-		else if (glyph == SpecialChars::OBJECT.unicode())
-		{
-			//for showing marks entries as control chars
-			points.resize(0);
-			points.addQuadPoint(0, -8, 1, -8, 0, -6, 1, -6);
-			stroke = true;
-		}
-		else // ???
-		{
-			points.resize(0);
-			points.addQuadPoint(0, -10, 0, -10, 0, -9, 0, -9);			
-			points.addQuadPoint(0, -9, 0, -9, 1, -9, 1, -9);			
-			points.addQuadPoint(1, -9, 1, -9, 1, -10, 1, -10);			
-			points.addQuadPoint(1, -10, 1, -10, 0, -10, 0, -10);			
-		}
-		chma.scale(glyphs.scaleH * style.fontSize() / 100.0, glyphs.scaleV * style.fontSize() / 100.0);
-		points.map(chma * chma4);
-		p->setupPolygon(&points, true);
-		QColor oldBrush = p->brush();
-		p->setBrush( (flags & ScLayout_SuppressSpace) ? Qt::green
-					: PrefsManager::instance()->appPrefs.displayPrefs.controlCharColor);
-		if (stroke)
-		{
-			QColor tmp = p->pen();
-			p->setPen(p->brush(), 1, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
-			p->setLineWidth(style.fontSize() * glyphs.scaleV / 200.0);
-			p->strokePath();
-			p->setPen(tmp, 1, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
-		}
-		else
-		{
-			p->setFillMode(1);
-			p->fillPath();
-		}
-		p->setBrush(oldBrush);
-		if (glyphs.more)
-		{
-			p->translate(glyphs.xadvance, 0);
-			drawGlyphs(p, style, ScLayout_None, *glyphs.more);
-		}			
-		return;
-	}
-	else if (glyph == (ScFace::CONTROL_GLYPHS + SpecialChars::NBSPACE.unicode()) ||
-			 glyph == (ScFace::CONTROL_GLYPHS + 32)) 
-		glyph = font.char2CMap(QChar(' '));
-	else if (glyph == (ScFace::CONTROL_GLYPHS + SpecialChars::NBHYPHEN.unicode()))
-		glyph = font.char2CMap(QChar('-'));
-	
-	if (glyph >= ScFace::CONTROL_GLYPHS || (style.effects() & ScLayout_SuppressSpace)) {
-//		qDebug("drawGlyphs: skipping %d", glyph);
-		// all those are empty
-		if (glyphs.more)
-		{
-			p->translate(glyphs.xadvance, 0);
-			drawGlyphs(p, style, ScLayout_None, *glyphs.more);
-		}			
-		return;
-	}
-//	if (font.canRender(QChar(glyph)))
-	{
-		FPointArray gly = font.glyphOutline(glyph);
-		// Do underlining first so you can get typographically correct
-		// underlines when drawing a white outline
-		if (((style.effects() & ScStyle_Underline) || ((style.effects() & ScStyle_UnderlineWords) && glyph != font.char2CMap(QChar(' ')))) && (style.strokeColor() != CommonStrings::None))
-		{
-			double st, lw;
-			if ((style.underlineOffset() != -1) || (style.underlineWidth() != -1))
+			FPointArray gly = font.glyphOutline(glyph);
+			// Do underlining first so you can get typographically correct
+			// underlines when drawing a white outline
+			if (((style.effects() & ScStyle_Underline) || ((style.effects() & ScStyle_UnderlineWords) && glyph != font.char2CMap(QChar(' ')))) && (style.strokeColor() != CommonStrings::None))
 			{
-				if (style.underlineOffset() != -1)
-					st = (style.underlineOffset() / 1000.0) * (font.descent(style.fontSize() / 10.0));
-				else
-					st = font.underlinePos(style.fontSize() / 10.0);
-				if (style.underlineWidth() != -1)
-					lw = (style.underlineWidth() / 1000.0) * (style.fontSize() / 10.0);
-				else
-					lw = qMax(font.strokeWidth(style.fontSize() / 10.0), 1.0);
-			}
-			else
-			{
-				st = font.underlinePos(style.fontSize() / 10.0);
-				lw = qMax(font.strokeWidth(style.fontSize() / 10.0), 1.0);
-			}
-			if (style.baselineOffset() != 0)
-				st += (style.fontSize() / 10.0) * glyphs.scaleV * (style.baselineOffset() / 1000.0);
-			QColor tmpC = p->pen();
-			p->setPen(p->brush());
-			p->setLineWidth(lw);
-			if (style.effects() & ScStyle_Subscript)
-				p->drawLine(FPoint(glyphs.xoffset, glyphs.yoffset - st), FPoint(glyphs.xoffset + glyphs.xadvance, glyphs.yoffset - st));
-			else
-				p->drawLine(FPoint(glyphs.xoffset, -st), FPoint(glyphs.xoffset + glyphs.xadvance, -st));
-			p->setPen(tmpC);
-		}
-		if (gly.size() > 3)
-		{
-			if (glyph == 0)
-			{
-//				qDebug() << QString("glyph 0: (%1,%2) * %3 %4 + %5").arg(glyphs.xoffset).arg(glyphs.yoffset).arg(glyphs.scaleH).arg(glyphs.scaleV).arg(glyphs.xadvance));
-			}
-			p->save();
-			p->translate(glyphs.xoffset, glyphs.yoffset - ((style.fontSize() / 10.0) * glyphs.scaleV));
-			if (m_isReversed)
-			{
-				p->scale(-1, 1);
-				p->translate(-glyphs.xadvance, 0);
-			}
-			if (style.baselineOffset() != 0)
-				p->translate(0, -(style.fontSize() / 10.0) * (style.baselineOffset() / 1000.0));
-			double glxSc = glyphs.scaleH * style.fontSize() / 100.00;
-			double glySc = glyphs.scaleV * style.fontSize() / 100.0;
-			p->scale(glxSc, glySc);
-//			p->setFillMode(1);
-			bool fr = p->fillRule();
-			p->setFillRule(false);
-//			double	a = gly.point(0).x();
-//			double	b = gly.point(0).y();
-//			double	c = gly.point(3).x();
-//			double	d = gly.point(3).y();
-//			qDebug() << QString("drawglyphs: %1 (%2,%3) (%4,%5) scaled %6,%7 trans %8,%9")
-//				   .arg(gly.size()).arg(a).arg(b).arg(c).arg(d)
-//				   .arg(p->worldMatrix().m11()).arg(p->worldMatrix().m22()).arg(p->worldMatrix().dx()).arg(p->worldMatrix().dy());
-			p->setupPolygon(&gly, true);
-			if (m_Doc->layerOutline(LayerID))
-			{
-				p->save();
-				p->setPen(m_Doc->layerMarker(LayerID), 0.5, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
-				p->setFillMode(ScPainter::None);
-				p->setBrushOpacity(1.0);
-				p->setPenOpacity(1.0);
-				p->strokePath();
-				p->restore();
-				p->setFillRule(fr);
-				p->restore();
-				if (glyphs.more)
+				double st, lw;
+				if ((style.underlineOffset() != -1) || (style.underlineWidth() != -1))
 				{
-					p->translate(glyphs.xadvance, 0);
-					drawGlyphs(p, style, ScLayout_None, *glyphs.more);
+					if (style.underlineOffset() != -1)
+						st = (style.underlineOffset() / 1000.0) * (font.descent(style.fontSize() / 10.0));
+					else
+						st = font.underlinePos(style.fontSize() / 10.0);
+					if (style.underlineWidth() != -1)
+						lw = (style.underlineWidth() / 1000.0) * (style.fontSize() / 10.0);
+					else
+						lw = qMax(font.strokeWidth(style.fontSize() / 10.0), 1.0);
 				}
-				return;
+				else
+				{
+					st = font.underlinePos(style.fontSize() / 10.0);
+					lw = qMax(font.strokeWidth(style.fontSize() / 10.0), 1.0);
+				}
+				if (style.baselineOffset() != 0)
+					st += (style.fontSize() / 10.0) * glyphLayout.scaleV * (style.baselineOffset() / 1000.0);
+				QColor tmpC = p->pen();
+				p->setPen(p->brush());
+				p->setLineWidth(lw);
+				if (style.effects() & ScStyle_Subscript)
+					p->drawLine(FPoint(glyphLayout.xoffset, glyphLayout.yoffset - st),
+								FPoint(glyphLayout.xoffset + glyphLayout.xadvance, glyphLayout.yoffset - st));
+				else
+					p->drawLine(FPoint(glyphLayout.xoffset, -st),
+								FPoint(glyphLayout.xoffset + glyphLayout.xadvance, -st));
+				p->setPen(tmpC);
 			}
-			if (glyph == 0)
+			if (gly.size() > 3)
 			{
-				p->setPen(PrefsManager::instance()->appPrefs.displayPrefs.controlCharColor, 1, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
-				p->setLineWidth(style.fontSize() * glyphs.scaleV * style.outlineWidth() * 2 / 10000.0);
-				p->strokePath();
-			}
-			else if ((font.isStroked()) && (style.strokeColor() != CommonStrings::None) && ((style.fontSize() * glyphs.scaleV * style.outlineWidth() / 10000.0) != 0))
-			{
-				QColor tmp = p->brush();
-				p->setPen(tmp, 1, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
-				p->setLineWidth(style.fontSize() * glyphs.scaleV * style.outlineWidth() / 10000.0);
-				p->strokePath();
-			}
-			else
-			{
-				if ((style.effects() & ScStyle_Shadowed) && (style.strokeColor() != CommonStrings::None))
+				if (glyph == 0)
+				{
+					//				qDebug() << QString("glyph 0: (%1,%2) * %3 %4 + %5").arg(glyphLayout.xoffset).arg(glyphLayout.yoffset).arg(glyphLayout.scaleH).arg(glyphLayout.scaleV).arg(glyphLayout.xadvance));
+				}
+				p->save();
+				p->translate(glyphLayout.xoffset, glyphLayout.yoffset - ((style.fontSize() / 10.0) * glyphLayout.scaleV));
+				if (m_isReversed)
+				{
+					p->scale(-1, 1);
+					p->translate(-glyphLayout.xadvance, 0);
+				}
+				if (style.baselineOffset() != 0)
+					p->translate(0, -(style.fontSize() / 10.0) * (style.baselineOffset() / 1000.0));
+				double glxSc = glyphLayout.scaleH * style.fontSize() / 100.00;
+				double glySc = glyphLayout.scaleV * style.fontSize() / 100.0;
+				p->scale(glxSc, glySc);
+				//			p->setFillMode(1);
+				bool fr = p->fillRule();
+				p->setFillRule(false);
+				//			double	a = gly.point(0).x();
+				//			double	b = gly.point(0).y();
+				//			double	c = gly.point(3).x();
+				//			double	d = gly.point(3).y();
+				//			qDebug() << QString("drawglyphs: %1 (%2,%3) (%4,%5) scaled %6,%7 trans %8,%9")
+				//				   .arg(gly.size()).arg(a).arg(b).arg(c).arg(d)
+				//				   .arg(p->worldMatrix().m11()).arg(p->worldMatrix().m22()).arg(p->worldMatrix().dx()).arg(p->worldMatrix().dy());
+				p->setupPolygon(&gly, true);
+				if (m_Doc->layerOutline(LayerID))
 				{
 					p->save();
-					p->translate((style.fontSize() * glyphs.scaleH * style.shadowXOffset() / 10000.0) / glxSc, -(style.fontSize() * glyphs.scaleV * style.shadowYOffset() / 10000.0) / glySc);
-					QColor tmp = p->brush();
-					p->setBrush(p->pen());
-					p->setupPolygon(&gly, true);
-					p->fillPath();
-					p->setBrush(tmp);
+					p->setPen(m_Doc->layerMarker(LayerID), 0.5, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
+					p->setFillMode(ScPainter::None);
+					p->setBrushOpacity(1.0);
+					p->setPenOpacity(1.0);
+					p->strokePath();
 					p->restore();
-					p->setupPolygon(&gly, true);
+					p->setFillRule(fr);
+					p->restore();
+					continue;
 				}
-				if (style.fillColor() != CommonStrings::None)
-					p->fillPath();
-				if ((style.effects() & ScStyle_Outline) && (style.strokeColor() != CommonStrings::None) && ((style.fontSize() * glyphs.scaleV * style.outlineWidth() / 10000.0) != 0))
+				if (glyph == 0)
 				{
-					p->setLineWidth((style.fontSize() * glyphs.scaleV * style.outlineWidth() / 10000.0) / glySc);
+					p->setPen(PrefsManager::instance()->appPrefs.displayPrefs.controlCharColor, 1, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
+					p->setLineWidth(style.fontSize() * glyphLayout.scaleV * style.outlineWidth() * 2 / 10000.0);
 					p->strokePath();
 				}
-			}
-			p->setFillRule(fr);
-			p->restore();
-		}
-		else {
-//			qDebug() << "drawGlyphs: empty glyph" << glyph;
-		}
-		if ((style.effects() & ScStyle_Strikethrough) && (style.strokeColor() != CommonStrings::None))
-		{
-			double st, lw;
-			if ((style.strikethruOffset() != -1) || (style.strikethruWidth() != -1))
-			{
-				if (style.strikethruOffset() != -1)
-					st = (style.strikethruOffset() / 1000.0) * (font.ascent(style.fontSize() / 10.0));
+				else if ((font.isStroked()) && (style.strokeColor() != CommonStrings::None) && ((style.fontSize() * glyphLayout.scaleV * style.outlineWidth() / 10000.0) != 0))
+				{
+					QColor tmp = p->brush();
+					p->setPen(tmp, 1, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
+					p->setLineWidth(style.fontSize() * glyphLayout.scaleV * style.outlineWidth() / 10000.0);
+					p->strokePath();
+				}
 				else
+				{
+					if ((style.effects() & ScStyle_Shadowed) && (style.strokeColor() != CommonStrings::None))
+					{
+						p->save();
+						p->translate((style.fontSize() * glyphLayout.scaleH * style.shadowXOffset() / 10000.0) / glxSc, -(style.fontSize() * glyphLayout.scaleV * style.shadowYOffset() / 10000.0) / glySc);
+						QColor tmp = p->brush();
+						p->setBrush(p->pen());
+						p->setupPolygon(&gly, true);
+						p->fillPath();
+						p->setBrush(tmp);
+						p->restore();
+						p->setupPolygon(&gly, true);
+					}
+					if (style.fillColor() != CommonStrings::None)
+						p->fillPath();
+					if ((style.effects() & ScStyle_Outline) && (style.strokeColor() != CommonStrings::None) && ((style.fontSize() * glyphLayout.scaleV * style.outlineWidth() / 10000.0) != 0))
+					{
+						p->setLineWidth((style.fontSize() * glyphLayout.scaleV * style.outlineWidth() / 10000.0) / glySc);
+						p->strokePath();
+					}
+				}
+				p->setFillRule(fr);
+				p->restore();
+			}
+			else {
+				//			qDebug() << "drawGlyphs: empty glyph" << glyph;
+			}
+			if ((style.effects() & ScStyle_Strikethrough) && (style.strokeColor() != CommonStrings::None))
+			{
+				double st, lw;
+				if ((style.strikethruOffset() != -1) || (style.strikethruWidth() != -1))
+				{
+					if (style.strikethruOffset() != -1)
+						st = (style.strikethruOffset() / 1000.0) * (font.ascent(style.fontSize() / 10.0));
+					else
+						st = font.strikeoutPos(style.fontSize() / 10.0);
+					if (style.strikethruWidth() != -1)
+						lw = (style.strikethruWidth() / 1000.0) * (style.fontSize() / 10.0);
+					else
+						lw = qMax(font.strokeWidth(style.fontSize() / 10.0), 1.0);
+				}
+				else
+				{
 					st = font.strikeoutPos(style.fontSize() / 10.0);
-				if (style.strikethruWidth() != -1)
-					lw = (style.strikethruWidth() / 1000.0) * (style.fontSize() / 10.0);
-				else
 					lw = qMax(font.strokeWidth(style.fontSize() / 10.0), 1.0);
+				}
+				if (style.baselineOffset() != 0)
+					st += (style.fontSize() / 10.0) * glyphLayout.scaleV * (style.baselineOffset() / 1000.0);
+				p->setPen(p->brush());
+				p->setLineWidth(lw);
+				p->drawLine(FPoint(glyphLayout.xoffset, glyphLayout.yoffset - st),
+							FPoint(glyphLayout.xoffset + glyphLayout.xadvance, glyphLayout.yoffset - st));
 			}
-			else
-			{
-				st = font.strikeoutPos(style.fontSize() / 10.0);
-				lw = qMax(font.strokeWidth(style.fontSize() / 10.0), 1.0);
-			}
-			if (style.baselineOffset() != 0)
-				st += (style.fontSize() / 10.0) * glyphs.scaleV * (style.baselineOffset() / 1000.0);
-			p->setPen(p->brush());
-			p->setLineWidth(lw);
-			p->drawLine(FPoint(glyphs.xoffset, glyphs.yoffset - st), FPoint(glyphs.xoffset + glyphs.xadvance, glyphs.yoffset - st));
 		}
-	}
-/*	else
-	{
-		p->setLineWidth(1);
-		p->setPen(red);
-		p->setBrush(red);
-		p->setFillMode(1);
-		p->drawRect(glyphs.xoffset, glyphs.yoffset - (style.fontSize() / 10.0) * glyphs.scaleV , (style.fontSize() / 10.0) * glyphs.scaleH, (style.fontSize() / 10.0) * glyphs.scaleV);
-	}
-	*/	
-	if (glyphs.more)
-	{
-		p->translate(glyphs.xadvance, 0);
-		drawGlyphs(p, style, ScLayout_None, *glyphs.more);
+		/*	else
+		 {
+		 p->setLineWidth(1);
+		 p->setPen(red);
+		 p->setBrush(red);
+		 p->setFillMode(1);
+		 p->drawRect(glyphs.xoffset, glyphs.yoffset - (style.fontSize() / 10.0) * glyphs.scaleV , (style.fontSize() / 10.0) * glyphs.scaleH, (style.fontSize() / 10.0) * glyphs.scaleV);
+		 }
+		 */
+		p->translate(glyphLayout.xadvance, 0);
 	}
 }
 

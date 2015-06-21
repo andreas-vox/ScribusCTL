@@ -1,0 +1,66 @@
+Determining if the system is big endian passed with the following output:
+Change Dir: /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/opt/local/bin/gmake" "cmTryCompileExec3605744564/fast"
+/opt/local/bin/gmake -f CMakeFiles/cmTryCompileExec3605744564.dir/build.make CMakeFiles/cmTryCompileExec3605744564.dir/build
+gmake[1]: Verzeichnis „/Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp“ wird betreten
+/opt/local/bin/cmake -E cmake_progress_report /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec3605744564.dir/TestEndianess.c.o
+/usr/bin/cc    -o CMakeFiles/cmTryCompileExec3605744564.dir/TestEndianess.c.o   -c /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp/TestEndianess.c
+Linking C executable cmTryCompileExec3605744564
+/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec3605744564.dir/link.txt --verbose=1
+/usr/bin/cc    -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTryCompileExec3605744564.dir/TestEndianess.c.o  -o cmTryCompileExec3605744564  
+gmake[1]: Verzeichnis „/Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp“ wird verlassen
+
+TestEndianess.c:
+/* A 16 bit integer is required. */
+typedef unsigned short cmakeint16;
+
+/* On a little endian machine, these 16bit ints will give "THIS IS LITTLE ENDIAN."
+   On a big endian machine the characters will be exchanged pairwise. */
+const cmakeint16 info_little[] =  {0x4854, 0x5349, 0x4920, 0x2053, 0x494c, 0x5454, 0x454c, 0x4520, 0x444e, 0x4149, 0x2e4e, 0x0000};
+
+/* on a big endian machine, these 16bit ints will give "THIS IS BIG ENDIAN."
+   On a little endian machine the characters will be exchanged pairwise. */
+const cmakeint16 info_big[] =     {0x5448, 0x4953, 0x2049, 0x5320, 0x4249, 0x4720, 0x454e, 0x4449, 0x414e, 0x2e2e, 0x0000};
+
+#ifdef __CLASSIC_C__
+int main(argc, argv) int argc; char *argv[];
+#else
+int main(int argc, char *argv[])
+#endif
+{
+  int require = 0;
+  require += info_little[argc];
+  require += info_big[argc];
+  (void)argv;
+  return require;
+}
+
+
+Determining if files endian.h exist failed with the following output:
+Change Dir: /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/opt/local/bin/gmake" "cmTryCompileExec2869772183/fast"
+/opt/local/bin/gmake -f CMakeFiles/cmTryCompileExec2869772183.dir/build.make CMakeFiles/cmTryCompileExec2869772183.dir/build
+gmake[1]: Verzeichnis „/Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp“ wird betreten
+/opt/local/bin/cmake -E cmake_progress_report /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec2869772183.dir/CheckIncludeFiles.c.o
+/usr/bin/cc   -arch x86_64   -o CMakeFiles/cmTryCompileExec2869772183.dir/CheckIncludeFiles.c.o   -c /Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp/CheckIncludeFiles.c
+/Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp/CheckIncludeFiles.c:2:10: fatal error: 'endian.h' file not found
+#include <endian.h>
+         ^
+1 error generated.
+CMakeFiles/cmTryCompileExec2869772183.dir/build.make:57: die Regel für Ziel „CMakeFiles/cmTryCompileExec2869772183.dir/CheckIncludeFiles.c.o“ scheiterte
+gmake[1]: Verzeichnis „/Users/vox/Scribus/ScribusCTL/build/CMakeFiles/CMakeTmp“ wird verlassen
+gmake[1]: *** [CMakeFiles/cmTryCompileExec2869772183.dir/CheckIncludeFiles.c.o] Fehler 1
+Makefile:118: die Regel für Ziel „cmTryCompileExec2869772183/fast“ scheiterte
+gmake: *** [cmTryCompileExec2869772183/fast] Fehler 2
+
+Source:
+/* */
+#include <endian.h>
+
+
+int main(){return 0;}
+
