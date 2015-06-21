@@ -2367,8 +2367,15 @@ bool Scribus150Format::readColor(ColorList& colors, ScXmlStreamAttributes& attrs
 	ScColor color;
 	if (attrs.hasAttribute("CMYK"))
 		color.setNamedColor(attrs.valueAsString("CMYK"));
-	else
+	else if (attrs.hasAttribute("RGB"))
 		color.fromQColor(QColor(attrs.valueAsString("RGB")));
+	else
+	{
+		double L = attrs.valueAsDouble("L", 0);
+		double a = attrs.valueAsDouble("A", 0);
+		double b = attrs.valueAsDouble("B", 0);
+		color.setColor(L, a, b);
+	}
 	color.setSpotColor( attrs.valueAsBool("Spot", false) );
 	color.setRegistrationColor( attrs.valueAsBool("Register", false) );
 	QString name = attrs.valueAsString("NAME", color.name());
@@ -3066,7 +3073,7 @@ bool Scribus150Format::readPDFOptions(ScribusDoc* doc, ScXmlStreamReader& reader
 	doc->pdfOptions().Articles   = attrs.valueAsBool("Articles");
 	doc->pdfOptions().Thumbnails = attrs.valueAsBool("Thumbnails");
 	doc->pdfOptions().Compress   = attrs.valueAsBool("Compress");
-	doc->pdfOptions().CompressMethod = (PDFOptions::PDFCompression)attrs.valueAsInt("CMethod", 0);
+	doc->pdfOptions().CompressMethod = (PDFOptions::PDFCompression) attrs.valueAsInt("CMethod", 0);
 	doc->pdfOptions().Quality    = attrs.valueAsInt("Quality", 0);
 	doc->pdfOptions().RecalcPic  = attrs.valueAsBool("RecalcPic");
 	doc->pdfOptions().embedPDF   = attrs.valueAsBool("EmbedPDF", false);
@@ -3084,6 +3091,8 @@ bool Scribus150Format::readPDFOptions(ScribusDoc* doc, ScXmlStreamReader& reader
 	doc->pdfOptions().Resolution = attrs.valueAsInt("Resolution");
 	doc->pdfOptions().Binding    = attrs.valueAsInt("Binding");
 	doc->pdfOptions().fileName   = "";
+
+	doc->pdfOptions().FontEmbedding = (PDFOptions::PDFFontEmbedding) attrs.valueAsInt("FontEmbedding", 0);
 	doc->pdfOptions().isGrayscale   = attrs.valueAsBool("Grayscale", false);
 	doc->pdfOptions().UseRGB        = attrs.valueAsBool("RGBMode", false);
 	doc->pdfOptions().UseProfiles   = attrs.valueAsBool("UseProfiles", false);
@@ -3127,7 +3136,7 @@ bool Scribus150Format::readPDFOptions(ScribusDoc* doc, ScXmlStreamReader& reader
 	doc->pdfOptions().openAction    = attrs.valueAsString("openAction", "");
 
 	QStringRef tagName = reader.name();
-	while(!reader.atEnd() && !reader.hasError())
+	while (!reader.atEnd() && !reader.hasError())
 	{
 		reader.readNext();
 		if (reader.isEndElement() && (reader.name() == tagName))
@@ -3136,7 +3145,7 @@ bool Scribus150Format::readPDFOptions(ScribusDoc* doc, ScXmlStreamReader& reader
 			continue;
 		QStringRef tName = reader.name();
 		attrs = reader.scAttributes();
-		if(tName == "LPI")
+		if (tName == "LPI")
 		{
 			struct LPIData lpo;
 			lpo.Angle     = attrs.valueAsInt("Angle");
@@ -3144,19 +3153,19 @@ bool Scribus150Format::readPDFOptions(ScribusDoc* doc, ScXmlStreamReader& reader
 			lpo.SpotFunc  = attrs.valueAsInt("SpotFunction");
 			doc->pdfOptions().LPISettings[attrs.valueAsString("Color")] = lpo;
 		}
-		if(tName == "Fonts")
+		if (tName == "Fonts")
 		{
 			QString fname = attrs.valueAsString("Name");
 			if (!doc->pdfOptions().EmbedList.contains(fname))
 				doc->pdfOptions().EmbedList.append(fname);
 		}
-		if(tName == "Subset")
+		if (tName == "Subset")
 		{
 			QString sname = attrs.valueAsString("Name");
 			if (!doc->pdfOptions().SubsetList.contains(sname))
 				doc->pdfOptions().SubsetList.append(sname);
 		}
-		if(tName == "Effekte")
+		if (tName == "Effekte")
 		{
 			struct PDFPresentationData ef;
 			ef.pageEffectDuration =  attrs.valueAsInt("pageEffectDuration");
@@ -5501,6 +5510,8 @@ PageItem* Scribus150Format::pasteItem(ScribusDoc *doc, ScXmlStreamAttributes& at
 	currItem->setSoftShadowBlurRadius(attrs.valueAsDouble("SOFTSHADOWBLURRADIUS", 5.0));
 	currItem->setSoftShadowBlendMode(attrs.valueAsInt("SOFTSHADOWBLENDMODE", 0));
 	currItem->setSoftShadowOpacity(attrs.valueAsDouble("SOFTSHADOWOPACITY", 0.0));
+	currItem->setSoftShadowErasedByObject(attrs.valueAsBool("SOFTSHADOWERASE", false));
+	currItem->setSoftShadowHasObjectTransparency(attrs.valueAsBool("SOFTSHADOWOBJTRANS", false));
 
 	//currItem->setRedrawBounding();
 	//currItem->OwnPage = view->OnPage(currItem);

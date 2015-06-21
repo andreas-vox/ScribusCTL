@@ -39,17 +39,48 @@ ScColor ScColorEngine::convertToModel(const ScColor& color, const ScribusDoc* do
 	if( oldModel == model )
 		return ScColor(color);
 	ScColor newCol;
-	if( model == colorModelRGB )
+	if (model == colorModelRGB)
 	{
 		RGBColor rgb;
 		getRGBValues(color, doc, rgb);
 		newCol.setColorRGB(rgb.r, rgb.g, rgb.b);
 	}
-	else
+	else if (model == colorModelCMYK)
 	{
 		CMYKColor cmyk;
 		getCMYKValues(color, doc, cmyk);
 		newCol.setColor(cmyk.c, cmyk.m, cmyk.y, cmyk.k);
+	}
+	else if (model == colorModelLab)
+	{
+		ScColorMgmtEngine engine(ScCore->defaultEngine);
+		if (oldModel == colorModelRGB)
+		{
+			ScColorProfile profRGB = doc ? doc->DocInputRGBProf : ScCore->defaultRGBProfile;
+			ScColorProfile profLab = ScCore->defaultLabProfile;
+			ScColorTransform trans = engine.createTransform(profRGB, Format_RGB_16, profLab, Format_Lab_Dbl, Intent_Perceptual, 0);
+			double outC[3];
+			unsigned short inC[3];
+			inC[0] = color.CR * 257;
+			inC[1] = color.MG * 257;
+			inC[2] = color.YB * 257;
+			trans.apply(inC, outC, 1);
+			newCol.setColor(outC[0], outC[1], outC[2]);
+		}
+		else
+		{
+			ScColorProfile profRGB = doc ? doc->DocInputCMYKProf : ScCore->defaultCMYKProfile;
+			ScColorProfile profLab = ScCore->defaultLabProfile;
+			ScColorTransform trans = engine.createTransform(profRGB, Format_CMYK_16, profLab, Format_Lab_Dbl, Intent_Perceptual, 0);
+			double outC[3];
+			unsigned short inC[4];
+			inC[0] = color.CR * 257;
+			inC[1] = color.MG * 257;
+			inC[2] = color.YB * 257;
+			inC[3] = color.K * 257;
+			trans.apply(inC, outC, 1);
+			newCol.setColor(outC[0], outC[1], outC[2]);
+		}
 	}
 	return newCol;
 }
@@ -66,7 +97,7 @@ void ScColorEngine::getRGBValues(const ScColor& color, const ScribusDoc* doc, RG
 			rgb.g = color.MG;
 			rgb.b = color.YB;
 		}
-		else
+		else if (model == colorModelCMYK)
 		{
 			unsigned short inC[4];
 			unsigned short outC[4];
@@ -79,6 +110,19 @@ void ScColorEngine::getRGBValues(const ScColor& color, const ScribusDoc* doc, RG
 			rgb.g = outC[1] / 257;
 			rgb.b = outC[2] / 257;
 		}
+		else if (model == colorModelLab)
+		{
+			ScColorTransform trans = doc ? doc->stdLabToRGBTrans : ScCore->defaultLabToRGBTrans;
+			double inC[3];
+			inC[0] = color.L_val;
+			inC[1] = color.a_val;
+			inC[2] = color.b_val;
+			quint16 outC[3];
+			trans.apply(inC, outC, 1);
+			rgb.r = outC[0] / 257;
+			rgb.g = outC[1] / 257;
+			rgb.b = outC[2] / 257;
+		}
 	}
 	else if (model == colorModelCMYK)
 	{
@@ -86,11 +130,24 @@ void ScColorEngine::getRGBValues(const ScColor& color, const ScribusDoc* doc, RG
 		rgb.g = 255 - qMin(255, color.MG + color.K);
 		rgb.b = 255 - qMin(255, color.YB + color.K);
 	}
-	else
+	else if (model == colorModelRGB)
 	{
 		rgb.r = color.CR;
 		rgb.g = color.MG;
 		rgb.b = color.YB;
+	}
+	else if (model == colorModelLab)
+	{
+		ScColorTransform trans = doc ? doc->stdLabToRGBTrans : ScCore->defaultLabToRGBTrans;
+		double inC[3];
+		inC[0] = color.L_val;
+		inC[1] = color.a_val;
+		inC[2] = color.b_val;
+		quint16 outC[3];
+		trans.apply(inC, outC, 1);
+		rgb.r = outC[0] / 257;
+		rgb.g = outC[1] / 257;
+		rgb.b = outC[2] / 257;
 	}
 }
 
@@ -122,12 +179,26 @@ void ScColorEngine::getCMYKValues(const ScColor& color, const ScribusDoc* doc, C
 				cmyk.k = outC[3] / 257;
 			}
 		}
-		else
+		else if (model == colorModelCMYK)
 		{
 			cmyk.c = color.CR;
 			cmyk.m = color.MG;
 			cmyk.y = color.YB;
 			cmyk.k = color.K;
+		}
+		else if (model == colorModelLab)
+		{
+			ScColorTransform trans = doc ? doc->stdLabToCMYKTrans : ScCore->defaultLabToCMYKTrans;
+			double inC[3];
+			inC[0] = color.L_val;
+			inC[1] = color.a_val;
+			inC[2] = color.b_val;
+			quint16 outC[4];
+			trans.apply(inC, outC, 1);
+			cmyk.c = outC[0] / 257;
+			cmyk.m = outC[1] / 257;
+			cmyk.y = outC[2] / 257;
+			cmyk.k = outC[3] / 257;
 		}
 	}
 	else if (model == colorModelRGB)
@@ -137,12 +208,26 @@ void ScColorEngine::getCMYKValues(const ScColor& color, const ScribusDoc* doc, C
 		cmyk.m = 255 - color.MG - cmyk.k;
 		cmyk.y = 255 - color.YB - cmyk.k;
 	}
-	else
+	else if (model == colorModelCMYK)
 	{
 		cmyk.c = color.CR;
 		cmyk.m = color.MG;
 		cmyk.y = color.YB;
 		cmyk.k = color.K;
+	}
+	else if (model == colorModelLab)
+	{
+		ScColorTransform trans = doc ? doc->stdLabToCMYKTrans : ScCore->defaultLabToCMYKTrans;
+		double inC[3];
+		inC[0] = color.L_val;
+		inC[1] = color.a_val;
+		inC[2] = color.b_val;
+		quint16 outC[4];
+		trans.apply(inC, outC, 1);
+		cmyk.c = outC[0] / 257;
+		cmyk.m = outC[1] / 257;
+		cmyk.y = outC[2] / 257;
+		cmyk.k = outC[3] / 257;
 	}
 }
 
@@ -156,12 +241,26 @@ void ScColorEngine::getShadeColorCMYK(const ScColor& color, const ScribusDoc* do
 		ScColor tmpR(rgb.r, rgb.g, rgb.b);
 		getCMYKValues(tmpR, doc, cmyk);
 	}
-	else
+	else if (color.getColorModel() == colorModelCMYK)
 	{
 		cmyk.c = qRound(color.CR * level / 100.0);
 		cmyk.m = qRound(color.MG * level / 100.0);
 		cmyk.y = qRound(color.YB * level / 100.0);
 		cmyk.k = qRound(color.K * level / 100.0);
+	}
+	else if (color.getColorModel() == colorModelLab)
+	{
+		ScColorTransform trans = doc ? doc->stdLabToCMYKTrans : ScCore->defaultLabToCMYKTrans;
+		double inC[3];
+		inC[0] = color.L_val * (level / 100.0);
+		inC[1] = color.a_val;
+		inC[2] = color.b_val;
+		quint16 outC[4];
+		trans.apply(inC, outC, 1);
+		cmyk.c = outC[0] / 257;
+		cmyk.m = outC[1] / 257;
+		cmyk.y = outC[2] / 257;
+		cmyk.k = outC[3] / 257;
 	}
 }
 
@@ -174,7 +273,7 @@ void ScColorEngine::getShadeColorRGB(const ScColor& color, const ScribusDoc* doc
 		ScColor tmpC(cmyk.c, cmyk.m, cmyk.y, cmyk.k);
 		getRGBValues(tmpC, doc, rgb);
 	}
-	else
+	else if (color.getColorModel() == colorModelRGB)
 	{
 		int h, s, v, snew, vnew;
 		QColor tmpR(color.CR, color.MG, color.YB);
@@ -187,6 +286,19 @@ void ScColorEngine::getShadeColorRGB(const ScColor& color, const ScribusDoc* doc
 		/*rgb.CR = 255 - ((255 - color.CR) * level / 100);
 		rgb.MG = 255 - ((255 - color.MG) * level / 100);
 		rgb.YB = 255 - ((255 - color.YB) * level / 100);*/
+	}
+	else if (color.getColorModel() == colorModelLab)
+	{
+		ScColorTransform trans = doc ? doc->stdLabToRGBTrans : ScCore->defaultLabToRGBTrans;
+		double inC[3];
+		inC[0] = color.L_val * (level / 100.0);
+		inC[1] = color.a_val;
+		inC[2] = color.b_val;
+		quint16 outC[3];
+		trans.apply(inC, outC, 1);
+		rgb.r = outC[0] / 257;
+		rgb.g = outC[1] / 257;
+		rgb.b = outC[2] / 257;
 	}
 }
 
@@ -201,7 +313,7 @@ QColor ScColorEngine::getDisplayColor(const ScColor& color, const ScribusDoc* do
 		rgb.b = color.YB;
 		tmp = getDisplayColor(rgb, doc, color.isSpotColor());
 	}
-	else
+	else if (color.getColorModel() == colorModelCMYK)
 	{
 		CMYKColor cmyk;
 		cmyk.c = color.CR;
@@ -209,6 +321,17 @@ QColor ScColorEngine::getDisplayColor(const ScColor& color, const ScribusDoc* do
 		cmyk.y = color.YB;
 		cmyk.k = color.K;
 		tmp = getDisplayColor(cmyk, doc, color.isSpotColor());
+	}
+	else if (color.getColorModel() == colorModelLab)
+	{
+		ScColorTransform trans  = doc ? doc->stdLabToRGBTrans : ScCore->defaultLabToRGBTrans;
+		double inC[3];
+		inC[0] = color.L_val;
+		inC[1] = color.a_val;
+		inC[2] = color.b_val;
+		quint16 outC[3];
+		trans.apply(inC, outC, 1);
+		tmp = QColor(outC[0] / 257, outC[1] / 257, outC[2] / 257);
 	}
 	return tmp;
 }
@@ -225,7 +348,7 @@ QColor ScColorEngine::getDisplayColor(const ScColor& color, const ScribusDoc* do
 		getShadeColorRGB(color, doc, rgb, level);
 		tmp = getDisplayColor(rgb, doc, color.isSpotColor());
 	}
-	else
+	else if (color.getColorModel() == colorModelCMYK)
 	{
 		CMYKColor cmyk;
 		cmyk.c = color.CR;
@@ -235,10 +358,21 @@ QColor ScColorEngine::getDisplayColor(const ScColor& color, const ScribusDoc* do
 		getShadeColorCMYK(color, doc, cmyk, level);
 		tmp = getDisplayColor(cmyk, doc, color.isSpotColor());
 	}
+	else if (color.getColorModel() == colorModelLab)
+	{
+		ScColorTransform trans  = doc ? doc->stdLabToRGBTrans : ScCore->defaultLabToRGBTrans;
+		double inC[3];
+		inC[0] = color.L_val * (level / 100.0);
+		inC[1] = color.a_val;
+		inC[2] = color.b_val;
+		quint16 outC[3];
+		trans.apply(inC, outC, 1);
+		tmp = QColor(outC[0] / 257, outC[1] / 257, outC[2] / 257);
+	}
 	return tmp;
 }
 
-QColor ScColorEngine::getDisplayColorGC(const ScColor& color, const ScribusDoc* doc)
+QColor ScColorEngine::getDisplayColorGC(const ScColor& color, const ScribusDoc* doc, bool *outOfG)
 {
 	QColor tmp;
 	bool doSoftProofing = doc ? doc->SoftProofing : false;
@@ -246,6 +380,8 @@ QColor ScColorEngine::getDisplayColorGC(const ScColor& color, const ScribusDoc* 
 	if ( doSoftProofing && doGamutCheck )
 	{
 		bool outOfGamutFlag = isOutOfGamut(color, doc);
+		if (outOfG != NULL)
+			*outOfG = outOfGamutFlag;
 		tmp = outOfGamutFlag ? QColor(0, 255, 0) : getDisplayColor(color, doc);
 	}
 	else
@@ -318,7 +454,7 @@ QColor ScColorEngine::getShadeColorProof(const ScColor& color, const ScribusDoc*
 		else
 			tmp = getColorProof(rgb, doc, color.isSpotColor(), doGC);
 	}
-	else
+	else if (color.getColorModel() == colorModelCMYK)
 	{
 		CMYKColor cmyk;
 		cmyk.c = color.CR;
@@ -327,6 +463,28 @@ QColor ScColorEngine::getShadeColorProof(const ScColor& color, const ScribusDoc*
 		cmyk.k = color.K;
 		getShadeColorCMYK(color, doc, cmyk, level);
 		tmp = getColorProof(cmyk, doc, color.isSpotColor(), doGC);
+	}
+	else if (color.getColorModel() == colorModelLab)
+	{
+		double inC[3];
+		inC[0] = color.L_val * (level / 100.0);
+		inC[1] = color.a_val;
+		inC[2] = color.b_val;
+		quint16 outC[3];
+		ScColorTransform trans  = doc ? doc->stdLabToRGBTrans : ScCore->defaultLabToRGBTrans;
+		ScColorTransform transProof   = doc ? doc->stdProofLab   : ScCore->defaultLabToRGBTrans;
+		ScColorTransform transProofGC = doc ? doc->stdProofLabGC : ScCore->defaultLabToRGBTrans;
+		if (cmsUse & doc->SoftProofing)
+		{
+			ScColorTransform xform = doGC ? transProofGC : transProof;
+			xform.apply(inC, outC, 1);
+			tmp = QColor(outC[0] / 257, outC[1] / 257, outC[2] / 257);
+		}
+		else
+		{
+			trans.apply(inC, outC, 1);
+			tmp = QColor(outC[0] / 257, outC[1] / 257, outC[2] / 257);
+		}
 	}
 	
 	return tmp;
@@ -477,7 +635,7 @@ bool ScColorEngine::isOutOfGamut(const ScColor& color, const ScribusDoc* doc)
 			if ((color.CR == color.MG && color.MG == color.YB))
 				alert = false;
 		}
-		else
+		else if (color.getColorModel() == colorModelCMYK)
 		{
 			inC[0] = color.CR * 257;
 			inC[1] = color.MG * 257;
@@ -490,6 +648,18 @@ bool ScColorEngine::isOutOfGamut(const ScColor& color, const ScribusDoc* doc)
 				alert = false;
 			if ((color.MG == color.CR) && (color.CR == color.YB) && (color.YB == color.K))
 				alert = false;
+		}
+		else if (color.getColorModel() == colorModelLab)
+		{
+			double inC[3];
+			inC[0] = color.L_val;
+			inC[1] = color.a_val;
+			inC[2] = color.b_val;
+			xformProof = doc->stdProofLabGC;
+			xformProof.apply(inC, outC, 1);
+			if ((outC[0]/257 == 0) && (outC[1]/257 == 255) && (outC[2]/257 == 0))
+				outOfGamutFlag = true;
+			alert = false;
 		}
 		if (alert)
 		{
@@ -504,7 +674,7 @@ bool ScColorEngine::isOutOfGamut(const ScColor& color, const ScribusDoc* doc)
 void ScColorEngine::applyGCR(ScColor& color, const ScribusDoc* doc)
 {
 	bool cmsUse = doc ? doc->HasCMS : false;
-	if (!(ScCore->haveCMS() && cmsUse))
+	if (!(ScCore->haveCMS() && cmsUse) && (color.getColorModel() != colorModelLab))
 	{
 		CMYKColor cmyk;
 		getCMYKValues(color, doc, cmyk);

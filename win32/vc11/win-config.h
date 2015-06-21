@@ -2,7 +2,7 @@
 #define WINCONFIG_H
 
 /* Version number of package */
-#define VERSION "1.5.0svn"
+#define VERSION "1.5.1.svn"
 
 /* Are we building win32 native version. */
 #define BUILD_WINDOWS_VERSION 1
@@ -59,9 +59,8 @@
 #define HAVE_REVENGE 1
 
 /* Define to 1 if you have the `snprintf' function. */
-#undef HAVE_SNPRINTF
-#ifdef _MSC_VER
 #define HAVE_SNPRINTF 1
+#if defined(_MSC_VER) && (_MSC_VER < 1900)
 #define snprintf(a, b, c, d) _snprintf(a, b, c, d)
 #endif
 

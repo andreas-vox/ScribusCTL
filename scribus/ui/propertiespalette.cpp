@@ -266,7 +266,7 @@ void PropertiesPalette::unsetDoc()
 	m_doc=NULL;
 	m_item = NULL;
 
-	xyzPal->unsetItem();
+	imagePal->unsetItem();
 	xyzPal->unsetDoc();
 	shadowPal->unsetItem();
 	shadowPal->unsetDoc();
@@ -301,7 +301,14 @@ void PropertiesPalette::unsetItem()
 	m_item     = NULL;
 	Cpal->setCurrentItem(NULL);
 	Tpal->setCurrentItem(NULL);
+	imagePal->unsetItem();
 	tablePal->unsetItem();
+	shapePal->unsetItem();
+	groupPal->unsetItem();
+	textPal->unsetItem();
+	shadowPal->unsetItem();
+	imagePal->unsetItem();
+	linePal->unsetItem();
 	handleSelectionChanged();
 }
 
@@ -400,7 +407,7 @@ void PropertiesPalette::setCurrentItem(PageItem *i)
 	if ((m_item->isGroup()) && (!m_item->isSingleSel))
 	{
 		TabStack->setItemEnabled(idXYZItem, true);
-		TabStack->setItemEnabled(idShadowItem, false);
+		TabStack->setItemEnabled(idShadowItem, true);
 		TabStack->setItemEnabled(idShapeItem, false);
 		TabStack->setItemEnabled(idGroupItem, true);
 		TabStack->setItemEnabled(idLineItem, false);
@@ -451,7 +458,7 @@ void PropertiesPalette::setCurrentItem(PageItem *i)
 	if (m_item->asSymbolFrame())
 	{
 		TabStack->setItemEnabled(idXYZItem, true);
-		TabStack->setItemEnabled(idShadowItem, false);
+		TabStack->setItemEnabled(idShadowItem, true);
 		TabStack->setItemEnabled(idShapeItem, false);
 		TabStack->setItemEnabled(idGroupItem, true);
 		TabStack->setItemEnabled(idLineItem, false);
@@ -543,7 +550,7 @@ void  PropertiesPalette::handleSelectionChanged()
 			TabStack->setItemEnabled(idLineItem, true);
 			break;
 		case PageItem::Line:
-			TabStack->setItemEnabled(idShadowItem, false);
+			TabStack->setItemEnabled(idShadowItem, true);
 			TabStack->setItemEnabled(idShapeItem, false);
 			TabStack->setItemEnabled(idTextItem, false);
 			TabStack->setItemEnabled(idImageItem, false);
@@ -562,14 +569,14 @@ void  PropertiesPalette::handleSelectionChanged()
 			break;
 		case PageItem::PolyLine:
 		case PageItem::Spiral:
-			TabStack->setItemEnabled(idShadowItem, false);
+			TabStack->setItemEnabled(idShadowItem, true);
 			TabStack->setItemEnabled(idShapeItem, true);
 			TabStack->setItemEnabled(idTextItem, false);
 			TabStack->setItemEnabled(idImageItem, false);
 			TabStack->setItemEnabled(idLineItem, true);
 			break;
 		case PageItem::PathText:
-			TabStack->setItemEnabled(idShadowItem, false);
+			TabStack->setItemEnabled(idShadowItem, true);
 			TabStack->setItemEnabled(idShapeItem, true);
 			TabStack->setItemEnabled(idTextItem, true);
 			TabStack->setItemEnabled(idImageItem, false);
@@ -577,12 +584,12 @@ void  PropertiesPalette::handleSelectionChanged()
 			break;
 		case PageItem::Symbol:
 		case PageItem::Group:
-			TabStack->setItemEnabled(idShadowItem, false);
+			TabStack->setItemEnabled(idShadowItem, true);
 			TabStack->setItemEnabled(idShapeItem, false);
 			TabStack->setItemEnabled(idTextItem, false);
 			TabStack->setItemEnabled(idImageItem, false);
-			TabStack->setItemEnabled(idLineItem, true);
-			TabStack->setItemEnabled(idGroupItem, false);
+			TabStack->setItemEnabled(idLineItem, false);
+			TabStack->setItemEnabled(idGroupItem, true);
 			TabStack->setItemEnabled(idColorsItem, false);
 			TabStack->setItemEnabled(idTransparencyItem, false);
 			break;

@@ -1019,6 +1019,9 @@
     <ClInclude Include="..\..\..\scribus\pdfwriter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\scribus\colormgmt\sccolorspacedata_labdbl.h">
+      <Filter>colorMgmt</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\scribus\desaxe\digester.cpp">
@@ -2897,6 +2900,9 @@
       <Filter>Form Files</Filter>
     </uic>
     <uic Include="..\..\..\scribus\ui\tabpdfoptions.ui">
+      <Filter>Form Files</Filter>
+    </uic>
+    <uic Include="..\..\..\scribus\ui\cmykfwbase.ui">
       <Filter>Form Files</Filter>
     </uic>
   </ItemGroup>
