@@ -1279,7 +1279,7 @@ void ScribusMainWindow::initStatusBar()
 	QByteArray stylesheet;
 	if (loadRawText(ScPaths::instance().libDir() + "scribus.css", stylesheet))
 	{
-		QString downArrow(ScPaths::instance().iconDir()+"16/go-down.png");
+		QString downArrow(pathForIcon("16/go-down.png"));
 		QByteArray da;
 		da.append(downArrow);
 		stylesheet.replace("___downArrow___", da);
@@ -3457,6 +3457,11 @@ bool ScribusMainWindow::loadDoc(QString fileName)
 		if (docFontDir3.exists())
 			prefsManager->appPrefs.fontPrefs.AvailFonts.AddScalableFonts(fi.absolutePath()+"/Document fonts", FName);
 		prefsManager->appPrefs.fontPrefs.AvailFonts.updateFontMap();
+		if (view != NULL)
+		{
+			actionManager->disconnectNewViewActions();
+			disconnect(view, SIGNAL(signalGuideInformation(int, qreal)), alignDistributePalette, SLOT(setGuide(int, qreal)));
+		}
 		doc=new ScribusDoc();
 		doc->saveFilePermissions(QFile::permissions(fileName));
 		doc->is12doc=is12doc;
@@ -7483,6 +7488,7 @@ void ScribusMainWindow::editInlineEnd()
 	doc->currentEditedTextframe = NULL;
 	view->DrawNew();
 	pagePalette->Rebuild();
+	propertiesPalette->unsetItem();
 	propertiesPalette->updateColorList();
 	inlinePalette->editingFinished();
 	layerPalette->setEnabled(true);

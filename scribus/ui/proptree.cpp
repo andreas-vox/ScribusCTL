@@ -97,7 +97,8 @@ void PropTreeItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &
 			painter->setFont(itemOpts.font);
 		}
 		QRect textrect = QRect(r.left() + i*2, r.top(), r.width() - (i * 2), r.height());
-		QString text = itemOpts.fontMetrics.elidedText(index.model()->data(index, Qt::DisplayRole).toString(), Qt::ElideMiddle, itemOpts.rect.width(), Qt::TextShowMnemonic);
+	//	QString text = itemOpts.fontMetrics.elidedText(index.model()->data(index, Qt::DisplayRole).toString(), Qt::ElideMiddle, itemOpts.rect.width(), Qt::TextShowMnemonic);
+		QString text = index.model()->data(index, Qt::DisplayRole).toString();
 		QApplication::style()->drawItemText(painter, textrect, Qt::AlignVCenter | Qt::AlignLeft | Qt::TextShowMnemonic, itemOpts.palette, (itemOpts.state & QStyle::State_Enabled), text, QPalette::Text);
 		painter->restore();
 	}
@@ -124,8 +125,8 @@ QWidget *PropTreeItemDelegate::createEditor(QWidget *parent, const QStyleOptionV
 		editor->setValues(item->m_min, item->m_max, 0, val);
 		edito = editor;
 		edito->setAutoFillBackground(true);
-		connect(editor, SIGNAL(valueChanged(double)), item, SIGNAL(valueChanged(double)));
 		connect(editor, SIGNAL(valueChanged(double)), this, SLOT(valueHasChanged()));
+		connect(editor, SIGNAL(valueChanged(double)), item, SIGNAL(valueChanged(double)));
 	}
 	else if (item->m_type == PropTreeItem::DoubleSpinBox)
 	{
@@ -134,8 +135,8 @@ QWidget *PropTreeItemDelegate::createEditor(QWidget *parent, const QStyleOptionV
 		editor->setValues(item->m_fmin, item->m_fmax, item->m_decimals, val);
 		edito = editor;
 		edito->setAutoFillBackground(true);
-		connect(editor, SIGNAL(valueChanged(double)), item, SIGNAL(valueChanged(double)));
 		connect(editor, SIGNAL(valueChanged(double)), this, SLOT(valueHasChanged()));
+		connect(editor, SIGNAL(valueChanged(double)), item, SIGNAL(valueChanged(double)));
 	}
 	else if (item->m_type == PropTreeItem::ComboBox)
 	{
@@ -143,27 +144,27 @@ QWidget *PropTreeItemDelegate::createEditor(QWidget *parent, const QStyleOptionV
 		editor->addItems(index.model()->data(index, Qt::UserRole+1).toStringList());
 		edito = editor;
 		edito->setAutoFillBackground(true);
+		connect(editor, SIGNAL(activated(int)), this, SLOT(valueHasChanged()));
 		connect(editor, SIGNAL(activated(int)), item, SIGNAL(valueChanged(int)));
 		connect(editor, SIGNAL(activated(QString)), item, SIGNAL(valueChanged(QString)));
-		connect(editor, SIGNAL(activated(int)), this, SLOT(valueHasChanged()));
 	}
 	else if (item->m_type == PropTreeItem::CheckBox)
 	{
 		QCheckBox *editor = new QCheckBox(parent);
 		edito = editor;
 		edito->setAutoFillBackground(true);
-		connect(editor, SIGNAL(clicked(bool)), item, SIGNAL(valueChanged(bool)));
 		connect(editor, SIGNAL(clicked(bool)), this, SLOT(valueHasChanged()));
+		connect(editor, SIGNAL(clicked(bool)), item, SIGNAL(valueChanged(bool)));
 	}
-	else if (item->m_type == PropTreeItem::ColorCombo)
+	else if (item->m_type == PropTreeItem::ColorComboBox)
 	{
 		ColorCombo *editor = new ColorCombo(parent);
 		editor->updateBox(item->m_colors, ColorCombo::fancyPixmaps, false);
 		edito = editor;
 		edito->setAutoFillBackground(true);
+		connect(editor, SIGNAL(activated(int)), this, SLOT(valueHasChanged()));
 		connect(editor, SIGNAL(activated(int)), item, SIGNAL(valueChanged(int)));
 		connect(editor, SIGNAL(activated(QString)), item, SIGNAL(valueChanged(QString)));
-		connect(editor, SIGNAL(activated(int)), this, SLOT(valueHasChanged()));
 	}
 	else
 		edito = 0;
@@ -196,7 +197,7 @@ void PropTreeItemDelegate::setEditorData(QWidget *editor, const QModelIndex &ind
 		QCheckBox *checkBox = static_cast<QCheckBox*>(editor);
 		checkBox->setChecked(index.model()->data(index, Qt::UserRole).toBool());
 	}
-	else if (item->m_type == PropTreeItem::ColorCombo)
+	else if (item->m_type == PropTreeItem::ColorComboBox)
 	{
 		ColorCombo *comboBox = static_cast<ColorCombo*>(editor);
 		setCurrentComboItem(comboBox ,index.model()->data(index, Qt::UserRole).toString());
@@ -240,7 +241,7 @@ void PropTreeItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *mod
 		model->setData(index, value, Qt::UserRole);
 		model->setData(index, value, Qt::DisplayRole);
 	}
-	else if (item->m_type == PropTreeItem::ColorCombo)
+	else if (item->m_type == PropTreeItem::ColorComboBox)
 	{
 		ColorCombo *comboBox = static_cast<ColorCombo*>(editor);
 		QString value = comboBox->currentText();

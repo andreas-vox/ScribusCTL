@@ -1,2 +1,0 @@
-/usr/bin/ar cr libscribus_prc_lib.a  CMakeFiles/scribus_prc_lib.dir/oPRCFile.cc.o CMakeFiles/scribus_prc_lib.dir/PRCbitStream.cc.o CMakeFiles/scribus_prc_lib.dir/PRCdouble.cc.o CMakeFiles/scribus_prc_lib.dir/writePRC.cc.o CMakeFiles/scribus_prc_lib.dir/exportPRC.cpp.o
-/usr/bin/ranlib libscribus_prc_lib.a

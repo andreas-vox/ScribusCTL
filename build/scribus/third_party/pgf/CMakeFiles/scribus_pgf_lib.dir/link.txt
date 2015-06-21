@@ -1,2 +1,0 @@
-/usr/bin/ar cr libscribus_pgf_lib.a  CMakeFiles/scribus_pgf_lib.dir/Decoder.cpp.o CMakeFiles/scribus_pgf_lib.dir/Encoder.cpp.o CMakeFiles/scribus_pgf_lib.dir/PGFimage.cpp.o CMakeFiles/scribus_pgf_lib.dir/PGFstream.cpp.o CMakeFiles/scribus_pgf_lib.dir/Subband.cpp.o CMakeFiles/scribus_pgf_lib.dir/WaveletTransform.cpp.o
-/usr/bin/ranlib libscribus_pgf_lib.a

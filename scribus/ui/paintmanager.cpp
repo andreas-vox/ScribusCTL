@@ -465,9 +465,9 @@ void PaintManagerDialog::createNew()
 			CMYKChoose* dia = new CMYKChoose(this, m_doc, tmpColor, tr("New Color"), &m_colorList, true);
 			if (dia->exec())
 			{
-				dia->Farbe.setSpotColor(dia->Separations->isChecked());
-				m_colorList.insert(dia->ColorName->text(), dia->Farbe);
-				QTreeWidgetItem *lg = updateColorList(dia->ColorName->text());
+				dia->Farbe.setSpotColor(dia->isSpotColor());
+				m_colorList.insert(dia->colorName(), dia->Farbe);
+				QTreeWidgetItem *lg = updateColorList(dia->colorName());
 				if (lg != 0)
 				{
 					dataTree->expandItem(lg->parent());
@@ -549,18 +549,18 @@ void PaintManagerDialog::editColorItem()
 			CMYKChoose* dia = new CMYKChoose(this, m_doc, tmpColor, it->text(0), &m_colorList, false);
 			if (dia->exec())
 			{
-				dia->Farbe.setSpotColor(dia->Separations->isChecked());
+				dia->Farbe.setSpotColor(dia->isSpotColor());
 				dia->Farbe.setRegistrationColor(tmpColor.isRegistrationColor());
-				m_colorList[dia->ColorName->text()] = dia->Farbe;
-				if (it->text(0) != dia->ColorName->text())
+				m_colorList[dia->colorName()] = dia->Farbe;
+				if (it->text(0) != dia->colorName())
 				{
-					replaceColorMap.insert(it->text(0), dia->ColorName->text());
+					replaceColorMap.insert(it->text(0), dia->colorName());
 					m_colorList.remove(it->text(0));
 				}
-				updateGradientColors(dia->ColorName->text(), it->text(0));
+				updateGradientColors(dia->colorName(), it->text(0));
 				updateGradientList();
 				updatePatternList();
-				QTreeWidgetItem *lg = updateColorList(dia->ColorName->text());
+				QTreeWidgetItem *lg = updateColorList(dia->colorName());
 				if (lg != 0)
 				{
 					dataTree->expandItem(lg->parent());
@@ -669,18 +669,18 @@ void PaintManagerDialog::duplicateColorItem()
 			CMYKChoose* dia = new CMYKChoose(this, m_doc, tmpColor, nam, &m_colorList, false);
 			if (dia->exec())
 			{
-				dia->Farbe.setSpotColor(dia->Separations->isChecked());
+				dia->Farbe.setSpotColor(dia->isSpotColor());
 				dia->Farbe.setRegistrationColor(tmpColor.isRegistrationColor());
-				m_colorList[dia->ColorName->text()] = dia->Farbe;
-				if (nam != dia->ColorName->text())
+				m_colorList[dia->colorName()] = dia->Farbe;
+				if (nam != dia->colorName())
 				{
-					replaceColorMap.insert(nam, dia->ColorName->text());
+					replaceColorMap.insert(nam, dia->colorName());
 					m_colorList.remove(nam);
 				}
-				updateGradientColors(dia->ColorName->text(), nam);
+				updateGradientColors(dia->colorName(), nam);
 				updateGradientList();
 				updatePatternList();
-				QTreeWidgetItem *lg = updateColorList(dia->ColorName->text());
+				QTreeWidgetItem *lg = updateColorList(dia->colorName());
 				if (lg != 0)
 				{
 					dataTree->expandItem(lg->parent());
@@ -1055,7 +1055,7 @@ void PaintManagerDialog::importColorItems()
 			QString wdir = dirs->get("colors", ".");
 			QString docexts("*.sla *.sla.gz *.scd *.scd.gz");
 			QString aiepsext(FormatsManager::instance()->extensionListForFormat(FormatsManager::EPS|FormatsManager::PS|FormatsManager::AI, 0));
-			QString ooexts(" *.acb *.aco *.skp *.soc *.gpl *.xml");
+			QString ooexts(" *.acb *.aco *.ase *.skp *.soc *.gpl *.xml *.sbz");
 			ooexts += extra;
 			QString filter = tr("All Supported Formats (%1);;Documents (%2);;Other Files (%3);;All Files (*)").arg(docexts+" "+aiepsext+ooexts).arg(docexts).arg(aiepsext+ooexts);
 			CustomFDialog dia(this, wdir, tr("Import Colors"), filter, fdHidePreviewCheckBox);

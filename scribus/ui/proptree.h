@@ -67,6 +67,7 @@ public:
 //	PropTreeItem(QTreeWidget* parent, QString title, bool value);
 //	PropTreeItem(QTreeWidget *parent, QString title, QString value);
 	~PropTreeItem() {};
+
 	enum PropItemType
 	{
 		Title      = 0,
@@ -74,7 +75,7 @@ public:
 		DoubleSpinBox = 2,
 		ComboBox      = 3,
 		CheckBox      = 4,
-		ColorCombo    = 5
+		ColorComboBox = 5
 	};
 
 	int valueAsInt();

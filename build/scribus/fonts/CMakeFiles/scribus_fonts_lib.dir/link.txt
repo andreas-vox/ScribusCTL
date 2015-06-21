@@ -1,2 +1,0 @@
-/usr/bin/ar cr libscribus_fonts_lib.a  CMakeFiles/scribus_fonts_lib.dir/scface.cpp.o CMakeFiles/scribus_fonts_lib.dir/ftface.cpp.o CMakeFiles/scribus_fonts_lib.dir/scface_ps.cpp.o CMakeFiles/scribus_fonts_lib.dir/cff.cpp.o CMakeFiles/scribus_fonts_lib.dir/sfnt.cpp.o CMakeFiles/scribus_fonts_lib.dir/scface_ttf.cpp.o CMakeFiles/scribus_fonts_lib.dir/scfontmetrics.cpp.o
-/usr/bin/ranlib libscribus_fonts_lib.a

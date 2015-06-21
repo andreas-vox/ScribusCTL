@@ -950,6 +950,10 @@ void ScribusDoc::SetDefaultCMSParams()
 	stdTransImg           = ScCore->defaultRGBToScreenImageTrans;
 	stdProofImg           = ScCore->defaultRGBToScreenImageTrans;
 	stdProofImgCMYK       = ScCore->defaultCMYKToScreenImageTrans;
+	stdLabToRGBTrans      = ScCore->defaultLabToRGBTrans;
+	stdLabToCMYKTrans     = ScCore->defaultLabToCMYKTrans;
+	stdProofLab           = ScCore->defaultLabToRGBTrans;
+	stdProofLabGC         = ScCore->defaultLabToRGBTrans;
 }
 
 bool ScribusDoc::OpenCMSProfiles(ProfilesL InPo, ProfilesL InPoCMYK, ProfilesL MoPo, ProfilesL PrPo)
@@ -1039,6 +1043,15 @@ bool ScribusDoc::OpenCMSProfiles(ProfilesL InPo, ProfilesL InPoCMYK, ProfilesL M
 						DocPrinterProf,
 						IntentColors,
 						Intent_Relative_Colorimetric, dcmsFlags | Ctf_GamutCheck);
+	stdProofLab = colorEngine.createProofingTransform(ScCore->defaultLabProfile, Format_Lab_Dbl,
+						DocDisplayProf, Format_RGB_16,
+						DocPrinterProf,
+						IntentColors,
+						Intent_Relative_Colorimetric, dcmsFlags);
+	stdProofLabGC = colorEngine.createProofingTransform(ScCore->defaultLabProfile, Format_Lab_Dbl,
+						DocDisplayProf, Format_RGB_16,
+						DocPrinterProf, IntentColors,
+						Intent_Relative_Colorimetric, dcmsFlags| Ctf_GamutCheck);
 
 	if (DocInputRGBProf.colorSpace() == ColorSpace_Rgb)
 			docPrefsData.colorPrefs.DCMSset.ComponentsInput2 = 3;
@@ -1046,10 +1059,13 @@ bool ScribusDoc::OpenCMSProfiles(ProfilesL InPo, ProfilesL InPoCMYK, ProfilesL M
 			docPrefsData.colorPrefs.DCMSset.ComponentsInput2 = 4;
 	if (DocInputRGBProf.colorSpace() == ColorSpace_Cmy)
 			docPrefsData.colorPrefs.DCMSset.ComponentsInput2 = 3;
+	stdLabToRGBTrans   = colorEngine.createTransform(ScCore->defaultLabProfile, Format_Lab_Dbl, DocDisplayProf, Format_RGB_16, Intent_Absolute_Colorimetric, dcmsFlags);
+	stdLabToCMYKTrans = colorEngine.createTransform(ScCore->defaultLabProfile, Format_Lab_Dbl, DocPrinterProf, Format_CMYK_16, Intent_Absolute_Colorimetric, dcmsFlags);
 
 	bool success  = (stdTransRGBMon && stdTransCMYKMon && stdProofImg  && stdProofImgCMYK &&
 		             stdTransImg    && stdTransRGB     && stdTransCMYK && stdProof       &&
-	                 stdProofGC     && stdProofCMYK    && stdProofCMYKGC);
+					 stdProofGC     && stdProofCMYK    && stdProofCMYKGC &&
+					 stdLabToRGBTrans && stdLabToCMYKTrans && stdProofLab && stdProofLabGC);
 	if (!success)
 	{
 		CloseCMSProfiles();
@@ -7826,7 +7842,7 @@ void ScribusDoc::itemSelection_RaiseItem()
 	}
 }
 
-void ScribusDoc::itemSelection_SetSoftShadow(bool has, QString color, double dx, double dy, double radius, int shade, double opac, int blend)
+void ScribusDoc::itemSelection_SetSoftShadow(bool has, QString color, double dx, double dy, double radius, int shade, double opac, int blend, bool erase, bool objopa)
 {
 	if (color == CommonStrings::tr_NoneColor)
 		color = CommonStrings::None;
@@ -7850,6 +7866,8 @@ void ScribusDoc::itemSelection_SetSoftShadow(bool has, QString color, double dx,
 			currItem->setSoftShadowShade(shade);
 			currItem->setSoftShadowOpacity(opac);
 			currItem->setSoftShadowBlendMode(blend);
+			currItem->setSoftShadowErasedByObject(erase);
+			currItem->setSoftShadowHasObjectTransparency(objopa);
 			QRectF newRect = currItem->getVisualBoundingRect().adjusted(-dx, -dy, dx, dy);
 			currItem->invalidateLayout();
 			regionsChanged()->update(newRect);
@@ -14873,6 +14891,20 @@ void ScribusDoc::scaleGroup(double scx, double scy, bool scaleText, Selection* c
 				PageItem_Spiral* item = bb->asSpiral();
 				item->recalcPath();
 			}
+			else if (bb->isRegularPolygon())
+			{
+				PageItem_RegularPolygon* item = bb->asRegularPolygon();
+				item->setWidthHeight(item->width() * scx, item->height() * scy, true);
+				item->recalcPath();
+			}
+			else if (bb->isGroup() || bb->isSymbol())
+			{
+				double oldGW = bb->groupWidth;
+				double oldGH = bb->groupHeight;
+				AdjustItemSize(bb, true, false);
+				bb->groupWidth = oldGW;
+				bb->groupHeight = oldGH;
+			}
 			else
 				AdjustItemSize(bb, true, false);
 			QTransform ma3;
@@ -14889,7 +14921,16 @@ void ScribusDoc::scaleGroup(double scx, double scy, bool scaleText, Selection* c
 				QTransform ma;
 				ma.rotate(-bb->rotation());
 				bb->PoLine.map(ma);
-				AdjustItemSize(bb, true, false);
+				if (bb->isGroup() || bb->isSymbol())
+				{
+					double oldGW = bb->groupWidth;
+					double oldGH = bb->groupHeight;
+					AdjustItemSize(bb, true, false);
+					bb->groupWidth = oldGW;
+					bb->groupHeight = oldGH;
+				}
+				else
+					AdjustItemSize(bb, true, false);
 			}
 		}
 		if (scaleText)
@@ -15442,6 +15483,20 @@ void ScribusDoc::removeFromGroup(PageItem* item)
 			ma.scale(1, -1);
 			item->PoLine.map(ma);
 			item->PoLine.translate(0, item->height());
+		}
+	}
+	if (item->isTextFrame() || item->isPathText())
+	{
+		if (item->itemText.length() != 0)
+		{
+			for (int aa = 0; aa < item->itemText.length(); ++aa)
+			{
+				CharStyle fsStyle;
+				fsStyle.setFontSize(qMax(qRound(item->itemText.charStyle(aa).fontSize()*((grScXi+grScYi)/2)), 1));
+				item->itemText.applyCharStyle(aa, 1, fsStyle);
+			}
+			if (item->asPathText())
+				item->updatePolyClip();
 		}
 	}
 	item->setXYPos(nX, nY, true);

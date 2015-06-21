@@ -1,2 +1,0 @@
-/usr/bin/ar cr libscribus_text_lib.a  CMakeFiles/scribus_text_lib.dir/specialchars.cpp.o CMakeFiles/scribus_text_lib.dir/storytext.cpp.o CMakeFiles/scribus_text_lib.dir/textlayout.cpp.o CMakeFiles/scribus_text_lib.dir/sctext_shared.cpp.o CMakeFiles/scribus_text_lib.dir/fsize.cpp.o CMakeFiles/scribus_text_lib.dir/frect.cpp.o CMakeFiles/scribus_text_lib.dir/moc_storytext.cpp.o
-/usr/bin/ranlib libscribus_text_lib.a

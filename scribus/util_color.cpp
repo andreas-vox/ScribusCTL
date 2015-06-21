@@ -34,6 +34,7 @@ for which a new license (GPL+exception) is in place.
 #include "fileloader.h"
 #include "loadsaveplugin.h"
 #include "plugins/formatidlist.h"
+#include "third_party/zip/scribus_zip.h"
 #include "util.h"
 #include "util_formats.h"
 #include "util_icon.h"
@@ -181,21 +182,36 @@ QPixmap * getWidePixmap(QColor rgb)
 	return pm;
 }
 
-static quint64 code64(const ScColor & col) {
-	int C, M, Y, K, R, G, B;
-	quint64 result=0;
+static quint64 code64(const ScColor & col)
+{
+	int C = 0;
+	int M = 0;
+	int Y = 0;
+	int K = 0;
+	int R = 0;
+	int G = 0;
+	int B = 0;
+	quint64 result = 0;
 	if (col.getColorModel() == colorModelRGB)
 	{
 		col.getRGB( &R, &G, &B );
 		QColor color = QColor(R, G, B);
 		color.getCmyk(&C, &M, &Y, &K);
 	}
-	else
+	else if (col.getColorModel() == colorModelCMYK)
 	{
 		col.getCMYK( &C, &M, &Y, &K );
 		R = 255-qMin(255, C + K);
 		G = 255-qMin(255, M + K);
 		B = 255-qMin(255, Y + K);
+	}
+	else
+	{
+		double L, a, b;
+		col.getLab(&L, &a, &b);
+		R = qRound(L);
+		G = qRound(a);
+		B = qRound(b);
 	}
 	result |= col.getColorModel() == colorModelRGB ? 1 : 0;
 	result |= col.isSpotColor() ? 64 : 0;
@@ -217,31 +233,35 @@ static quint64 code64(const ScColor & col) {
 	return result;
 }
 
-QPixmap * getFancyPixmap(const ScColor& col, ScribusDoc* doc) {
+QPixmap * getFancyPixmap(const ScColor& col, ScribusDoc* doc)
+{
 	static ScPixmapCache<quint64> pxCache;
 
 	static QPixmap alertIcon;
 	static QPixmap cmykIcon;
 	static QPixmap rgbIcon;
+	static QPixmap labIcon;
 	static QPixmap spotIcon;
 	static QPixmap regIcon;
 	static bool iconsInitialized = false;
 
-	if ( !iconsInitialized ) {
+	if ( !iconsInitialized )
+	{
 		alertIcon = loadIcon("alert.png");
 		cmykIcon = loadIcon("cmyk.png");
 		rgbIcon = loadIcon("rgb.png");
+		labIcon = loadIcon("lab.png");
 		spotIcon = loadIcon("spot.png");
 		regIcon = loadIcon("register.png");
 		iconsInitialized = true;
 	}
 
-	quint64 res=code64(col);
+	quint64 res = code64(col);
 	if (pxCache.contains(res))
 		return pxCache[res];
 
-	QPixmap *pa=new QPixmap(60, 15);
-	QPixmap *pm=getSmallPixmap(ScColorEngine::getDisplayColor(col, doc));
+	QPixmap *pa = new QPixmap(60, 15);
+	QPixmap *pm = getSmallPixmap(ScColorEngine::getDisplayColor(col, doc));
 //	QPixmap *pm=getSmallPixmap(col.getRawRGBColor());
 	pa->fill(Qt::white);
 	paintAlert(*pm, *pa, 0, 0);
@@ -249,8 +269,10 @@ QPixmap * getFancyPixmap(const ScColor& col, ScribusDoc* doc) {
 		paintAlert(alertIcon, *pa, 15, 0);
 	if (col.getColorModel() == colorModelCMYK)   // || (col.isSpotColor()))
 		paintAlert(cmykIcon, *pa, 30, 0);
-	else
+	else if (col.getColorModel() == colorModelRGB)
 		paintAlert(rgbIcon, *pa, 30, 0);
+	else if (col.getColorModel() == colorModelLab)
+		paintAlert(labIcon, *pa, 30, 0);
 	if (col.isSpotColor())
 		paintAlert(spotIcon, *pa, 46, 2);
 	if (col.isRegistrationColor())
@@ -1000,6 +1022,107 @@ bool importColorsFromFile(QString fileName, ColorList &EditColors, QHash<QString
 					fiC.close();
 				}
 			}
+			else if (ext == "ase")			// Adobe swatch exchange format
+			{
+				QFile fiC(fileName);
+				if (fiC.open(QIODevice::ReadOnly))
+				{
+					ScColor lf = ScColor();
+					QDataStream ts(&fiC);
+					ts.setByteOrder(QDataStream::BigEndian);
+					ts.setFloatingPointPrecision(QDataStream::SinglePrecision);
+					quint16 vers1 = 0;
+					quint16 vers2 = 0;
+					quint32 signature;
+					ts >> signature;
+					ts >> vers1 >> vers2;
+					if ((signature == 0x41534546) && (vers1 == 1) && (vers2 == 0))
+					{
+						QString blockName;
+						quint32 numBlocks;
+						ts >> numBlocks;
+						for (quint32 n = 0; n < numBlocks; n++)
+						{
+							quint16 blockType;
+							quint32 blockLen;
+							ts >> blockType;
+							ts >> blockLen;
+							if (blockType == 0xC001)
+								blockName = readAdobeUniCodeString16(ts);
+							else if (blockType == 0x0001)
+							{
+								if (blockName.isEmpty())
+									blockName = fi.baseName();
+								QString Cname = readAdobeUniCodeString16(ts);
+								quint32 clrType;
+								quint16 spotMode;
+								ts >> clrType;
+								if (clrType == 0x52474220)		// RGB
+								{
+									float r, g, b;
+									ts >> r >> g >> b;
+									ts >> spotMode;
+									lf.setColorRGB(qRound(255 * r), qRound(255 * g), qRound(255 * b));
+									lf.setSpotColor(spotMode == 1);
+									lf.setRegistrationColor(false);
+									if (Cname.isEmpty())
+									{
+										Cname = blockName + QString("#%1%2%3").arg(qRound(255 * r),2,16,QChar('0')).arg(qRound(255 * g),2,16,QChar('0')).arg(qRound(255 * b),2,16,QChar('0')).toUpper();
+										Cname.replace(" ","_");
+									}
+									EditColors.tryAddColor(Cname, lf);
+								}
+								else if (clrType == 0x434D594B)	// CMYK
+								{
+									float c, m, y, k;
+									ts >> c >> m >> y >> k;
+									ts >> spotMode;
+									lf.setColor(qRound(255 * c), qRound(255 * m), qRound(255 * y), qRound(255 * k));
+									lf.setSpotColor(spotMode == 1);
+									lf.setRegistrationColor(false);
+									if (Cname.isEmpty())
+									{
+										Cname = blockName + QString("#%1%2%3%4").arg(qRound(255 * c),2,16,QChar('0')).arg(qRound(255 * m),2,16,QChar('0')).arg(qRound(255 * y),2,16,QChar('0')).arg(qRound(255 * k),2,16,QChar('0')).toUpper();
+										Cname.replace(" ","_");
+									}
+									EditColors.tryAddColor(Cname, lf);
+								}
+								else if (clrType == 0x47726179)	// Gray
+								{
+									float g;
+									ts >> g;
+									ts >> spotMode;
+									lf.setColor(0, 0, 0, qRound(255 * g));
+									lf.setSpotColor(spotMode == 1);
+									lf.setRegistrationColor(false);
+									if (Cname.isEmpty())
+									{
+										Cname = blockName + QString("#000000%1").arg(qRound(255 * g),2,16,QChar('0')).toUpper();
+										Cname.replace(" ","_");
+									}
+									EditColors.tryAddColor(Cname, lf);
+								}
+								else if (clrType == 0x4C414220) // Lab
+								{
+									float L, a, b;
+									ts >> L >> a >> b;
+									ts >> spotMode;
+									lf.setColor(L * 100.0, a, b);
+									lf.setSpotColor(spotMode == 1);
+									lf.setRegistrationColor(false);
+									if (Cname.isEmpty())
+									{
+										Cname = blockName + QString("_%1_%2_%3").arg(qRound(L * 100)).arg(qRound(a)).arg(qRound(b));
+										Cname.replace(" ","_");
+									}
+									EditColors.tryAddColor(Cname, lf);
+								}
+							}
+						}
+					}
+					fiC.close();
+				}
+			}
 			else if (ext == "skp")			// Sk1 palette
 			{
 				QFile fiC(fileName);
@@ -1063,6 +1186,85 @@ bool importColorsFromFile(QString fileName, ColorList &EditColors, QHash<QString
 				}
 				fiC.close();
 			}
+			else if (ext == "sbz")
+			{
+				ScZipHandler *uz = new ScZipHandler();
+				if (uz->open(fileName))
+				{
+					if (uz->contains("swatchbook.xml"))
+					{
+						QByteArray docBytes;
+						if (uz->read("swatchbook.xml", docBytes))
+						{
+							QString docText("");
+							docText = QString::fromUtf8(docBytes);
+							QDomDocument docu("scridoc");
+							if (docu.setContent(docText))
+							{
+								QDomElement docElem = docu.documentElement();
+								for(QDomElement drawPag = docElem.firstChildElement(); !drawPag.isNull(); drawPag = drawPag.nextSiblingElement())
+								{
+									if (drawPag.tagName() == "materials")
+									{
+										for(QDomElement spf = drawPag.firstChildElement(); !spf.isNull(); spf = spf.nextSiblingElement() )
+										{
+											if (spf.tagName() == "color")
+											{
+												bool isSpot = spf.attribute("usage") == "spot";
+												QString colorName = "";
+												ScColor tmp;
+												tmp.setRegistrationColor(false);
+												for(QDomElement spp = spf.firstChildElement(); !spp.isNull(); spp = spp.nextSiblingElement() )
+												{
+													if (spp.tagName() == "metadata")
+													{
+														for(QDomElement spm = spp.firstChildElement(); !spm.isNull(); spm = spm.nextSiblingElement() )
+														{
+															if (spm.tagName() == "dc:identifier")
+																colorName = spm.text();
+														}
+													}
+													else if (spp.tagName() == "values")
+													{
+														QString colorVals = spp.text();
+														ScTextStream CoE(&colorVals, QIODevice::ReadOnly);
+														if (spp.attribute("model") == "Lab")
+														{
+															double inC[3];
+															CoE >> inC[0];
+															CoE >> inC[1];
+															CoE >> inC[2];
+															tmp.setColor(inC[0], inC[1], inC[2]);
+															tmp.setSpotColor(isSpot);
+														}
+														else if (spp.attribute("model") == "CMYK")
+														{
+															double c, m, y, k;
+															CoE >> c >> m >> y >> k;
+															tmp.setColor(qRound(255 * c), qRound(255 * m), qRound(255 * y), qRound(255 * k));
+															tmp.setSpotColor(isSpot);
+														}
+														else if (spp.attribute("model") == "RGB")
+														{
+															double r, g, b;
+															CoE >> r >> g >> b;
+															tmp.setColorRGB(qRound(255 * r), qRound(255 * g), qRound(255 * b));
+															tmp.setSpotColor(false);
+														}
+													}
+												}
+												if (!colorName.isEmpty())
+													EditColors.tryAddColor(colorName, tmp);
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+				delete uz;
+			}
 			else							// try for OpenOffice, Viva and our own format
 			{
 				QFile fiC(fileName);
@@ -1097,8 +1299,15 @@ bool importColorsFromFile(QString fileName, ColorList &EditColors, QHash<QString
 							{
 								if (pg.hasAttribute("CMYK"))
 									lf.setNamedColor(pg.attribute("CMYK"));
-								else
+								else if (pg.hasAttribute("RGB"))
 									lf.fromQColor(QColor(pg.attribute("RGB")));
+								else
+								{
+									double L = pg.attribute("L", "0").toDouble();
+									double a = pg.attribute("A", "0").toDouble();
+									double b = pg.attribute("B", "0").toDouble();
+									lf.setColor(L, a, b);
+								}
 								if (pg.hasAttribute("Spot"))
 									lf.setSpotColor(static_cast<bool>(pg.attribute("Spot").toInt()));
 								else

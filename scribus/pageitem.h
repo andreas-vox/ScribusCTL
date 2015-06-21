@@ -691,6 +691,12 @@ public: // Start public functions
 	void setSoftShadowBlendMode(int val);
 	double softShadowBlendMode() { return m_softShadowBlendMode; }
 
+	void setSoftShadowErasedByObject(bool val);
+	bool softShadowErasedByObject() { return m_softShadowErasedByObject; }
+
+	void setSoftShadowHasObjectTransparency(bool val);
+	bool softShadowHasObjectTransparency() { return m_softShadowHasObjectTransparency; }
+
 	int frameType() const { return FrameType; } ///< rect / oval / round / other
 	void setFrameType(int val) { FrameType = val; }
 	//
@@ -1320,6 +1326,8 @@ public:	// Start public variables
 	double m_softShadowYOffset;
 	double m_softShadowOpacity;
 	int m_softShadowBlendMode;
+	bool m_softShadowErasedByObject;
+	bool m_softShadowHasObjectTransparency;
 	/* Additions for Table Support */
 	/* now deprecated with the new PageItem_Table */
 		PageItem* LeftLink;
@@ -1619,6 +1627,8 @@ protected: // Start protected functions
 	void restoreSoftShadowYOffset(SimpleState *state, bool isUndo);
 	void restoreSoftShadowOpacity(SimpleState *state, bool isUndo);
 	void restoreSoftShadowBlendMode(SimpleState *state, bool isUndo);
+	void restoreSoftShadowErasedByObject(SimpleState *state, bool isUndo);
+	void restoreSoftShadowHasObjectTransparency(SimpleState *state, bool isUndo);
 
 
 	/*@}*/
