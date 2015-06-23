@@ -31,6 +31,8 @@ ADD_SUBDIRECTORY(desaxe)
 ADD_SUBDIRECTORY(fonts)
 ADD_SUBDIRECTORY(styles)
 ADD_SUBDIRECTORY(text)
+ADD_SUBDIRECTORY(harfbuzz)
+ADD_SUBDIRECTORY(fribidi)
 ADD_SUBDIRECTORY(ui/qml)
 IF(WITH_TESTS)
 	ADD_SUBDIRECTORY(tests)
@@ -265,6 +267,7 @@ SET(SCRIBUS_MOC_CLASSES
 	pageitem_symbol.h
 	pageitem_table.h
 	pageitem_textframe.h
+	shaper.h
 	pageitem_noteframe.h
 	pageitempointer.h
 	pdf_analyzer.h
@@ -639,6 +642,7 @@ SET(SCRIBUS_SOURCES
 	pageitem_spiral.cpp
 	pageitem_symbol.cpp
 	pageitem_table.cpp
+	shaper.cpp	
 	pageitem_textframe.cpp
 	pageitem_noteframe.cpp
 	pageitempointer.cpp
@@ -1055,6 +1059,8 @@ ENDIF (HAVE_BOOST)
 
 SET(SCRIBUS_COLORMGMT_LIB "scribus_colormgmt_lib")
 SET(SCRIBUS_TEXT_LIB "scribus_text_lib")
+SET(SCRIBUS_HARFBUZZ_LIB "scribus_harfbuzz_lib")
+SET(SCRIBUS_FRIBIDI_LIB "scribus_fribidi_lib")
 IF(WITH_TESTS)
 	SET(SCRIBUS_TESTS_LIB "scribus_tests_lib")
 ELSE(WITH_TESTS)
@@ -1126,6 +1132,8 @@ IF(HAVE_OSG)
 		${SCRIBUS_MAIN_CPP}
 		${SCRIBUS_UI_SOURCES}
 		${SCRIBUS_TEXT_SOURCES}
+        ${SCRIBUS_HARFBUZZ_SOURCES}
+        ${SCRIBUS_FRIBIDI_SOURCES}		
 		${SCRIBUS_STYLES_SOURCES}
 		${SCRIBUS_COLORMGMT_SOURCES}
 		${SCRIBUS_FONTS_SOURCES}
@@ -1141,6 +1149,8 @@ ELSE(HAVE_OSG)
 		${SCRIBUS_MAIN_CPP}
 		${SCRIBUS_UI_SOURCES}
 		${SCRIBUS_TEXT_SOURCES}
+        ${SCRIBUS_HARFBUZZ_SOURCES}
+        ${SCRIBUS_FRIBIDI_SOURCES}		
 		${SCRIBUS_STYLES_SOURCES}
 		${SCRIBUS_COLORMGMT_SOURCES}
 		${SCRIBUS_FONTS_SOURCES}
@@ -1245,6 +1255,8 @@ TARGET_LINK_LIBRARIES(${EXE_NAME}
 	${SCRIBUS_COLORMGMT_LIB}
 	${SCRIBUS_DESAXE_LIB}
 	${SCRIBUS_TEXT_LIB}
+    ${SCRIBUS_HARFBUZZ_LIB}
+    ${SCRIBUS_FRIBIDI_LIB}	
 	${SCRIBUS_STYLES_LIB}
 	${SCRIBUS_FONTS_LIB}
 	${SCRIBUS_WPG_LIB}

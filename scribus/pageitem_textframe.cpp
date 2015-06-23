@@ -55,6 +55,7 @@ for which a new license (GPL+exception) is in place.
 #include "scribusview.h"
 #include "scribusstructs.h"
 #include "selection.h"
+#include "shaper.h"
 #include "ui/guidemanager.h"
 #include "undomanager.h"
 #include "undostate.h"
@@ -1171,6 +1172,255 @@ static double opticalRightMargin(const StoryText& itemText, const LineSpec& line
 	return 0.0;
 }
 
+#if BIDI_LAYOUT
+#include <QLinkedList>
+#include "fribidi/fribidi.h"
+#ifndef SCRIBUS_BIDI_HEADERS
+#define SCRIBUS_BIDI_HEADERS
+struct LayoutLine;
+/**
+    This code is a hack that applies bidi reordering after the layout method has done its business.
+    BidiInfo will Figure out embedding levels (using GNU FriBidi) and supply ranges for runs (uni-directional segments of text).
+    This information is used to drive the bidi-reordering process, which involves:   
+        * Detecting positions of new lines
+        * Reordering each line using the BidiInfo
+    This should get proper bidirectional display, but this is not enough for full bidi support:
+        * We need to shape arabic characters (and other languages that require it, if any): 
+            * For this we need HarfBuzz
+        * We need extra work so that selections and editing are done correctly.
+            * See section "Supporting Text Manipulation" on http://java.sun.com/j2se/1.5.0/docs/guide/2d/spec/j2d-fonts.html#wp68590
+    -hasenj                   
+*/
+class BidiInfo
+{
+    private:
+        QString qString;
+        QVector<uint> qUtf32; // included for RAII
+        FriBidiChar *inputString;
+        FriBidiStrIndex inputLength;
+        FriBidiParType baseDir;
+        FriBidiLevel *embeddingLevels;
+        FriBidiCharType *bidiTypes;        
+    public:
+        BidiInfo(StoryText *itemText);
+        ~BidiInfo();
+        bool isRtlEmbedding(int index);
+        bool isLtrEmbedding(int index);
+        bool nextRunOfLevel(int level, int start, int limit, int *out_start, int *out_end);
+        int levelAt(int index){ return embeddingLevels[index]; }
+        FriBidiChar * getInputString() { return inputString; }
+        QUtf32 getUtf32() { return qUtf32; }   
+        bool isRtlBase() { return baseDir == FRIBIDI_PAR_RTL; }  
+        FriBidiParType getBaseDir() { return baseDir; }                   
+};
+struct LayoutLine
+{
+    int startIndex;
+    int endIndex;
+    LayoutLine()
+    {
+        startIndex = 0;
+        endIndex = 0;
+    }
+    LayoutLine(LineSpec line)
+    {
+        startIndex = line.firstItem;
+        endIndex = line.lastItem + 1; //lastItem is inclusive
+    }
+};
+#endif
+/**
+    Let fribidi work its magic.
+    This will give us the embedding levels, allowing us to grab directional runs
+*/
+BidiInfo::BidiInfo(StoryText *itemText) : 
+    qString(itemText->text(0, itemText->length())),
+    qUtf32(qString.toUcs4()),
+    inputString(qUtf32.data()),
+    inputLength(qString.length()),
+    baseDir(FRIBIDI_PAR_LTR),
+    embeddingLevels(0), 
+    bidiTypes(0)
+{
+    embeddingLevels = new FriBidiLevel[inputLength]; //don't forget to delete me
+    bidiTypes = new FriBidiCharType[inputLength]; //ditto
+    fribidi_get_bidi_types (inputString, inputLength, bidiTypes);
+    baseDir = fribidi_get_par_direction(bidiTypes, inputLength);
+    FriBidiLevel ok = fribidi_get_par_embedding_levels(bidiTypes, inputLength, &baseDir, embeddingLevels);
+    if(ok == 0) 
+    {
+        qDebug() << "BIDI ERROR"; // XXX: how do we panic?
+    }
+}
+BidiInfo::~BidiInfo()
+{
+    delete[] embeddingLevels;
+    delete[] bidiTypes;
+}
+/**
+    Does character at index have an RTL embedding level?
+*/
+bool BidiInfo::isRtlEmbedding(int index)
+{
+    return embeddingLevels[index] % 2 == 1; // odd embedding levels are part of an RTL run
+}
+/**
+    Does character at index have an LTR embedding level?
+*/
+bool BidiInfo::isLtrEmbedding(int index)
+{
+    return !(isRtlEmbedding(index));
+}
+void mirrorItem(ScText *item)
+{
+    if(item->ch.hasMirrored())
+    {
+        item->glyph.glyph = item->font().char2CMap(item->ch.mirroredChar());
+    }
+}
+/**
+    EXPERIMENTAL
+
+    Reverse the layout of a sequence of glyphs. 
+
+    This is probably a naive approach, but at least we can 
+    learn a few more things about glyph layout, hopefully
+
+    @param itemText: the text we want to reverse a segment of
+    @param startIndex: start of segment to reverse
+    @param endIndex: end of segment to reverse (exclusive, of course!)
+
+    how it works: swaps the glyphs (originally I thought of swapping positions, but then
+    I figured it's better to just swap the glyphs, since it's much less than the position info!)
+    FIXME: This is probably wrong, it results in an ScText item to have a glyph not of its own    
+ */
+bool reverseGlyphLayout(StoryText *itemText, int startIndex, int endIndex)
+{
+    if(startIndex > itemText->length() || endIndex > itemText->length())
+    {
+        qDebug() << "out of range";
+        return false;
+    }
+    int length = endIndex - startIndex;
+    for(int i = 0; i < length / 2; i++)
+    {
+        ScText *first = itemText->item(i + startIndex);
+        ScText *second = itemText->item(endIndex - 1 - i);
+        mirrorItem(first);
+        mirrorItem(second);        
+        GlyphLayout tmp = first->glyph;
+        first->glyph = second->glyph;
+        second->glyph = tmp;
+    }
+    return true;
+}
+/**
+    Get the first range for the embedding level `level` between `(start, limit)` 
+    If such a range is found, it outputs it to (out_start, out_end), and returns true.
+    If none is found, then we return false, and (out_start, out_end) is undefined
+*/
+bool BidiInfo::nextRunOfLevel(int level, int start, int limit, int* out_start, int* out_end)
+{
+    *out_start = *out_end = -1;
+    for(int index = start; index < limit; index++)
+    {
+        if(embeddingLevels[index] >= level)
+        {
+            *out_start = index;
+            break;
+        }
+    }
+    if(*out_start == -1) return false;
+    for(int index = *out_start; index < limit; index++)
+    {
+        if(embeddingLevels[index] < level)
+        {
+            *out_end = index;
+            break;
+        }
+    }
+    if(*out_end == -1) *out_end = limit;
+    assert(*out_end > *out_start);
+    return true;
+}
+/**
+    The bidi needs to be applied to one line at a time. This method expects you to tell it
+    where a line starts and ends
+    Call this function when you determine the start and end of a line. It will examine 
+    the given range and look for RTL runs and reverse them.
+    @param itemText: ojbect representing the text of the scribus text-frame
+    @param bidi: holds the bidi information about the text
+*/
+void doBidiReordering(StoryText *itemText, BidiInfo *bidi, int lineStart, int lineEnd, bool inner=false)
+{
+    int max_level = bidi->levelAt(lineStart);
+    int min_odd_level = max_level + 1;
+    for(int i = lineStart; i < lineEnd; i++)
+    {
+        int level = bidi->levelAt(i);
+        if(level > max_level) max_level = level;
+        if(level % 2 == 1 && level < min_odd_level) min_odd_level = level;
+    }
+    for(int level = max_level; level >= min_odd_level; level--)
+    {
+        int start = lineStart;
+        int end = start;
+        while(true)
+        {
+            if(bidi->nextRunOfLevel(level, end, lineEnd, &start, &end))
+            {
+                reverseGlyphLayout(itemText, start, end);
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
+}
+/**
+    Applies bidi reordering to each line in a parapgraph.
+    @param layoutLines: tells us the line boundaries
+*/
+void doBidiParagraph(StoryText *itemText, BidiInfo *bidi, QLinkedList<LayoutLine> layoutLines)
+{
+    while(!layoutLines.isEmpty())
+    {
+        LayoutLine line = layoutLines.takeFirst();
+        // HACK:last space seems to be ignored/suppressed, this results in a character to be missing from the end of the line
+        //      when an RTL run crosses a line boundary, because the character was swaped with an invisible space
+        //      To circumvent this situation, we ignore the last character from the line if it's a space. This should not cause
+        //      any problem, even if it turned out that the space wasn't suppressed
+        //
+        if(itemText->item(line.endIndex-1)->ch == ' ') {
+                line.endIndex--;
+        }
+        doBidiReordering(itemText, bidi, line.startIndex, line.endIndex);
+    }
+}
+/**
+    This function takes off where PageItem_TextFrame::layout (thinks) it's done.
+    Inject a call to this method somewhere at the tail of the layout method
+*/
+void doBidiPostProcess(StoryText* itemText, BidiInfo *bidi, QLinkedList<LayoutLine> layoutLines)
+{
+    doBidiParagraph(itemText, bidi, layoutLines);
+}
+/**
+    selects the glyphs for the text before the layout method does
+ */
+void preShapeText(StoryText *itemText, BidiInfo *bidi, int start=0)
+{
+    QVector<uint> ustr = bidi->getUtf32();
+    while(start < itemText->length())
+    {
+        int end = nextScriptRun(ustr, start);
+        shapeGlyphs(itemText, start, end);
+        start = end;
+    }
+}
+#endif
+
 static double findRealOverflowEnd(const QRegion& shape, QRect pt, double maxX)
 {
 	while (!regionContainsRect(shape, pt) && pt.right() < maxX)
@@ -1377,6 +1627,12 @@ void PageItem_TextFrame::layout()
 	current.init(m_width, m_height, m_textDistanceMargins, lineCorr);
 	current.initColumns(columnWidth(), ColGap);
 	current.hyphenCount = 0;
+
+    #if BIDI_LAYOUT
+        BidiInfo bidiInfo(&itemText); //FIXME: this treats the whole text as one paragraph
+        preShapeText(&itemText, &bidiInfo, firstInFrame());
+        QLinkedList<LayoutLine> layoutLines; //used to keep track of line boundaries
+    #endif
 
 	//hold Y position of last computed line of text (with glyphs descent)
 	//for moving next line if glyphs are higher than that
@@ -2665,6 +2921,12 @@ void PageItem_TextFrame::layout()
 					current.breakLine(itemText, style, firstLineOffset(), a);
 					EndX = current.endOfLine(m_availableRegion, style.rightMargin(), regionMinY, regionMaxY);
 					current.finishLine(EndX);
+					
+					#if BIDI_LAYOUT
+                        //bidi-line-break [dup#1]
+                        layoutLines << LayoutLine(current.line);					
+                    #endif	
+					
 					//addLine = true;
 					assert(current.addLine);
 					//current.startOfCol = false;
@@ -2742,6 +3004,11 @@ void PageItem_TextFrame::layout()
 						//current.xPos = current.breakXPos;
 						EndX = current.endOfLine(m_availableRegion, current.rightMargin, regionMinY, regionMaxY);
 						current.finishLine(EndX);
+						
+						#if BIDI_LAYOUT
+                            //bidi-line-break [dup#2]
+                            layoutLines << LayoutLine(current.line);					
+                        #endif	
 
 						hyphWidth = 0.0;
 						if (itemText.hasFlag(a, ScLayout_HyphenationPossible) || itemText.text(a) == SpecialChars::SHYPHEN)
@@ -2999,6 +3266,11 @@ void PageItem_TextFrame::layout()
 
 			EndX = current.endOfLine(m_availableRegion, style.rightMargin(), regionMinY, regionMaxY);
 			current.finishLine(EndX);
+			
+			#if BIDI_LAYOUT
+                //bidi-line-break [dup#3]
+                layoutLines << LayoutLine(current.line);					
+            #endif	
 
 			if (opticalMargins & ParagraphStyle::OM_RightHangingPunct)
 				current.line.width += opticalRightMargin(itemText, current.line);
@@ -3045,6 +3317,9 @@ void PageItem_TextFrame::layout()
 				return;
 			}
 		}
+        #if BIDI_LAYOUT
+            doBidiPostProcess(&itemText, &bidiInfo, layoutLines);
+        #endif	
 	}
 	MaxChars = itemText.length();
 	if ((verticalAlign > 0) && (NextBox == NULL))
@@ -3092,6 +3367,9 @@ void PageItem_TextFrame::layout()
 	return;
 
 NoRoom:
+    #if BIDI_LAYOUT
+        doBidiPostProcess(&itemText, &bidiInfo, layoutLines); // XXX dup#2
+    #endif 
 	invalid = false;
 
 	adjustParagraphEndings ();
