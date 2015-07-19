@@ -20,7 +20,6 @@ for which a new license (GPL+exception) is in place.
 #include "prefsmanager.h"
 #include "scpaths.h"
 #include "scribuscore.h"
-#include "ui/sctextbrowser.h"
 #include "upgradechecker.h"
 
 
@@ -266,7 +265,7 @@ void UpgradeChecker::reportError(const QString& s)
 	}
 }
 
-UpgradeCheckerGUI::UpgradeCheckerGUI(ScTextBrowser *tb) : UpgradeChecker()
+UpgradeCheckerGUI::UpgradeCheckerGUI(QTextBrowser *tb) : UpgradeChecker()
 {
 	outputWidget=tb;
 	writeToConsole=false;
@@ -278,7 +277,7 @@ UpgradeCheckerGUI::~UpgradeCheckerGUI()
 
 void UpgradeCheckerGUI::outputText(QString text, bool noLineFeed)
 {
-	ScTextBrowser* w=outputWidget;
+	QTextBrowser* w=outputWidget;
 	if (w)
 	{
 		QString wText(w->toPlainText());

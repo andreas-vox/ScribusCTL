@@ -12,7 +12,7 @@ for which a new license (GPL+exception) is in place.
 #include "scribus.h"
 #include "units.h"
 #include "util.h"
-#include "util_icon.h"
+#include "iconmanager.h"
 #include "ui/charselectenhanced.h"
 
 static bool isEqual(double a, double b)
@@ -32,9 +32,9 @@ SMPStyleWidget::SMPStyleWidget(ScribusDoc* doc, StyleSet<CharStyle> *cstyles) : 
 	setupUi(this);
 	//Not used yet
 // 	optMarginCheckLeftProtruding->setVisible(false);
-	lineSpacingLabel->setPixmap(loadIcon("linespacing2.png"));
-	spaceAboveLabel->setPixmap( loadIcon("above.png") );
-	spaceBelowLabel->setPixmap( loadIcon("below.png") );
+	lineSpacingLabel->setPixmap(IconManager::instance()->loadPixmap("linespacing2.png"));
+	spaceAboveLabel->setPixmap(IconManager::instance()->loadPixmap("above.png") );
+	spaceBelowLabel->setPixmap(IconManager::instance()->loadPixmap("below.png") );
 
 	lineSpacingMode->addItem( tr("Fixed Linespacing"));
 	lineSpacingMode->addItem( tr("Automatic Linespacing"));
@@ -55,7 +55,7 @@ SMPStyleWidget::SMPStyleWidget(ScribusDoc* doc, StyleSet<CharStyle> *cstyles) : 
 	parEffectOffset->setSuffix(unitGetSuffixFromIndex(0));
 
 	fillBulletStrEditCombo();
-	bulletCharTableButton->setIcon(loadIcon("22/insert-table.png"));
+	bulletCharTableButton->setIcon(IconManager::instance()->loadPixmap("22/insert-table.png"));
 	fillNumFormatCombo();
 	numStartSpin->setMinimum(1);
 	numStartSpin->setMaximum(9999);
@@ -158,7 +158,7 @@ void SMPStyleWidget::languageChange()
 	spaceAbove->setSuffix(unitGetSuffixFromIndex(0));
 	spaceBelow->setSuffix(unitGetSuffixFromIndex(0));
 	parentLabel->setText( tr("Based On:"));
-	distancesBox->setTitle( tr("Distances and Alignment"));
+	distancesBox->setTitle( tr("Alignment and Distances"));
 
 	//parEffectsBox->setTitle(tr("Paragraph Effects"));
 	bulletBox->setTitle(           tr("Bullets"));

@@ -111,6 +111,7 @@ for which a new license (GPL+exception) is in place.
 #include "fpointarray.h"
 #include "gtgettext.h"
 #include "hyphenator.h"
+#include "iconmanager.h"
 #include "langmgr.h"
 #include "loadsaveplugin.h"
 #include "marks.h"
@@ -259,9 +260,7 @@ for which a new license (GPL+exception) is in place.
 #include "util_file.h"
 #include "util_formats.h"
 #include "util_ghostscript.h"
-#include "util_icon.h"
 #include "util_math.h"
-
 
 
 #ifdef HAVE_OSG
@@ -304,7 +303,7 @@ ScribusMainWindow::ScribusMainWindow()
 #ifdef Q_OS_MAC
 	//commenting this out until this is resolved :https://bugreports.qt.io/browse/QTBUG-44565
 	//ScQApp->setAttribute(Qt::AA_DontShowIconsInMenus);
-	noIcon = loadIcon("noicon.xpm");
+	//noIcon = IconManager::instance()->loadPixmap("noicon.xpm");
 #endif
 }
 
@@ -350,7 +349,7 @@ int ScribusMainWindow::initScMW(bool primaryMainWindow)
 	setWindowTitle( tr("Scribus " VERSION));
 	setAttribute(Qt::WA_KeyCompression, false);
 	setAttribute(Qt::WA_InputMethodEnabled, true);
-	setWindowIcon(loadIcon("AppIcon.png"));
+	setWindowIcon(IconManager::instance()->loadIcon("AppIcon.png"));
 	setObjectName("MainWindow");
 	scrActionGroups.clear();
 	scrActions.clear();
@@ -474,6 +473,8 @@ int ScribusMainWindow::initScMW(bool primaryMainWindow)
 	}
 	appModeHelper->setStartupActionsEnabled(false);
 
+	setStyleSheet();
+
 	return retVal;
 }
 
@@ -515,6 +516,35 @@ void ScribusMainWindow::initToolBars()
 	connect(scrActions["toolsToolbarTools"], SIGNAL(toggled(bool)), modeToolBar, SLOT(setVisible(bool)) );
 	connect(viewToolBar, SIGNAL(visibilityChanged(bool)), scrActions["toolsToolbarView"], SLOT(setChecked(bool)));
 	connect(scrActions["toolsToolbarView"], SIGNAL(toggled(bool)), viewToolBar, SLOT(setVisible(bool)) );
+}
+
+void ScribusMainWindow::setStyleSheet()
+{
+	QByteArray stylesheet;
+	if (loadRawText(ScPaths::instance().libDir() + "scribus.css", stylesheet))
+	{
+		QString downArrow(IconManager::instance()->pathForIcon("16/go-down.png"));
+		QByteArray da;
+		da.append(downArrow);
+		stylesheet.replace("___downArrow___", da);
+		QString toolbararrow(IconManager::instance()->pathForIcon("stylesheet/down_arrow.png"));
+		QByteArray tba;
+		tba.append(toolbararrow);
+		stylesheet.replace("___tb_menu_arrow___", tba);
+	}
+
+	layerMenu->setStyleSheet(stylesheet);
+	unitSwitcher->setStyleSheet(stylesheet);
+	zoomDefaultToolbarButton->setStyleSheet(stylesheet);
+	zoomInToolbarButton->setStyleSheet(stylesheet);
+	zoomOutToolbarButton->setStyleSheet(stylesheet);
+	zoomSpinBox->setStyleSheet(stylesheet);
+
+	fileToolBar->setStyleSheet(stylesheet);
+	editToolBar->setStyleSheet(stylesheet);
+	modeToolBar->setStyleSheet(stylesheet);
+	pdfToolBar->setStyleSheet(stylesheet);
+	viewToolBar->setStyleSheet(stylesheet);
 }
 
 
@@ -1056,7 +1086,7 @@ void ScribusMainWindow::initMenuBar()
 	scrMenuMgr->createMenu("ViewPreview", tr("Preview"), "View");
 	scrMenuMgr->addMenuItemString("ViewPreview", "View");
 	scrMenuMgr->addMenuItemString("viewPreviewMode", "ViewPreview");
-	scrMenuMgr->createMenu("ViewMeasuring", tr("Measures"), "View");
+	scrMenuMgr->createMenu("ViewMeasuring", tr("Measurement"), "View");
 	scrMenuMgr->addMenuItemString("ViewMeasuring", "View");
 	scrMenuMgr->addMenuItemString("viewShowRulers", "ViewMeasuring");
 	scrMenuMgr->addMenuItemString("viewRulerMode", "ViewMeasuring");
@@ -1248,9 +1278,9 @@ void ScribusMainWindow::initStatusBar()
 	zoomInToolbarButton->setDefault( false );
 	zoomInToolbarButton->setAutoDefault( false );
 
-	zoomDefaultToolbarButton->setIcon(QIcon(loadIcon("16/zoom-original.png")));
-	zoomOutToolbarButton->setIcon(QIcon(loadIcon("16/zoom-out.png")));
-	zoomInToolbarButton->setIcon(QIcon(loadIcon("16/zoom-in.png")));
+	zoomDefaultToolbarButton->setIcon(IconManager::instance()->loadIcon("16/zoom-original.png"));
+	zoomOutToolbarButton->setIcon(IconManager::instance()->loadIcon("16/zoom-out.png"));
+	zoomInToolbarButton->setIcon(IconManager::instance()->loadIcon("16/zoom-in.png"));
 
 
 	zoomLayout->addWidget( zoomSpinBox );
@@ -1276,14 +1306,16 @@ void ScribusMainWindow::initStatusBar()
 	mainWindowYPosDataLabel->setMinimumWidth(mainWindowYPosDataLabel->fontMetrics().width("99999.999"));
 	statusBarLanguageChange();
 
+	/*
 	QByteArray stylesheet;
 	if (loadRawText(ScPaths::instance().libDir() + "scribus.css", stylesheet))
 	{
-		QString downArrow(pathForIcon("16/go-down.png"));
+		QString downArrow(IconManager::instance()->pathForIcon("16/go-down.png"));
 		QByteArray da;
 		da.append(downArrow);
 		stylesheet.replace("___downArrow___", da);
 	}
+	*/
 
 	layerMenu->setObjectName("layerMenu");
 	unitSwitcher->setObjectName("unitSwitcher");
@@ -1292,12 +1324,14 @@ void ScribusMainWindow::initStatusBar()
 	zoomOutToolbarButton->setObjectName("zoomOutToolbarButton");
 	zoomSpinBox->setObjectName("zoomSpinBox");
 
+	/*
 	layerMenu->setStyleSheet(stylesheet);
 	unitSwitcher->setStyleSheet(stylesheet);
 	zoomDefaultToolbarButton->setStyleSheet(stylesheet);
 	zoomInToolbarButton->setStyleSheet(stylesheet);
 	zoomOutToolbarButton->setStyleSheet(stylesheet);
 	zoomSpinBox->setStyleSheet(stylesheet);
+	*/
 
 	statusBar()->setFont(fo);
 	statusBar()->addPermanentWidget(mainWindowStatusLabel, 5);
@@ -1627,7 +1661,7 @@ void ScribusMainWindow::keyPressEvent(QKeyEvent *k)
 	{
 		if ((doc->appMode == modeMagnifier) && (kk == Qt::Key_Shift))
 		{
-			view->setCursor(QCursor(loadIcon("LupeZm.xpm")));
+			view->setCursor(IconManager::instance()->loadCursor("LupeZm.xpm"));
 			return;
 		}
 	}
@@ -1876,7 +1910,7 @@ void ScribusMainWindow::keyReleaseEvent(QKeyEvent *k)
 	if (HaveDoc)
 	{
 		if (doc->appMode == modeMagnifier)
-			view->setCursor(QCursor(loadIcon("LupeZ.xpm")));
+			view->setCursor(IconManager::instance()->loadCursor("LupeZ.xpm"));
 	}
 	if (k->isAutoRepeat() || !_arrowKeyDown)
 		return;
@@ -2877,11 +2911,9 @@ void ScribusMainWindow::loadRecent(QString filename)
 {
 	QFileInfo fd(filename);
 	if (!fd.exists())
-	{
 		removeRecent(filename);
-		return;
-	}
-	loadDoc(filename);
+	else
+		loadDoc(filename);
 }
 
 void ScribusMainWindow::rebuildRecentFileMenu()
@@ -3093,7 +3125,7 @@ void ScribusMainWindow::importVectorFile()
 		md->setUrls(urls);
 		QDrag* dr = new QDrag(this);
 		dr->setMimeData(md);
-		const QPixmap& dragCursor = loadIcon("DragPix.xpm");
+		const QPixmap& dragCursor = IconManager::instance()->loadPixmap("DragPix.xpm");
 		dr->setPixmap(dragCursor);
 		dr->exec();
 	}
@@ -6617,61 +6649,62 @@ void ScribusMainWindow::slotDocSetup()
 		return;
 	struct ApplicationPrefs oldDocPrefs(doc->prefsData());
 	PreferencesDialog prefsDialog(this, oldDocPrefs, doc);
-	int prefsResult=prefsDialog.exec();
-	if (prefsResult==QDialog::Accepted)
+	int prefsResult = prefsDialog.exec();
+	if (prefsResult != QDialog::Accepted)
+		return;
+
+	struct ApplicationPrefs newDocPrefs(prefsDialog.prefs());
+	bool resizePages, resizeMasterPages, resizePageMargins, resizeMasterPageMargins;
+	prefsDialog.getResizeDocumentPages(resizePages, resizeMasterPages, resizePageMargins, resizeMasterPageMargins);
+	doc->setNewPrefs(newDocPrefs, oldDocPrefs, resizePages, resizeMasterPages, resizePageMargins, resizeMasterPageMargins);
+
+	slotChangeUnit(doc->unitIndex(), false);
+
+	if (oldDocPrefs.itemToolPrefs.imageLowResType!=newDocPrefs.itemToolPrefs.imageLowResType)
 	{
-		struct ApplicationPrefs newDocPrefs(prefsDialog.prefs());
-		bool resizePages, resizeMasterPages, resizePageMargins, resizeMasterPageMargins;
-		prefsDialog.getResizeDocumentPages(resizePages, resizeMasterPages, resizePageMargins, resizeMasterPageMargins);
-		doc->setNewPrefs(newDocPrefs, oldDocPrefs, resizePages, resizeMasterPages, resizePageMargins, resizeMasterPageMargins);
-
-		slotChangeUnit(doc->unitIndex(), false);
-
-		if (oldDocPrefs.itemToolPrefs.imageLowResType!=newDocPrefs.itemToolPrefs.imageLowResType)
-		{
-			setStatusBarInfoText( tr("Updating Images"));
-			mainWindowProgressBar->reset();
-			qApp->setOverrideCursor(QCursor(Qt::WaitCursor));
-			qApp->processEvents();
-			doc->recalcPicturesRes(true);
-			qApp->restoreOverrideCursor();
-			setStatusBarInfoText("");
-			mainWindowProgressBar->reset();
-			viewToolBar->setDoc(doc);
-		}
-		if (oldDocPrefs.typoPrefs != newDocPrefs.typoPrefs)
-		{
-			doc->invalidateAll();
-		}
-		emit UpdateRequest(reqDocFontListUpdate);
-		scrActions["viewShowMargins"]->setChecked(doc->guidesPrefs().marginsShown);
-		scrActions["viewShowBleeds"]->setChecked(doc->guidesPrefs().showBleed);
-		scrActions["viewShowFrames"]->setChecked(doc->guidesPrefs().framesShown);
-		scrActions["viewShowLayerMarkers"]->setChecked(doc->guidesPrefs().layerMarkersShown);
-		scrActions["viewShowGrid"]->setChecked(doc->guidesPrefs().gridShown);
-		scrActions["viewShowGuides"]->setChecked(doc->guidesPrefs().guidesShown);
-		scrActions["viewShowColumnBorders"]->setChecked(doc->guidesPrefs().colBordersShown);
-		scrActions["viewShowBaseline"]->setChecked(doc->guidesPrefs().baselineGridShown);
-		scrActions["viewShowImages"]->setChecked(doc->guidesPrefs().showPic);
-		scrActions["viewShowTextChain"]->setChecked(doc->guidesPrefs().linkShown);
-		scrActions["viewShowTextControls"]->setChecked(doc->guidesPrefs().showControls);
-		scrActions["viewShowRulers"]->setChecked(doc->guidesPrefs().rulersShown);
-		scrActions["viewRulerMode"]->setChecked(doc->guidesPrefs().rulerMode);
-		scrActions["extrasGenerateTableOfContents"]->setEnabled(doc->hasTOCSetup());
-		scrActions["extrasUpdateDocument"]->setEnabled(true);
-		scrActions["viewToggleCMS"]->setChecked(doc->HasCMS);
-		//doc emits changed() via this
-		doc->setMasterPageMode(true);
-		view->reformPages();
-		doc->setMasterPageMode(false);
-		view->reformPages();
-		view->GotoPage(doc->currentPage()->pageNr());
-		view->DrawNew();
-		pagePalette->rebuildPages();
-		emit UpdateRequest(reqCmsOptionsUpdate);
-		doc->changed();
-		modeToolBar->setDoc(doc);
+		setStatusBarInfoText( tr("Updating Images"));
+		mainWindowProgressBar->reset();
+		qApp->setOverrideCursor(QCursor(Qt::WaitCursor));
+		qApp->processEvents();
+		doc->recalcPicturesRes(true);
+		qApp->restoreOverrideCursor();
+		setStatusBarInfoText("");
+		mainWindowProgressBar->reset();
+		viewToolBar->setDoc(doc);
 	}
+	if (oldDocPrefs.typoPrefs != newDocPrefs.typoPrefs)
+	{
+		doc->invalidateAll();
+	}
+	emit UpdateRequest(reqDocFontListUpdate);
+	scrActions["viewShowMargins"]->setChecked(doc->guidesPrefs().marginsShown);
+	scrActions["viewShowBleeds"]->setChecked(doc->guidesPrefs().showBleed);
+	scrActions["viewShowFrames"]->setChecked(doc->guidesPrefs().framesShown);
+	scrActions["viewShowLayerMarkers"]->setChecked(doc->guidesPrefs().layerMarkersShown);
+	scrActions["viewShowGrid"]->setChecked(doc->guidesPrefs().gridShown);
+	scrActions["viewShowGuides"]->setChecked(doc->guidesPrefs().guidesShown);
+	scrActions["viewShowColumnBorders"]->setChecked(doc->guidesPrefs().colBordersShown);
+	scrActions["viewShowBaseline"]->setChecked(doc->guidesPrefs().baselineGridShown);
+	scrActions["viewShowImages"]->setChecked(doc->guidesPrefs().showPic);
+	scrActions["viewShowTextChain"]->setChecked(doc->guidesPrefs().linkShown);
+	scrActions["viewShowTextControls"]->setChecked(doc->guidesPrefs().showControls);
+	scrActions["viewShowRulers"]->setChecked(doc->guidesPrefs().rulersShown);
+	scrActions["viewRulerMode"]->setChecked(doc->guidesPrefs().rulerMode);
+	scrActions["extrasGenerateTableOfContents"]->setEnabled(doc->hasTOCSetup());
+	scrActions["extrasUpdateDocument"]->setEnabled(true);
+	scrActions["viewToggleCMS"]->setChecked(doc->HasCMS);
+	view->setRulersShown(doc->guidesPrefs().rulersShown);
+	//doc emits changed() via this
+	doc->setMasterPageMode(true);
+	view->reformPages();
+	doc->setMasterPageMode(false);
+	view->reformPages();
+	view->GotoPage(doc->currentPage()->pageNr());
+	view->DrawNew();
+	pagePalette->rebuildPages();
+	emit UpdateRequest(reqCmsOptionsUpdate);
+	doc->changed();
+	modeToolBar->setDoc(doc);
 }
 
 int ScribusMainWindow::ShowSubs()
@@ -7400,10 +7433,6 @@ void ScribusMainWindow::editSymbolEnd()
 	}
 	slotSelect();
 	appModeHelper->setSymbolEditMode(false, doc);
-	scrActions["fileClose"]->setToolTip( tr("Close"));
-	scrActions["fileClose"]->setIcon(loadIcon("22/close.png"));
-	scrMenuMgr->setMenuEnabled("FileOpenRecent", true);
-	scrMenuMgr->setMenuEnabled("FileExport", true);
 
 	if ( ScCore->haveGS() || ScCore->isWinGUI() )
 		scrActions["PrintPreview"]->setEnabled(true);
@@ -7470,10 +7499,6 @@ void ScribusMainWindow::editInlineEnd()
 	}
 	slotSelect();
 	appModeHelper->setInlineEditMode(false, doc);
-	scrActions["fileClose"]->setToolTip( tr("Close"));
-	scrActions["fileClose"]->setIcon(loadIcon("22/close.png"));
-	scrMenuMgr->setMenuEnabled("FileOpenRecent", true);
-	scrMenuMgr->setMenuEnabled("FileExport", true);
 	pagePalette->enablePalette(true);
 	pagePalette->rebuildMasters();
 	view->setScale(storedViewScale);
@@ -7550,9 +7575,6 @@ void ScribusMainWindow::editMasterPagesEnd()
 	}
 	slotSelect();
 	appModeHelper->setMasterPageEditMode(false, doc);
-	scrActions["fileClose"]->setToolTip( tr("Close"));
-	scrActions["fileClose"]->setIcon(loadIcon("22/close.png"));
-	scrMenuMgr->setMenuEnabled("FileOpenRecent", true);
 	uint pageCount=doc->DocPages.count();
 	for (uint c=0; c<pageCount; ++c)
 		Apply_MasterPage(doc->DocPages.at(c)->MPageNam, c, false);
@@ -9191,6 +9213,8 @@ void ScribusMainWindow::managePaints()
 			doc = NULL;
 		}
 	}
+	if (!HaveDoc)
+		doc = NULL;
 	delete dia;
 	undoManager->setUndoEnabled(true);
 }

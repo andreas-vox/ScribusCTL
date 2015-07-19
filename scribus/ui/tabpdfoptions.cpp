@@ -43,7 +43,7 @@ for which a new license (GPL+exception) is in place.
 #include "units.h"
 #include "usertaskstructs.h"
 #include "ui/scrspinbox.h"
-#include "util_icon.h"
+#include "iconmanager.h"
 #include "scribuscore.h"
 #include "util.h"
 
@@ -64,10 +64,10 @@ TabPDFOptions::TabPDFOptions(QWidget* parent, PDFOptions & Optionen,
 
 	// General tab
 	rangeGroupLayout->setAlignment( Qt::AlignTop );
- 	pageNrButton->setIcon(QIcon(loadIcon("ellipsis.png")));
-	MirrorH->setIcon(QIcon(loadIcon("16/flip-object-horizontal.png")));
+	pageNrButton->setIcon(IconManager::instance()->loadIcon("ellipsis.png"));
+	MirrorH->setIcon(IconManager::instance()->loadIcon("16/flip-object-horizontal.png"));
 	MirrorH->setCheckable( true );
-	MirrorV->setIcon(QIcon(loadIcon("16/flip-object-vertical.png")));
+	MirrorV->setIcon(IconManager::instance()->loadIcon("16/flip-object-vertical.png"));
 	MirrorV->setCheckable( true );
 
 	fileOptionsLayout->setAlignment( Qt::AlignTop );
@@ -96,9 +96,11 @@ TabPDFOptions::TabPDFOptions(QWidget* parent, PDFOptions & Optionen,
 	// Fonts tab
 	groupFontLayout->setAlignment( Qt::AlignTop );
 	EmbedList->setMaximumHeight(300);
+	EmbedList->setSelectionMode(QListWidget::ExtendedSelection);
 	SubsetList->setMaximumHeight(300);
-	ToSubset->setIcon(QIcon(loadIcon("22/go-next.png")));
-	FromSubset->setIcon(QIcon(loadIcon("22/go-previous.png")));
+	SubsetList->setSelectionMode(QListWidget::ExtendedSelection);
+	ToSubset->setIcon(IconManager::instance()->loadIcon("22/go-next.png"));
+	FromSubset->setIcon(IconManager::instance()->loadIcon("22/go-previous.png"));
 
 	// Presentation tab
 	effectsLayout->setAlignment( Qt::AlignTop );
@@ -1327,69 +1329,76 @@ void TabPDFOptions::EmbeddingModeChange()
 
 void TabPDFOptions::RemoveSubset()
 {
-	QString currentFont = SubsetList->currentItem()->text();
-	const ScFace fontFace = AllFonts[currentFont];
-	if ((fontFace.type() != ScFace::OTF) && (!fontFace.subset()))
+	QList<QListWidgetItem*> selection = SubsetList->selectedItems();
+	for (int i = 0; i < selection.count() ; ++i)
 	{
+		QListWidgetItem* fontItem = selection[i];
+		QString currentFont = fontItem->text();
+		const ScFace fontFace = AllFonts[currentFont];
+		if ((fontFace.type() == ScFace::OTF) || (fontFace.subset()))
+			continue;
 		addFontItem(currentFont, EmbedList);
-		delete SubsetList->takeItem(SubsetList->currentRow());
+		int currentRow = SubsetList->row(fontItem);
+		delete SubsetList->takeItem(currentRow);
 	}
+
 	SubsetList->clearSelection();
-	if (SubsetList->count() == 0)
-		FromSubset->setEnabled(false);
+	FromSubset->setEnabled(false);
 }
 
 void TabPDFOptions::PutToSubset()
 {
-	QString currentFont = EmbedList->currentItem()->text();
-	if (SubsetList->count() != 0)
+	QList<QListWidgetItem*> selection = EmbedList->selectedItems();
+	for (int i = 0; i < selection.count() ; ++i)
 	{
-		if (SubsetList->findItems(currentFont, Qt::MatchExactly).count() == 0)
-			addFontItem(currentFont, SubsetList);
-	}
-	else
-	{
-		addFontItem(currentFont, SubsetList);
-	}
-	delete EmbedList->takeItem(EmbedList->currentRow());
-	EmbedList->clearSelection();
-	if (EmbedList->count() == 0)
-	{
-		ToSubset->setEnabled(false);
-	}
-	else if (!(EmbedList->currentItem()->flags() & Qt::ItemIsSelectable))
-	{
-		ToSubset->setEnabled(false);
-	}
-}
-
-void TabPDFOptions::SelEFont(QListWidgetItem *c)
-{
-	if (c != NULL)
-	{
-		if (c->flags() & Qt::ItemIsSelectable)
-			ToSubset->setEnabled(true);
-		FromSubset->setEnabled(false);
-		SubsetList->clearSelection();
-	}
-}
-
-void TabPDFOptions::SelSFont(QListWidgetItem *c)
-{
-	if (c != NULL)
-	{
-		if (PDFVersionCombo->currentIndex() == 4)
+		QListWidgetItem* fontItem = selection[i];
+		QString currentFont = fontItem->text();
+		if (SubsetList->count() != 0)
 		{
-			if ((AllFonts[c->text()].type() == ScFace::OTF) || (AllFonts[c->text()].subset()))
-				FromSubset->setEnabled(false);
-			else
-				FromSubset->setEnabled(true);
+			if (SubsetList->findItems(currentFont, Qt::MatchExactly).count() == 0)
+				addFontItem(currentFont, SubsetList);
 		}
 		else
-			FromSubset->setEnabled(true);
-		ToSubset->setEnabled(false);
-		EmbedList->clearSelection();
+		{
+			addFontItem(currentFont, SubsetList);
+		}
+		int itemRow = EmbedList->row(fontItem);
+		delete EmbedList->takeItem(itemRow);
 	}
+
+	EmbedList->clearSelection();
+	ToSubset->setEnabled(false);
+}
+
+void TabPDFOptions::SelEFont(QListWidgetItem*)
+{
+	QList<QListWidgetItem*> selection = EmbedList->selectedItems();
+	bool enableToSubset = (selection.count() > 0);
+
+	ToSubset->setEnabled(enableToSubset);
+	FromSubset->setEnabled(false);
+	SubsetList->clearSelection();
+}
+
+void TabPDFOptions::SelSFont(QListWidgetItem*)
+{
+	QList<QListWidgetItem*> selection = SubsetList->selectedItems();
+	int enabledForEmbedding = selection.count();
+
+	if (PDFVersionCombo->currentIndex() == 4)
+	{
+		for (int i = 0; i < selection.count(); ++i)
+		{
+			const QListWidgetItem* item = selection.at(i);
+			const ScFace face = AllFonts[item->text()];
+			if ((face.type() == ScFace::OTF) || (face.subset()))
+				enabledForEmbedding--;
+		}
+	}
+
+	FromSubset->setEnabled(enabledForEmbedding > 0);
+	ToSubset->setEnabled(false);
+	EmbedList->clearSelection();
 }
 
 void TabPDFOptions::EmbedAll()
@@ -1448,13 +1457,13 @@ QListWidgetItem* TabPDFOptions::addFontItem(QString fontName, QListWidget* fontL
 
 	const ScFace& face = AllFonts.value(fontName);
 	if (face.isReplacement())
-		item = new QListWidgetItem( QIcon(loadIcon("font_subst16.png")), fontName, fontList );
+		item = new QListWidgetItem( IconManager::instance()->loadIcon("font_subst16.png"), fontName, fontList );
 	else if (face.type() == ScFace::TYPE1)
-		item = new QListWidgetItem( QIcon(loadIcon("font_type1_16.png")), fontName, fontList );
+		item = new QListWidgetItem( IconManager::instance()->loadIcon("font_type1_16.png"), fontName, fontList );
 	else if (face.type() == ScFace::TTF)
-		item = new QListWidgetItem( QIcon(loadIcon("font_truetype16.png")), fontName, fontList );
+		item = new QListWidgetItem( IconManager::instance()->loadIcon("font_truetype16.png"), fontName, fontList );
 	else if (face.type() == ScFace::OTF)
-		item = new QListWidgetItem( QIcon(loadIcon("font_otf16.png")), fontName, fontList );
+		item = new QListWidgetItem( IconManager::instance()->loadIcon("font_otf16.png"), fontName, fontList );
 
 	return item;
 }
