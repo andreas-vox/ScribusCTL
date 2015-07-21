@@ -1,0 +1,26 @@
+os:
+  - osx
+  
+before_install:
+  - brew update 
+  - brew outdated xz || brew upgrade xz  
+  - brew outdated cmake || brew upgrade cmake
+  - brew outdated little-cms2 || brew upgrade little-cms2
+  - brew outdated xz || brew upgrade xz
+  - brew outdated qt5 || brew upgrade qt5
+  - brew outdated cairo || brew upgrade cairo
+  - brew outdated jpeg || brew upgrade jpeg
+  - brew outdated libtiff || brew upgrade libtiff
+  - brew outdated fontconfig || brew upgrade fontconfig
+  - brew outdated openssl || brew upgrade openssl
+  - brew outdated pkg-config || brew upgrade pkg-config
+  - brew outdated python || brew upgrade python
+  - brew outdated hunspell || brew upgrade hunspell
+  - brew outdated homebrew/dupes/zlib || brew upgrade homebrew/dupes/zlib
+  - brew outdated ghostscript || brew upgrade ghostscript
+  - brew outdated graphicsmagick || brew upgrade graphicsmagick
+  - brew outdated boost || brew upgrade boost
+  - brew outdated poppler || brew upgrade poppler
+  - brew outdated podofo || brew upgrade podofo
+  - brew outdated poppler || brew upgrade poppler
+  - brew outdated freetype || brew upgrade freetype
