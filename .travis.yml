@@ -1,6 +1,7 @@
 os: osx
 language: c++
 compiler: clang  
+sudo: required
 
 before_install:
   - brew update 
@@ -28,7 +29,6 @@ before_install:
 
 
 install:
-  git clone --depth 1 https://github.com/scribusproject/scribus.git
   args = %W[
     -DBUILD_OSX_BUNDLE=1
     -DCMAKE_INSTALL_PREFIX:PATH=#{prefix}/Scribus.app/Contents/
