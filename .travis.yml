@@ -41,3 +41,7 @@ install:
   system "cmake", ".", *args
   system "make"
   system "make install"
+
+notifications:
+  email:
+  - kunda@scribus.net
