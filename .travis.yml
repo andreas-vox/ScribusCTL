@@ -1,6 +1,7 @@
-language: c++
 os: osx
-  
+language: c++
+compiler: clang  
+
 before_install:
   - brew update 
   - brew outdated xz || brew upgrade xz  
