@@ -46,7 +46,3 @@ install:
 notifications:
   email:
   - kunda@scribus.net
-
-matrix:
-  allow_failures:
-    - compiler: clang
