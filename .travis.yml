@@ -9,28 +9,36 @@ language: c++
 compiler: clang  
 
 before_install:
-  - brew update 
-  - brew outdated xz || brew upgrade xz  
-  - brew outdated cmake || brew upgrade cmake
-  - brew outdated little-cms2 || brew upgrade little-cms2
-  - brew outdated xz || brew upgrade xz
-  - brew outdated qt5 || brew upgrade qt5
-  - brew outdated cairo || brew upgrade cairo
-  - brew outdated jpeg || brew upgrade jpeg
-  - brew outdated libtiff || brew upgrade libtiff
-  - brew outdated fontconfig || brew upgrade fontconfig
-  - brew outdated openssl || brew upgrade openssl
-  - brew outdated pkg-config || brew upgrade pkg-config
-  - brew outdated python || brew upgrade python
-  - brew outdated hunspell || brew upgrade hunspell
-  - brew outdated homebrew/dupes/zlib || brew upgrade homebrew/dupes/zlib
-  - brew outdated ghostscript || brew upgrade ghostscript
-  - brew outdated graphicsmagick || brew upgrade graphicsmagick
-  - brew outdated boost || brew upgrade boost
-  - brew outdated poppler || brew upgrade poppler
-  - brew outdated podofo || brew upgrade podofo
-  - brew outdated poppler || brew upgrade poppler
-  - brew outdated freetype || brew upgrade freetype
+- if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get update -qq && 
+    sudo apt-get install cmake libboost-python-dev libcups2-dev libhunspell-dev
+    libhyphen-dev liblcms2-dev libpodofo-dev libtiff-dev libxml2-dev
+    python-all-dev zlib1g-dev qtbase5-dev qtdeclarative5-dev libqt5opengl5-dev
+    qttools5-dev qttools5-dev-tools libgraphicsmagick++1-dev
+    libopenscenegraph-dev libpoppler-dev libcairo2-dev libwpg-dev libmspub-dev
+    libcdr-dev libvisio-dev; fi
+- if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew tap scribusproject/scribus && brew install scribus; fi
+#  - brew update 
+#  - brew outdated xz || brew upgrade xz  
+#  - brew outdated cmake || brew upgrade cmake
+#  - brew outdated little-cms2 || brew upgrade little-cms2
+#  - brew outdated xz || brew upgrade xz
+#  - brew outdated qt5 || brew upgrade qt5
+#  - brew outdated cairo || brew upgrade cairo
+#  - brew outdated jpeg || brew upgrade jpeg
+#  - brew outdated libtiff || brew upgrade libtiff
+#  - brew outdated fontconfig || brew upgrade fontconfig
+#  - brew outdated openssl || brew upgrade openssl
+#  - brew outdated pkg-config || brew upgrade pkg-config
+#  - brew outdated python || brew upgrade python
+#  - brew outdated hunspell || brew upgrade hunspell
+#  - brew outdated homebrew/dupes/zlib || brew upgrade homebrew/dupes/zlib
+#  - brew outdated ghostscript || brew upgrade ghostscript
+#  - brew outdated graphicsmagick || brew upgrade graphicsmagick
+#  - brew outdated boost || brew upgrade boost
+#  - brew outdated poppler || brew upgrade poppler
+#  - brew outdated podofo || brew upgrade podofo
+#  - brew outdated poppler || brew upgrade poppler
+#  - brew outdated freetype || brew upgrade freetype
 
 
 install:
