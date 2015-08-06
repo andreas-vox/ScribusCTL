@@ -69,6 +69,7 @@ for which a new license (GPL+exception) is in place.
 #include "scribusdoc.h"
 #include "scribusview.h"
 #include "scribuswin.h"
+#include "shaper.h"
 #include "sctextstream.h"
 #include "selection.h"
 #include "text/storytext.h"
@@ -2558,6 +2559,12 @@ double PageItem::layoutGlyphs(const CharStyle& style, const QString& chars, Layo
 	const ScFace font = style.font();
 	double asce = font.ascent(style.fontSize() / 10.0);
 	int chst = style.effects() & ScStyle_UserStyles;
+    #if BIDI_LAYOUT
+        bool reset_xadvance = chars[0].unicode() > 256 && layout.xadvance == 0; //HACK for vowel marks
+        if(layout.glyph == 0) //we couldn't get this glyph with harfbuzz (why?)
+        {
+        reset_xadvance = false;    
+    #endif
 /*	if (chars[0] == SpecialChars::ZWSPACE ||
 		chars[0] == SpecialChars::ZWNBSPACE ||
 		chars[0] == SpecialChars::NBSPACE ||
@@ -2575,6 +2582,9 @@ double PageItem::layoutGlyphs(const CharStyle& style, const QString& chars, Layo
 	{
 		layout.glyph = font.char2CMap(chars[0].unicode());
 	}
+	#if BIDI_LAYOUT
+        }
+    #endif 
 	double tracking = 0.0;
 	if ( (flags & ScLayout_StartOfLine) == 0)
 		tracking = style.fontSize() * style.tracking() / 10000.0;
@@ -2639,6 +2649,10 @@ double PageItem::layoutGlyphs(const CharStyle& style, const QString& chars, Layo
 	{
 		layout.xadvance = font.glyphWidth(layout.glyph, style.fontSize() / 10) * layout.scaleH;
 		layout.yadvance = font.glyphBBox(layout.glyph, style.fontSize() / 10).ascent * layout.scaleV;
+    #if BIDI_LAYOUT
+            if(reset_xadvance)
+                layout.xadvance = 0;
+    #endif
 	}
 	if (layout.xadvance > 0)
 		layout.xadvance += tracking;

@@ -251,7 +251,7 @@ public slots:
 signals:
 		void changed();
 
-private:
+public:
  	ScText * item(uint index);
  	const ScText * item(uint index) const;
 
