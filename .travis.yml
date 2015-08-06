@@ -1,7 +1,12 @@
-os: osx
+matrix:
+  include:
+    - os: linux
+      dist: trusty
+      sudo: required
+    - os: osx
+
 language: c++
 compiler: clang  
-sudo: required
 
 before_install:
   - brew update 
