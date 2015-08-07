@@ -49,14 +49,14 @@ Prefs_PDFExport::Prefs_PDFExport(QWidget* parent, ScribusDoc* doc)
 	exportChosenPagesRadioButton->setToolTip( "<qt>" + tr( "Export a range of pages to PDF" ) );
 	exportPageListLineEdit->setToolTip( "<qt>" + tr( "Insert a comma separated list of tokens where "
 											"a token can be * for all the pages, 1-5 for "
-											"a range of pages or a single page number.") + "</qt>" );
+											"a range of pages or a single page number") + "</qt>" );
 	exportRangeMorePushButton->setToolTip( "<qt>" + tr( "Create a range of pages" ) + "</qt>");
 
 	pdfVersionComboBox->setToolTip( "<qt>" + tr( "Determines the PDF compatibility.<br/>The default is <b>PDF 1.3</b> which gives the widest compatibility.<br/>Choose <b>PDF 1.4</b> if your file uses features such as transparency or you require 128 bit encryption.<br/><b>PDF 1.5</b> is necessary when you wish to preserve objects in separate layers within the PDF.<br/><b>PDF/X-3</b> is for exporting the PDF when you want color managed RGB for commercial printing and is selectable when you have activated color management. Use only when advised by your printer or in some cases printing to a 4 color digital color laser printer.<br/><b>PDF/X-1a</b> is for blind exchange with colors strictly specified in CMYK or spot colors.<br/><b>PDF/X-4</b> is an extension of PDF/X-3 to support transparancy and layering." ) + "</qt>");
 	pageBindingComboBox->setToolTip( "<qt>" + tr( "Determines the binding of pages in the PDF. Unless you know you need to change it leave the default choice - Left." ) + "</qt>" );
 	generateThumbnailsCheckBox->setToolTip( "<qt>" + tr( "Generates thumbnails of each page in the PDF. Some viewers can use the thumbnails for navigation." ) + "</qt>" );
-	saveLinkedTextFramesAsArticlesCheckBox->setToolTip( "<qt>" + tr( "Generate PDF Articles, which is useful for navigating linked articles in a PDF." ) + "</qt>" );
-	includeLayersCheckBox->setToolTip( "<qt>" + tr( "Layers in your document are exported to the PDF Only available if PDF 1.5 is chosen." ) + "</qt>" );
+	saveLinkedTextFramesAsArticlesCheckBox->setToolTip( "<qt>" + tr( "Generate PDF Articles, which is useful for navigating linked articles in a PDF" ) + "</qt>" );
+	includeLayersCheckBox->setToolTip( "<qt>" + tr( "Layers in your document are exported to the PDF. Only available if PDF 1.5 is chosen." ) + "</qt>" );
 	includeBookmarksCheckBox->setToolTip( "<qt>" + tr( "Embed the bookmarks you created in your document. These are useful for navigating long PDF documents." ) + "</qt>" );
 	epsExportResolutionSpinBox->setToolTip( "<qt>" + tr( "Export resolution of text and vector graphics. This does not affect the resolution of bitmap images like photos." ) + "</qt>" );
 	embedPDFAndEPSFilesCheckBox->setToolTip( "<qt>" + tr( "Export PDFs in image frames as embedded PDFs. This does *not* yet take care of colorspaces, so you should know what you are doing before setting this to 'true'." ) + "</qt>" );
@@ -64,12 +64,12 @@ Prefs_PDFExport::Prefs_PDFExport(QWidget* parent, ScribusDoc* doc)
 	imageCompressionMethodComboBox->setToolTip( "<qt>" + tr( "Method of compression to use for images. Automatic allows Scribus to choose the best method. ZIP is lossless and good for images with solid colors. JPEG is better at creating smaller PDF files which have many photos (with slight image quality loss possible). Leave it set to Automatic unless you have a need for special compression options." ) + "</qt>");
 	imageCompressionQualityComboBox->setToolTip( "<qt>" + tr( "Compression quality levels for lossy compression methods: Minimum (25%), Low (50%), Medium (75%), High (85%), Maximum (95%). Note that a quality level does not directly determine the size of the resulting image - both size and quality loss vary from image to image at any given quality level. Even with Maximum selected, there is always some quality loss with jpeg." ) + "</qt>");
 	maxResolutionLimitCheckBox->setToolTip( "<qt>" + tr( "Limits the resolution of your bitmap images to the selected DPI. Images with a lower resolution will be left untouched. Leaving this unchecked will render them at their native resolution. Enabling this will increase memory usage and slow down export." ) + "</qt>" );
-	maxExportResolutionSpinBox->setToolTip( "<qt>" + tr( "DPI (Dots Per Inch) for image export.") + "</qt>" );
+	maxExportResolutionSpinBox->setToolTip( "<qt>" + tr( "DPI (Dots Per Inch) for image export") + "</qt>" );
 	useEncryptionCheckBox->setToolTip( "<qt>" + tr( "Enable the security features in your exported PDF. If you selected PDF 1.3, the PDF will be protected by 40 bit encryption. If you selected PDF 1.4, the PDF will be protected by 128 bit encryption. Disclaimer: PDF encryption is not as reliable as GPG or PGP encryption and does have some limitations." ) + "</qt>" );
 	passwordOwnerLineEdit->setToolTip( "<qt>" + tr( "Choose an owner password which enables or disables all the security features in your exported PDF" ) + "</qt>" );
-	passwordUserLineEdit->setToolTip( "<qt>" + tr( "Choose a password for users to be able to read your PDF." ) + "</qt>" );
-	allowPrintingCheckBox->setToolTip( "<qt>" + tr( "Allow printing of the PDF. If un-checked, printing is prevented. " ) + "</qt>" );
-	allowChangingCheckBox->setToolTip( "<qt>" + tr( "Allow modifying of the PDF. If un-checked, modifying the PDF is prevented." ) + "</qt>" );
+	passwordUserLineEdit->setToolTip( "<qt>" + tr( "Choose a password for users to be able to read your PDF" ) + "</qt>" );
+	allowPrintingCheckBox->setToolTip( "<qt>" + tr( "Allow printing of the PDF. If unchecked, printing is prevented. " ) + "</qt>" );
+	allowChangingCheckBox->setToolTip( "<qt>" + tr( "Allow modifying of the PDF. If unchecked, modifying the PDF is prevented." ) + "</qt>" );
 	allowCopyingCheckBox->setToolTip( "<qt>" + tr( "Allow copying of text or graphics from the PDF. If unchecked, text and graphics cannot be copied." ) + "</qt>" );
 	allowAnnotatingCheckBox->setToolTip( "<qt>" + tr( "Allow adding annotations and fields to the PDF. If unchecked, editing annotations and fields is prevented." ) + "</qt>" );
 	outputIntentionComboBox->setToolTip( "<qt>" + tr( "Color model for the output of your PDF. Choose Screen/Web for PDFs which are used for screen display and for printing on typical inkjets. Choose Printer when printing to a true 4 color CMYK printer. Choose Grayscale when you want a grey scale PDF." ) + "</qt>" );
@@ -652,12 +652,12 @@ void Prefs_PDFExport::restoreDefaults(struct ApplicationPrefs *prefsData, const 
 		showPagePreviewsCheckBox->setToolTip( "<qt>" + tr( "Show page previews of each page listed above." ) + "</qt>");
 		effectDurationSpinBox->setToolTip( "<qt>" + tr( "Length of time the page is shown before the presentation starts on the selected page. Setting 0 will disable automatic page transition." ) + "</qt>" );
 		effectDurationSpinBox->setToolTip( "<qt>" + tr( "Length of time the effect runs. A shorter time will speed up the effect, a longer one will slow it down." ) + "</qt>" );
-		effectTypeComboBox->setToolTip( "<qt>" + tr( "Type of the display effect." ) + "</qt>" );
-		effectMovingDirectionComboBox->setToolTip( "<qt>" + tr( "Direction of the effect of moving lines for the split and blind effects." ) + "</qt>" );
-		effectInOutComboBox->setToolTip( "<qt>" + tr( "Starting position for the box and split effects." ) + "</qt>" );
-		effectDirectionComboBox->setToolTip( "<qt>" + tr( "Direction of the glitter or wipe effects." ) + "</qt>" );
-		applyEffectToAllPagesPushButton->setToolTip( "<qt>" + tr( "Apply the selected effect to all pages." ) + "</qt>" );
-		subsetAllButton->setToolTip( "<qt>" + tr("Embed only subset fonts with glyphs used in the document into the PDF.") + "</qt>");
+		effectTypeComboBox->setToolTip( "<qt>" + tr( "Type of the display effect" ) + "</qt>" );
+		effectMovingDirectionComboBox->setToolTip( "<qt>" + tr( "Direction of the effect of moving lines for the split and blind effects" ) + "</qt>" );
+		effectInOutComboBox->setToolTip( "<qt>" + tr( "Starting position for the box and split effects" ) + "</qt>" );
+		effectDirectionComboBox->setToolTip( "<qt>" + tr( "Direction of the glitter or wipe effects" ) + "</qt>" );
+		applyEffectToAllPagesPushButton->setToolTip( "<qt>" + tr( "Apply the selected effect to all pages" ) + "</qt>" );
+		subsetAllButton->setToolTip( "<qt>" + tr("Embed only subset fonts with glyphs used in the document into the PDF") + "</qt>");
 		singlePageRadioButton->setToolTip( "<qt>" + tr( "Show the document in single page mode" ) + "</qt>" );
 		continuousPagesRadioButton->setToolTip( "<qt>" + tr( "Show the document in single page mode with the pages displayed continuously end to end like a scroll" ) + "</qt>" );
 		doublePageLeftRadioButton->setToolTip( "<qt>" + tr( "Show the document with facing pages, starting with the first page displayed on the left" ) + "</qt>" );
@@ -668,8 +668,8 @@ void Prefs_PDFExport::restoreDefaults(struct ApplicationPrefs *prefsData, const 
 		useThumbnailsRadioButton->setToolTip( "<qt>" + tr( "Display the page thumbnails upon opening" ) + "</qt>" );
 		useLayersRadioButton->setToolTip( "<qt>" + tr( "Forces the displaying of layers. Useful only for PDF 1.5+." ) + "</qt>" );
 		hideViewerToolBarCheckBox->setToolTip( "<qt>" + tr( "Hides the Tool Bar which has selection and other editing capabilities" ) + "</qt>" );
-		hideViewerMenuBarCheckBox->setToolTip( "<qt>" + tr( "Hides the Menu Bar for the viewer, the PDF will display in a plain window. " ) + "</qt>" );
-		fitViewerWindowCheckBox->setToolTip( "<qt>" + tr( "Fit the document page or pages to the available space in the viewer window." ) + "</qt>" );
+		hideViewerMenuBarCheckBox->setToolTip( "<qt>" + tr( "Hides the Menu Bar for the viewer, the PDF will display in a plain window" ) + "</qt>" );
+		fitViewerWindowCheckBox->setToolTip( "<qt>" + tr( "Fit the document page or pages to the available space in the viewer window" ) + "</qt>" );
 	}
 }
 
