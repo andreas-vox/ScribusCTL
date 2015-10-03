@@ -16,7 +16,7 @@ before_install:
 #    qttools5-dev qttools5-dev-tools libgraphicsmagick++1-dev
 #    libopenscenegraph-dev libpoppler-dev libcairo2-dev libwpg-dev libmspub-dev
 #    libcdr-dev libvisio-dev; fi
-- if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew tap scribusproject/scribus && brew install --HEAD scribus; fi
+- if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew tap luzpaz/scribustravis && brew install --HEAD scribustravis; fi
 #  - brew update 
 #  - brew outdated xz || brew upgrade xz  
 #  - brew outdated cmake || brew upgrade cmake
