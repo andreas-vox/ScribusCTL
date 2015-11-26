@@ -20,7 +20,7 @@ for which a new license (GPL+exception) is in place.
 #include "scribusview.h"
 #include "ui/scmessagebox.h"
 #include "util.h"
-#include "util_icon.h"
+#include "iconmanager.h"
 
 
 
@@ -30,21 +30,23 @@ CharSelect::CharSelect(QWidget* parent) : ScrPaletteBase(parent, "CharSelect"), 
 
 	paletteFileMask = tr("Scribus Char Palette (*.ucp);;All Files (*)");
 
-	hideButton->setIcon(loadIcon("22/insert-table.png"));
-	unicodeButton->setIcon(loadIcon("find.png"));
-	uniLoadButton->setIcon(loadIcon("22/document-open.png"));
-	uniSaveButton->setIcon(loadIcon("22/document-save.png"));
-	uniClearButton->setIcon(loadIcon("22/document-new.png"));
+	hideButton->setIcon(IconManager::instance()->loadIcon("22/insert-table.png"));
+	unicodeButton->setIcon(IconManager::instance()->loadIcon("find.png"));
+	uniLoadButton->setIcon(IconManager::instance()->loadIcon("22/document-open.png"));
+	uniSaveButton->setIcon(IconManager::instance()->loadIcon("22/document-save.png"));
+	uniClearButton->setIcon(IconManager::instance()->loadIcon("22/document-new.png"));
 
 	m_userTableModel = new CharTableModel(this, 6, m_doc, PrefsManager::instance()->appPrefs.itemToolPrefs.textFont);
 	loadUserContent(ScPaths::getApplicationDataDir() + "charpalette.ucp");
+
+	m_unicodeSearchModel = new UnicodeSearchModel(this);
 
 	m_userTable->setModel(m_userTableModel);
 	m_userTable->setAcceptDrops(true);
 
 	// signals and slots connections
 	connect(m_userTable, SIGNAL(selectChar(uint, QString)), this, SLOT(userNewChar(uint, QString)));
-	connect(m_userTableModel, SIGNAL(selectionChanged(QItemSelectionModel*)), m_userTable, SLOT(modelSelectionChanged(QItemSelectionModel*)));
+	connect(m_userTable->selectionModel(), SIGNAL(selectionChanged(const QItemSelection& ,const QItemSelection&)), this, SLOT(slot_selectionChanged(const QItemSelection&, const QItemSelection&)) );
 	connect(m_userTableModel, SIGNAL(rowAppended()), m_userTable, SLOT(resizeLastRow()));
 	connect(unicodeButton, SIGNAL(chosenUnicode(const QString &)), m_userTableModel, SLOT(appendUnicode(const QString &)));
 	connect(hideButton, SIGNAL(toggled(bool)), this, SLOT(hideButton_toggled(bool)));
@@ -154,6 +156,31 @@ void CharSelect::slot_insertUserSpecialChar(QChar ch, QString font)
 	cItem->itemText.applyCharStyle(pot, 1, nstyle);
 	m_doc->view()->DrawNew();
 	m_doc->changed();
+}
+
+void CharSelect::slot_selectionChanged( const QItemSelection& sel, const QItemSelection& )
+{
+	QModelIndexList indexes = sel.indexes();
+	if ( indexes.isEmpty() )
+		return;
+
+	QModelIndex index = indexes.at(0);
+	if ( !index.isValid() )
+		return;
+
+	// we retrieve a QStringList of two elements from data() encapsulated in a
+	// QVariant, so we should make sure first that we can convert to QStringList.
+	// Otherwise clear the status label
+	QVariant tmp = index.data(Qt::StatusTipRole);
+	if ( !tmp.canConvert(QMetaType::QStringList) )
+	{
+		m_statusLabel->setText(QString());
+		return;
+	}
+
+	QStringList lst = tmp.toStringList();
+	m_statusLabel->setText("<p><b>" + QString("%1").arg(m_unicodeSearchModel->descriptionFromHex(lst.at(0))).toUpper() +
+												 "</b><br>" + QString(tr("Font: %2")).arg(lst.at(1)) + "</p>");
 }
 
 void CharSelect::openEnhanced()
@@ -317,6 +344,7 @@ void CharSelect::uniClearButton_clicked()
 	   )
 	{
 		m_userTableModel->setCharacters(CharClassDef());
+		m_statusLabel->setText(QString());
 	}
 }
 

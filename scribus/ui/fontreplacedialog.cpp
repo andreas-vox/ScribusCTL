@@ -18,17 +18,17 @@ for which a new license (GPL+exception) is in place.
 #include <QToolTip>
 #include <QCloseEvent>
 
-#include "fontcombo.h"
 #include "commonstrings.h"
-#include "util_icon.h"
-#include "util.h"
+#include "fontcombo.h"
+#include "iconmanager.h"
 #include "scribusstructs.h"
+#include "util.h"
 
 FontReplaceDialog::FontReplaceDialog( QWidget* parent, QMap<QString, QString> *RList) : QDialog( parent )
 {
 	setModal(true);
 	setWindowTitle( tr( "Font Substitution" ) );
-	setWindowIcon(QIcon(loadIcon ( "AppIcon.png" )));
+	setWindowIcon(IconManager::instance()->loadIcon("AppIcon.png"));
 	ReplaceList = RList;
 	FontReplaceDialogLayout = new QVBoxLayout( this );
 	FontReplaceDialogLayout->setMargin(10);
@@ -80,9 +80,9 @@ FontReplaceDialog::FontReplaceDialog( QWidget* parent, QMap<QString, QString> *R
 	FontReplaceDialogLayout->addLayout( layout1 );
 	resize( QSize(450, 250) );
 
-	cancelButton->setToolTip( "<qt>" + tr( "Cancels these font substitutions and stops loading the document.") + "</qt>" );
+	cancelButton->setToolTip( "<qt>" + tr( "Cancels these font substitutions and stops loading the document") + "</qt>" );
 	stickyReplacements->setToolTip( "<qt>" + tr( "Enabling this tells Scribus to use these replacements for missing fonts permanently in all future layouts. This can be reverted or changed in File > Preferences > Fonts.") + "</qt>" );
-	okButton->setToolTip( "<qt>" + tr( "If you select OK, then save, these substitutions are made permanent in the document.") + "</qt>" );
+	okButton->setToolTip( "<qt>" + tr( "If you select OK, then save, these substitutions are made permanent in the document") + "</qt>" );
 	connect(okButton, SIGNAL(clicked()), this, SLOT(leaveOK()));
 	connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 }

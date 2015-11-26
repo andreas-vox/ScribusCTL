@@ -569,9 +569,6 @@
     <ClInclude Include="..\..\..\scribus\util_ghostscript.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\scribus\util_icon.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\scribus\util_layer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -2413,9 +2410,6 @@
     <ClCompile Include="..\..\..\scribus\util_ghostscript.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\scribus\util_icon.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\scribus\util_layer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -2543,6 +2537,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\scribus\pdfwriter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\scribus\iconmanager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -2903,6 +2900,9 @@
       <Filter>Form Files</Filter>
     </uic>
     <uic Include="..\..\..\scribus\ui\cmykfwbase.ui">
+      <Filter>Form Files</Filter>
+    </uic>
+    <uic Include="..\..\..\scribus\ui\annot.ui">
       <Filter>Form Files</Filter>
     </uic>
   </ItemGroup>
@@ -4008,6 +4008,9 @@
       <Filter>Header Files</Filter>
     </moc>
     <moc Include="..\..\..\scribus\ui\resourcemanager.h">
+      <Filter>Header Files</Filter>
+    </moc>
+    <moc Include="..\..\..\scribus\iconmanager.h">
       <Filter>Header Files</Filter>
     </moc>
   </ItemGroup>

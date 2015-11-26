@@ -56,10 +56,15 @@ QVariant CharTableModel::data(const QModelIndex &index, int role) const
 
 	// tooltip
 	if (role == Qt::ToolTipRole)
+		return QString("Unicode:\n0x%1").arg(currentChar, 4, 16, QChar('0'));
+
+	// status tip
+	if ( role == Qt::StatusTipRole )
 	{
-		QString tmp;
-		tmp.sprintf("%04X", currentChar);
-		return "Unicode:\n0x"+tmp;
+		QString tmp = QString("%1").arg(currentChar, 4, 16, QChar('0')).toUpper();
+		QStringList lst;
+		lst << tmp << currentFont;
+		return lst;
 	}
 
 	// pixmap

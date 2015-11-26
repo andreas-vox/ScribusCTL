@@ -15,6 +15,7 @@ for which a new license (GPL+exception) is in place.
 #include "appmodes.h"
 #include "autoform.h"
 #include "commonstrings.h"
+#include "iconmanager.h"
 #include "pageitem_arc.h"
 #include "pageitem_regularpolygon.h"
 #include "pageitem_textframe.h"
@@ -32,8 +33,8 @@ for which a new license (GPL+exception) is in place.
 #include "undomanager.h"
 #include "units.h"
 #include "util.h"
-#include "util_icon.h"
 #include "util_math.h"
+
 
 PropertiesPalette_Shape::PropertiesPalette_Shape( QWidget* parent) : QWidget(parent)
 {
@@ -51,11 +52,11 @@ PropertiesPalette_Shape::PropertiesPalette_Shape( QWidget* parent) : QWidget(par
 
 	roundRectLabel->setBuddy(roundRect);
 
-	textFlowDisabled->setIcon(QIcon(loadIcon("flow-none.png")));
-	textFlowUsesFrameShape->setIcon(QIcon(loadIcon("flow-frame.png")));
-	textFlowUsesBoundingBox->setIcon(QIcon(loadIcon("flow-bounding.png")));
-	textFlowUsesContourLine->setIcon(QIcon(loadIcon("flow-contour.png")));
-	textFlowUsesImageClipping->setIcon(QIcon(loadIcon("flow-contour.png")));
+	textFlowDisabled->setIcon(IconManager::instance()->loadIcon("flow-none.png"));
+	textFlowUsesFrameShape->setIcon(IconManager::instance()->loadIcon("flow-frame.png"));
+	textFlowUsesBoundingBox->setIcon(IconManager::instance()->loadIcon("flow-bounding.png"));
+	textFlowUsesContourLine->setIcon(IconManager::instance()->loadIcon("flow-contour.png"));
+	textFlowUsesImageClipping->setIcon(IconManager::instance()->loadIcon("flow-contour.png"));
 
 	languageChange();
 
@@ -556,8 +557,8 @@ void PropertiesPalette_Shape::languageChange()
 	evenOdd->setText( tr("Even-Odd"));
 	nonZero->setText( tr("Non Zero"));
 
-	evenOdd->setToolTip( "<qt>" + tr("This rule determines the &quot;insideness&quot; of a point on the canvas by drawing a ray from that point to infinity in any direction and counting the number of path segments from the given shape that the ray crosses. If this number is odd, the point is inside, if even, the point is outside.")  + "</qt>");
-	nonZero->setToolTip( "<qt>" + tr("This rule determines the &quot;insideness&quot; of a point on the canvas by drawing a ray from that point to infinity in any direction and then examining the places where a segment of the shape crosses the ray. Starting with a count of zero, add one each time a path segment crosses the ray from left to right and subtract one each time a path segment crosses the ray from right to left. If the result is zero then the point is outside the path. Otherwise, it is inside.")  + "</qt>");
+	evenOdd->setToolTip( "<qt>" + tr("Any path self-intersections or subpaths create holes in the fill")  + "</qt>");
+	nonZero->setToolTip( "<qt>" + tr("Fill is solid unless a subpath is counter-directional")  + "</qt>");
 
 	textFlowGroup->setTitle( tr("Text &Flow Around Frame"));
 	textFlowDisabled->setText( tr("Disabled"));

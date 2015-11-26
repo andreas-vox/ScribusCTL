@@ -15,12 +15,12 @@ for which a new license (GPL+exception) is in place.
 #include <QPushButton>
 
 #include "scribusapi.h"
-#include "util_icon.h"
+#include "iconmanager.h"
 
 SxwDialog::SxwDialog(bool update, bool prefix, bool pack) : QDialog(0)
 {
 	setModal(true);
-	setWindowIcon(QIcon(loadIcon ( "AppIcon.png" )));
+	setWindowIcon(QIcon(IconManager::instance()->loadIcon ( "AppIcon.png" )));
 	setWindowTitle( tr("OpenOffice.org Writer Importer Options"));
 
 	QBoxLayout* layout = new QVBoxLayout(this);
@@ -59,7 +59,7 @@ SxwDialog::SxwDialog(bool update, bool prefix, bool pack) : QDialog(0)
 	dlayout->setSpacing(5);
 	doNotAskCheck = new QCheckBox( tr("Do not ask again"), this);
 	doNotAskCheck->setChecked(false);
-	doNotAskCheck->setToolTip( "<qt>" + tr("Make these settings the default and do not prompt again when importing an OpenOffice.org 1.x document.") +"</qt>");
+	doNotAskCheck->setToolTip( "<qt>" + tr("Make these settings the default and do not prompt again when importing an OpenOffice.org 1.x document") +"</qt>");
 	//dlayout->addStretch(10);
 	dlayout->addWidget(doNotAskCheck);
 	layout->addLayout(dlayout);

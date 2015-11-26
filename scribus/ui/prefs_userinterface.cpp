@@ -10,12 +10,15 @@ for which a new license (GPL+exception) is in place.
 #include <QPixmap>
 #include <QStyleFactory>
 
+#include "iconmanager.h"
 #include "langmgr.h"
 #include "prefs_userinterface.h"
 #include "prefsstructs.h"
+#include "scribusapp.h"
 #include "scribusdoc.h"
 #include "util.h"
 
+extern ScribusQApp *ScQApp;
 
 Prefs_UserInterface::Prefs_UserInterface(QWidget* parent, ScribusDoc* doc)
 	: Prefs_Pane(parent)
@@ -24,7 +27,8 @@ Prefs_UserInterface::Prefs_UserInterface(QWidget* parent, ScribusDoc* doc)
 	languageChange();
 
 	QStringList languageList;
-	LanguageManager::instance()->fillInstalledGUIStringList(&languageList, true);
+	languageList <<"";
+	LanguageManager::instance()->fillInstalledGUIStringList(&languageList, false);
 	languageComboBox->addItems( languageList );
 
 	// qt styles
@@ -32,7 +36,7 @@ Prefs_UserInterface::Prefs_UserInterface(QWidget* parent, ScribusDoc* doc)
 	themeComboBox->addItem("");
 	themeComboBox->addItems(styleList);
 	QStringList iconSetList;
-	iconSetList<<"1_5_0"<<"1_5_1";
+	iconSetList=IconManager::instance()->nameList(ScQApp->currGUILanguage());
 	iconSetComboBox->addItems(iconSetList);
 
 	connect(languageComboBox, SIGNAL(activated(const QString &)), this, SLOT(setSelectedGUILang(const QString &)));
@@ -46,10 +50,10 @@ Prefs_UserInterface::~Prefs_UserInterface()
 
 void Prefs_UserInterface::languageChange()
 {
-	languageComboBox->setToolTip( "<qt>" + tr( "Select your default language for Scribus to run with. Leave this blank to choose based on environment variables. You can still override this by passing a command line option when starting Scribus" )+"</qt>");
+	languageComboBox->setToolTip( "<qt>" + tr( "Select your default language for Scribus to run with. Leave this blank to choose based on environment variables. You can still override this by passing a command line option when starting Scribus." )+"</qt>");
 	themeComboBox->setToolTip( "<qt>" + tr( "Choose the default window decoration and looks. Scribus inherits any available KDE or Qt themes, if Qt is configured to search KDE plugins." ) + "</qt>");
 	iconSetComboBox->setToolTip( "<qt>" + tr( "Choose the default icon set" ) + "</qt>");
-	useSmallWidgetsCheckBox->setToolTip( "<qt>" + tr( "Palette windows will use smaller (space savy) widgets. Requires application restart" ) + "</qt>");
+	useSmallWidgetsCheckBox->setToolTip( "<qt>" + tr( "Palette windows will use smaller (space savy) widgets. Requires application restart." ) + "</qt>");
 	recentDocumentsSpinBox->setToolTip( "<qt>" + tr( "Number of recently edited documents to show in the File menu" ) + "</qt>");
 	fontSizeMenuSpinBox->setToolTip( "<qt>" + tr( "Default font size for the menus and windows" ) + "</qt>");
 	fontSizePaletteSpinBox->setToolTip( "<qt>" + tr( "Default font size for the tool windows" ) + "</qt>");
@@ -88,7 +92,7 @@ void Prefs_UserInterface::saveGuiToPrefs(struct ApplicationPrefs *prefsData) con
 {
 	prefsData->uiPrefs.language=selectedGUILang;
 	prefsData->uiPrefs.style=themeComboBox->currentText();
-	prefsData->uiPrefs.iconSet=iconSetComboBox->currentText();
+	prefsData->uiPrefs.iconSet=IconManager::instance()->baseNameForTranslation(iconSetComboBox->currentText());
 	prefsData->uiPrefs.applicationFontSize=fontSizeMenuSpinBox->value();
 	prefsData->uiPrefs.paletteFontSize=fontSizePaletteSpinBox->value();
 	prefsData->uiPrefs.wheelJump=wheelJumpSpinBox->value();

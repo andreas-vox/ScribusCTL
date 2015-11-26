@@ -8,21 +8,21 @@ for which a new license (GPL+exception) is in place.
 #include <QColorDialog>
 
 #include "commonstrings.h"
-#include "ui/prefs_guides.h"
+#include "iconmanager.h"
 #include "prefsstructs.h"
 #include "scribusdoc.h"
 #include "scrspinbox.h"
+#include "ui/prefs_guides.h"
 #include "units.h"
-#include "util_icon.h"
 
 Prefs_Guides::Prefs_Guides(QWidget* parent, ScribusDoc* doc)
 	: Prefs_Pane(parent)
 {
 	setupUi(this);
 	languageChange();
-	buttonUp->setIcon(loadIcon("16/go-up.png"));
+	buttonUp->setIcon(IconManager::instance()->loadIcon("16/go-up.png"));
 	buttonUp->setEnabled(false);
-	buttonDown->setIcon(loadIcon("16/go-down.png"));
+	buttonDown->setIcon(IconManager::instance()->loadIcon("16/go-down.png"));
 	buttonDown->setEnabled(false);
 
 	QString pxSuffix = QString(" %1").arg(CommonStrings::trStrPX);
@@ -85,7 +85,7 @@ void Prefs_Guides::languageChange()
 	minorGridSpacingSpinBox->setToolTip( tr( "Distance between the minor grid lines" ) );
 	majorGridSpacingSpinBox->setToolTip( tr( "Distance between the major grid lines" ) );
 	guideSnapDistanceSpinBox->setToolTip(  "<qt>" + tr( "Distance within which an object will snap to your placed guides. After setting this you will need to restart Scribus to set this setting." ) + "</qt>");
-	guideGrabRadiusSpinBox->setToolTip( "<qt>" + tr( "Radius of the area where Scribus will allow you to grab an objects handles.After setting this you will need to restart Scribus to set this setting." ) + "</qt>");
+	guideGrabRadiusSpinBox->setToolTip( "<qt>" + tr( "Radius of the area where Scribus will allow you to grab an objects handles. After setting this you will need to restart Scribus to set this setting." ) + "</qt>");
 	minorGridColorPushButton->setToolTip( tr( "Color of the minor grid lines" ) );
 	majorGridColorPushButton->setToolTip( tr( "Color of the major grid lines" ) );
 	guideColorPushButton->setToolTip( tr( "Color of the guide lines you insert" ) );

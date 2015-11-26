@@ -48,24 +48,23 @@ for which a new license (GPL+exception) is in place.
 #include <cstdlib>
 #include <algorithm>
 
-#include "pslib.h"
 #include "checkDocument.h"
 #include "cmsettings.h"
-#include "prefsfile.h"
+#include "iconmanager.h"
 #include "prefscontext.h"
+#include "prefsfile.h"
 #include "prefsmanager.h"
 #include "prefstable.h"
-#include "util.h"
-#include "util_icon.h"
+#include "pslib.h"
 #include "sccolor.h"
-
-#include "scribusdoc.h"
-#include "scpaths.h"
-#include "ui/pageselector.h"
-#include "util_printer.h"
-#include "util_ghostscript.h"
 #include "sccolorengine.h"
+#include "scpaths.h"
 #include "scribuscore.h"
+#include "scribusdoc.h"
+#include "ui/pageselector.h"
+#include "util.h"
+#include "util_ghostscript.h"
+#include "util_printer.h"
 
 #if defined(_WIN32)
 #include "scprintengine_gdi.h"
@@ -76,7 +75,7 @@ extern bool printDinUse;
 PPreview::PPreview( QWidget* parent, ScribusView *vin, ScribusDoc *docu, QString printer, PrintEngine engine ) : QDialog( parent )
 {
 	setModal(true);
-	setWindowIcon(QIcon(loadIcon ( "AppIcon.png" )));
+	setWindowIcon(IconManager::instance()->loadIcon("AppIcon.png"));
 	Q_ASSERT(!docu->masterPageMode());
 	prefsManager=PrefsManager::instance();
 	QString tmp;
@@ -150,7 +149,7 @@ PPreview::PPreview( QWidget* parent, ScribusView *vin, ScribusDoc *docu, QString
 
 		Table = new QTableWidget(spots.count()+4, 2, devTitle );
 		inkMax = (spots.count()+4) * 255;
-		Table->setHorizontalHeaderItem(0, new QTableWidgetItem(QIcon(loadIcon("16/show-object.png")), ""));
+		Table->setHorizontalHeaderItem(0, new QTableWidgetItem(IconManager::instance()->loadIcon("16/show-object.png"), ""));
 		Table->setHorizontalHeaderItem(1, new QTableWidgetItem( tr("Separation Name")));
 		QHeaderView *header = Table->horizontalHeader();
 		header->setStretchLastSection(true);
@@ -355,10 +354,10 @@ PPreview::PPreview( QWidget* parent, ScribusView *vin, ScribusDoc *docu, QString
 	PGSel->setGUIForPage(doc->currentPage()->pageNr());
 	// tooltips
 	AntiAlias->setToolTip( "<qt>" + tr( "Provides a more pleasant view of Type 1 fonts, TrueType Fonts, OpenType Fonts, EPS, PDF and vector graphics in the preview, at the expense of a slight slowdown in previewing" ) + "</qt>" );
-	AliasTr->setToolTip( "<qt>" + tr( "Shows transparency and transparent items in your document. Requires Ghostscript 7.07 or later" ) + "</qt>");
+	AliasTr->setToolTip( "<qt>" + tr( "Shows transparency and transparent items in your document. Requires Ghostscript 7.07 or later." ) + "</qt>");
 	EnableCMYK->setToolTip( "<qt>" + tr( "Gives a print preview using simulations of generic CMYK inks, instead of RGB colors" ) + "</qt>");
 	EnableGCR->setToolTip( "<qt>" + tr( "A way of switching off some of the gray shades which are composed of cyan, yellow and magenta and using black instead. UCR most affects parts of images which are neutral and/or dark tones which are close to the gray. Use of this may improve printing some images and some experimentation and testing is need on a case by case basis. UCR reduces the possibility of over saturation with CMY inks." ) + "</qt>" );
-	scaleBox->setToolTip( "<qt>" + tr("Resize the scale of the page.") + "</qt>");
+	scaleBox->setToolTip( "<qt>" + tr("Resize the scale of the page") + "</qt>");
 	spotColors->setToolTip("<qt>" + tr( "Enables Spot Colors to be converted to composite colors. Unless you are planning to print spot colors at a commercial printer, this is probably best left enabled." ) + "</qt>");
 	UseICC->setToolTip("<qt>" + tr( "Allows you to embed color profiles in the print stream when color management is enabled" ) + "</qt>");
 
@@ -1297,7 +1296,7 @@ QPixmap PPreview::CreatePreview(int Seite, int Res)
 	{
 		Bild = QPixmap(image.width(), image.height());
 		QPainter p;
-		QBrush b(QColor(205,205,205), loadIcon("testfill.png"));
+		QBrush b(QColor(205,205,205), IconManager::instance()->loadPixmap("testfill.png"));
 		p.begin(&Bild);
 		p.fillRect(0, 0, image.width(), image.height(), b);
 		p.drawImage(0, 0, image);

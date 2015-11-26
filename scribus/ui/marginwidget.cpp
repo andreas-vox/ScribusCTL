@@ -101,7 +101,7 @@ pageType(0)
 #if defined(HAVE_CUPS) || defined(_WIN32)
 	usePrinterMarginsButton=new QPushButton( tr("Printer Margins..."),marginPage );
 	GroupLayout->addWidget( usePrinterMarginsButton, 5, 1 );
-	usePrinterMarginsButton->setToolTip( "<qt>" + tr( "Import the margins for the selected page size from the available printers." ) + "</qt>");
+	usePrinterMarginsButton->setToolTip( "<qt>" + tr( "Import the margins for the selected page size from the available printers" ) + "</qt>");
 	connect(usePrinterMarginsButton, SIGNAL(clicked()), this, SLOT(setMarginsToPrinterMargins()));
 #endif
 
@@ -155,8 +155,8 @@ pageType(0)
 	// hints
 	topR->setToolTip( "<qt>" + tr( "Distance between the top margin guide and the edge of the page" ) + "</qt>");
 	bottomR->setToolTip( "<qt>" + tr( "Distance between the bottom margin guide and the edge of the page" ) + "</qt>");
-	leftR->setToolTip( "<qt>" + tr( "Distance between the left margin guide and the edge of the page. If a double-sided, 3 or 4-fold layout is selected, this margin space can be used to achieve the correct margins for binding") + "</qt>");
-	rightR->setToolTip( "<qt>" + tr( "Distance between the right margin guide and the edge of the page. If a double-sided, 3 or 4-fold layout is selected, this margin space can be used to achieve the correct margins for binding") + "</qt>");
+	leftR->setToolTip( "<qt>" + tr( "Distance between the left margin guide and the edge of the page. If a double-sided, 3 or 4-fold layout is selected, this margin space can be used to achieve the correct margins for binding.") + "</qt>");
+	rightR->setToolTip( "<qt>" + tr( "Distance between the right margin guide and the edge of the page. If a double-sided, 3 or 4-fold layout is selected, this margin space can be used to achieve the correct margins for binding.") + "</qt>");
 
 		// signals&slots
 	connect(topR, SIGNAL(valueChanged(double)), this, SLOT(setTop()));
@@ -173,12 +173,37 @@ void MarginWidget::slotLinkBleeds()
 	disconnect(BleedRight, SIGNAL(valueChanged(double)), this, SLOT(changeBleeds()));
 	disconnect(BleedTop, SIGNAL(valueChanged(double)), this, SLOT(changeBleeds()));
 	disconnect(BleedBottom, SIGNAL(valueChanged(double)), this, SLOT(changeBleeds()));
+
+	double bleedValue = BleedLeft->value();
+	if (BleedLeft->hasFocus())
+	{
+		BleedLeft->clearFocus();
+		bleedValue = BleedLeft->value();
+	}
+	if (BleedRight->hasFocus())
+	{
+		BleedRight->clearFocus();
+		bleedValue = BleedRight->value();
+	}
+	if (BleedTop->hasFocus())
+	{
+		BleedTop->clearFocus();
+		bleedValue = BleedTop->value();
+	}
+	if (BleedBottom->hasFocus())
+	{
+		BleedBottom->clearFocus();
+		bleedValue = BleedBottom->value();
+	}
+
 	if (linkBleeds->isChecked())
 	{
-		BleedTop->setValue(BleedLeft->value());
-		BleedBottom->setValue(BleedLeft->value());
-		BleedRight->setValue(BleedLeft->value());
+		BleedLeft->setValue(bleedValue);
+		BleedTop->setValue(bleedValue);
+		BleedBottom->setValue(bleedValue);
+		BleedRight->setValue(bleedValue);
 	}
+
 	connect(BleedLeft, SIGNAL(valueChanged(double)), this, SLOT(changeBleeds()));
 	connect(BleedRight, SIGNAL(valueChanged(double)), this, SLOT(changeBleeds()));
 	connect(BleedTop, SIGNAL(valueChanged(double)), this, SLOT(changeBleeds()));
@@ -556,14 +581,39 @@ void MarginWidget::slotLinkMargins()
 	disconnect(bottomR, SIGNAL(valueChanged(double)), this, SLOT(setBottom()));
 	disconnect(leftR, SIGNAL(valueChanged(double)), this, SLOT(setLeft()));
 	disconnect(rightR, SIGNAL(valueChanged(double)), this, SLOT(setRight()));
+
+	double marginValue = leftR->value();
+	if (leftR->hasFocus())
+	{
+		leftR->clearFocus();
+		marginValue = leftR->value();
+	}
+	if (rightR->hasFocus())
+	{
+		rightR->clearFocus();
+		marginValue = rightR->value();
+	}
+	if (topR->hasFocus())
+	{
+		topR->clearFocus();
+		marginValue = topR->value();
+	}
+	if (bottomR->hasFocus())
+	{
+		bottomR->clearFocus();
+		marginValue = bottomR->value();
+	}
+
 	if (linkMargins->isChecked())
 	{
-		bottomR->setValue(leftR->value());
-		topR->setValue(leftR->value());
-		rightR->setValue(leftR->value());
-		double newVal=leftR->value() / m_unitRatio;
+		leftR->setValue(marginValue);
+		bottomR->setValue(marginValue);
+		topR->setValue(marginValue);
+		rightR->setValue(marginValue);
+		double newVal = marginValue / m_unitRatio;
 		marginData.set(newVal, newVal, newVal, newVal);
-	}	
+	}
+
 	connect(topR, SIGNAL(valueChanged(double)), this, SLOT(setTop()));
 	connect(bottomR, SIGNAL(valueChanged(double)), this, SLOT(setBottom()));
 	connect(leftR, SIGNAL(valueChanged(double)), this, SLOT(setLeft()));

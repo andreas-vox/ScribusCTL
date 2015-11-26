@@ -31,12 +31,13 @@ for which a new license (GPL+exception) is in place.
 #include <QToolTip>
 #include <QVBoxLayout>
 
+#include "iconmanager.h"
 #include "sccombobox.h"
-#include "ui/scrspinbox.h"
 #include "scribus.h"
 #include "scribusdoc.h"
+#include "ui/scrspinbox.h"
 #include "undomanager.h"
-#include "util_icon.h"
+
 
 LayerPalette::LayerPalette(QWidget* parent) : ScDockPalette( parent, "Layers", 0 ), m_Doc(0)
 {
@@ -67,14 +68,15 @@ LayerPalette::LayerPalette(QWidget* parent) : ScDockPalette( parent, "Layers", 0
 	layout1->addWidget( opacitySpinBox );
 	LayerPaletteLayout->addLayout( layout1 );
 
+	IconManager* im = IconManager::instance();
 	Table = new QTableWidget(0, 8, this );
 	Table->setHorizontalHeaderItem(0, new QTableWidgetItem(""));
-	Table->setHorizontalHeaderItem(1, new QTableWidgetItem(QIcon(loadIcon("16/show-object.png")), ""));
-	Table->setHorizontalHeaderItem(2, new QTableWidgetItem(QIcon(loadIcon("16/document-print.png")), ""));
-	Table->setHorizontalHeaderItem(3, new QTableWidgetItem(QIcon(loadIcon("16/lock.png")), ""));
-	Table->setHorizontalHeaderItem(4, new QTableWidgetItem(QIcon(loadIcon("16/layer-flow-around.png")), ""));
-	Table->setHorizontalHeaderItem(5, new QTableWidgetItem(QIcon(loadIcon("layer-outline.png")), ""));
-	Table->setHorizontalHeaderItem(6, new QTableWidgetItem(QIcon(loadIcon("16/pointer.png")), ""));
+	Table->setHorizontalHeaderItem(1, new QTableWidgetItem(im->loadIcon("16/show-object.png"), ""));
+	Table->setHorizontalHeaderItem(2, new QTableWidgetItem(im->loadIcon("16/document-print.png"), ""));
+	Table->setHorizontalHeaderItem(3, new QTableWidgetItem(im->loadIcon("16/lock.png"), ""));
+	Table->setHorizontalHeaderItem(4, new QTableWidgetItem(im->loadIcon("16/layer-flow-around.png"), ""));
+	Table->setHorizontalHeaderItem(5, new QTableWidgetItem(im->loadIcon("layer-outline.png"), ""));
+	Table->setHorizontalHeaderItem(6, new QTableWidgetItem(im->loadIcon("16/pointer.png"), ""));
 	Table->setHorizontalHeaderItem(7, new QTableWidgetItem( tr("Name")));
 
 	QHeaderView *header = Table->horizontalHeader();
@@ -109,35 +111,35 @@ LayerPalette::LayerPalette(QWidget* parent) : ScDockPalette( parent, "Layers", 0
 	newLayerButton->setMinimumSize( QSize( 50, 24 ) );
 	newLayerButton->setMaximumSize( QSize( 50, 24 ) );
 	newLayerButton->setText( "" );
-	newLayerButton->setIcon(QIcon(loadIcon("16/list-add.png")));
+	newLayerButton->setIcon(IconManager::instance()->loadIcon("16/list-add.png"));
 	Layout1->addWidget( newLayerButton );
 
 	deleteLayerButton = new QPushButton( this );
 	deleteLayerButton->setMinimumSize( QSize( 50, 24 ) );
 	deleteLayerButton->setMaximumSize( QSize( 50, 24 ) );
 	deleteLayerButton->setText( "" );
-	deleteLayerButton->setIcon(QIcon(loadIcon("16/list-remove.png")));
+	deleteLayerButton->setIcon(IconManager::instance()->loadIcon("16/list-remove.png"));
 	Layout1->addWidget( deleteLayerButton );
 	
 	duplicateLayerButton = new QPushButton( this );
 	duplicateLayerButton->setMinimumSize( QSize( 50, 24 ) );
 	duplicateLayerButton->setMaximumSize( QSize( 50, 24 ) );
 	duplicateLayerButton->setText( "" );
-	duplicateLayerButton->setIcon(QIcon(loadIcon("16/edit-copy.png")));
+	duplicateLayerButton->setIcon(IconManager::instance()->loadIcon("16/edit-copy.png"));
 	Layout1->addWidget( duplicateLayerButton );
 
 	raiseLayerButton = new QPushButton( this );
 	raiseLayerButton->setMinimumSize( QSize( 50, 24 ) );
 	raiseLayerButton->setMaximumSize( QSize( 50, 24 ) );
 	raiseLayerButton->setText( "" );
-	raiseLayerButton->setIcon(QIcon(loadIcon("16/go-up.png")));
+	raiseLayerButton->setIcon(IconManager::instance()->loadIcon("16/go-up.png"));
 	Layout1->addWidget( raiseLayerButton );
 
 	lowerLayerButton = new QPushButton( this );
 	lowerLayerButton->setMinimumSize( QSize( 50, 24 ) );
 	lowerLayerButton->setMaximumSize( QSize( 50, 24 ) );
 	lowerLayerButton->setText( "" );
-	lowerLayerButton->setIcon(QIcon(loadIcon("16/go-down.png")));
+	lowerLayerButton->setIcon(IconManager::instance()->loadIcon("16/go-down.png"));
 	Layout1->addWidget( lowerLayerButton );
 
 	LayerPaletteLayout->addLayout( Layout1 );
@@ -667,14 +669,14 @@ void LayerPalette::languageChange()
 	lowerLayerButton->setToolTip( tr( "Lower Layer" ) );
 	blendMode->setToolTip( tr("Selects the Blendmode, works only in PDF 1.4"));
 	opacitySpinBox->setToolTip( tr("Layer Transparency, works only in PDF 1.4 and SVG"));
-	Table->horizontalHeaderItem(0)->setToolTip("<qt>" + tr("Color of the Layer Indicator - Each layer has a color assigned to display on the canvas when layer indicators are enabled. You can double click to edit the color. ") + "</qt>");
-	Table->horizontalHeaderItem(1)->setToolTip("<qt>" + tr("Make Layer Visible - Uncheck to hide the layer from the display ") + "</qt>" );
-	Table->horizontalHeaderItem(2)->setToolTip("<qt>" + tr("Print Layer - Uncheck to disable printing. ") + "</qt>" );
-	Table->horizontalHeaderItem(3)->setToolTip("<qt>" + tr("Lock or Unlock Layer - Unchecked is unlocked ") + "</qt>" );
-	Table->horizontalHeaderItem(4)->setToolTip("<qt>" + tr("Make text in lower layers flow around objects - Enabling this forces text in lower layers to flow around objects of the layer for which this option has been enabled") + "</qt>" );
-	Table->horizontalHeaderItem(5)->setToolTip("<qt>" + tr("Outline Mode - Toggles the 'wireframe' display of objects to speed the display of very complex objects.") + "</qt>" ) ;
-	Table->horizontalHeaderItem(6)->setToolTip("<qt>" + tr("Select Objects on Layer - Check to enable selecting. ") + "</qt>" );
-	Table->horizontalHeaderItem(7)->setToolTip("<qt>" + tr("Name of the Layer - Double click on the name of a layer to edit the name") + "</qt>" );
+	Table->horizontalHeaderItem(0)->setToolTip("<qt>" + tr("Color of the Layer Indicator. Each layer has a color assigned to display on the canvas when layer indicators are enabled. You can double click to edit the color.") + "</qt>");
+	Table->horizontalHeaderItem(1)->setToolTip("<qt>" + tr("Make Layer Visible. Uncheck to hide the layer from the display.") + "</qt>" );
+	Table->horizontalHeaderItem(2)->setToolTip("<qt>" + tr("Print Layer. Uncheck to disable printing.") + "</qt>" );
+	Table->horizontalHeaderItem(3)->setToolTip("<qt>" + tr("Lock or Unlock Layer. Unchecked is unlocked.") + "</qt>" );
+	Table->horizontalHeaderItem(4)->setToolTip("<qt>" + tr("Make text in lower layers flow around objects. Enabling this forces text in lower layers to flow around objects of the layer for which this option has been enabled.") + "</qt>" );
+	Table->horizontalHeaderItem(5)->setToolTip("<qt>" + tr("Outline Mode. Toggles the 'wireframe' display of objects to speed the display of very complex objects.") + "</qt>" ) ;
+	Table->horizontalHeaderItem(6)->setToolTip("<qt>" + tr("Select Objects on Layer. Check to enable selecting.") + "</qt>" );
+	Table->horizontalHeaderItem(7)->setToolTip("<qt>" + tr("Name of the Layer. Double click on the name of a layer to edit the name.") + "</qt>" );
 }
 
 

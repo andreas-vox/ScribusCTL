@@ -43,7 +43,7 @@ for which a new license (GPL+exception) is in place.
 #include "units.h"
 #include "usertaskstructs.h"
 #include "ui/scrspinbox.h"
-#include "util_icon.h"
+#include "iconmanager.h"
 #include "scribuscore.h"
 #include "util.h"
 
@@ -64,10 +64,10 @@ TabPDFOptions::TabPDFOptions(QWidget* parent, PDFOptions & Optionen,
 
 	// General tab
 	rangeGroupLayout->setAlignment( Qt::AlignTop );
- 	pageNrButton->setIcon(QIcon(loadIcon("ellipsis.png")));
-	MirrorH->setIcon(QIcon(loadIcon("16/flip-object-horizontal.png")));
+	pageNrButton->setIcon(IconManager::instance()->loadIcon("ellipsis.png"));
+	MirrorH->setIcon(IconManager::instance()->loadIcon("16/flip-object-horizontal.png"));
 	MirrorH->setCheckable( true );
-	MirrorV->setIcon(QIcon(loadIcon("16/flip-object-vertical.png")));
+	MirrorV->setIcon(IconManager::instance()->loadIcon("16/flip-object-vertical.png"));
 	MirrorV->setCheckable( true );
 
 	fileOptionsLayout->setAlignment( Qt::AlignTop );
@@ -96,9 +96,11 @@ TabPDFOptions::TabPDFOptions(QWidget* parent, PDFOptions & Optionen,
 	// Fonts tab
 	groupFontLayout->setAlignment( Qt::AlignTop );
 	EmbedList->setMaximumHeight(300);
+	EmbedList->setSelectionMode(QListWidget::ExtendedSelection);
 	SubsetList->setMaximumHeight(300);
-	ToSubset->setIcon(QIcon(loadIcon("22/go-next.png")));
-	FromSubset->setIcon(QIcon(loadIcon("22/go-previous.png")));
+	SubsetList->setSelectionMode(QListWidget::ExtendedSelection);
+	ToSubset->setIcon(IconManager::instance()->loadIcon("22/go-next.png"));
+	FromSubset->setIcon(IconManager::instance()->loadIcon("22/go-previous.png"));
 
 	// Presentation tab
 	effectsLayout->setAlignment( Qt::AlignTop );
@@ -204,8 +206,8 @@ TabPDFOptions::TabPDFOptions(QWidget* parent, PDFOptions & Optionen,
 	AllPages->setToolTip( "<qt>" + tr( "Export all pages to PDF" ) + "</qt>" );
 	OnlySome->setToolTip( "<qt>" + tr( "Export a range of pages to PDF" ) );
 	PageNr->setToolTip( "<qt>" + tr( "Insert a comma separated list of tokens where "
-		                                    "a token can be * for all the pages, 1-5 for "
-		                                    "a range of pages or a single page number.") + "</qt>" );
+											"a token can be * for all the pages, 1-5 for "
+											"a range of pages or a single page number") + "</qt>" );
 	pageNrButton->setToolTip( "<qt>" + tr( "Create a range of pages" ) + "</qt>");
 	ClipMarg->setToolTip( "<qt>" + tr( "Do not show objects outside the margins in the exported file" ) + "</qt>" );
 	MirrorH->setToolTip( "<qt>" + tr( "Mirror Page(s) horizontally" ) + "</qt>" );
@@ -213,8 +215,8 @@ TabPDFOptions::TabPDFOptions(QWidget* parent, PDFOptions & Optionen,
 	PDFVersionCombo->setToolTip( "<qt>" + tr( "Determines the PDF compatibility.<br/>The default is <b>PDF 1.3</b> which gives the widest compatibility.<br/>Choose <b>PDF 1.4</b> if your file uses features such as transparency or you require 128 bit encryption.<br/><b>PDF 1.5</b> is necessary when you wish to preserve objects in separate layers within the PDF.<br/><b>PDF/X-3</b> is for exporting the PDF when you want color managed RGB for commercial printing and is selectable when you have activated color management. Use only when advised by your printer or in some cases printing to a 4 color digital color laser printer.<br/><b>PDF/X-1a</b> is for blind exchange with colors strictly specified in CMYK or spot colors.<br/><b>PDF/X-4</b> is an extension of PDF/X-3 to support transparancy and layering." ) + "</qt>");
 	ComboBind->setToolTip( "<qt>" + tr( "Determines the binding of pages in the PDF. Unless you know you need to change it leave the default choice - Left." ) + "</qt>" );
 	CheckBox1->setToolTip( "<qt>" + tr( "Generates thumbnails of each page in the PDF. Some viewers can use the thumbnails for navigation." ) + "</qt>" );
-	Article->setToolTip( "<qt>" + tr( "Generate PDF Articles, which is useful for navigating linked articles in a PDF." ) + "</qt>" );
-	useLayers->setToolTip( "<qt>" + tr( "Layers in your document are exported to the PDF Only available if PDF 1.5 is chosen." ) + "</qt>" );
+	Article->setToolTip( "<qt>" + tr( "Generate PDF Articles, which is useful for navigating linked articles in a PDF" ) + "</qt>" );
+	useLayers->setToolTip( "<qt>" + tr( "Layers in your document are exported to the PDF. Only available if PDF 1.5 is chosen." ) + "</qt>" );
 	CheckBM->setToolTip( "<qt>" + tr( "Embed the bookmarks you created in your document. These are useful for navigating long PDF documents." ) + "</qt>" );
 	Resolution->setToolTip( "<qt>" + tr( "Export resolution of text and vector graphics. This does not affect the resolution of bitmap images like photos." ) + "</qt>" );
 	EmbedPDF->setToolTip( "<qt>" + tr( "Export PDFs in image frames as embedded PDFs. This does *not* yet take care of colorspaces, so you should know what you are doing before setting this to 'true'." ) + "</qt>" );
@@ -222,7 +224,7 @@ TabPDFOptions::TabPDFOptions(QWidget* parent, PDFOptions & Optionen,
 	CMethod->setToolTip( "<qt>" + tr( "Method of compression to use for images. Automatic allows Scribus to choose the best method. ZIP is lossless and good for images with solid colors. JPEG is better at creating smaller PDF files which have many photos (with slight image quality loss possible). Leave it set to Automatic unless you have a need for special compression options." ) + "</qt>");
 	CQuality->setToolTip( "<qt>" + tr( "Compression quality levels for lossy compression methods: Minimum (25%), Low (50%), Medium (75%), High (85%), Maximum (95%). Note that a quality level does not directly determine the size of the resulting image - both size and quality loss vary from image to image at any given quality level. Even with Maximum selected, there is always some quality loss with jpeg." ) + "</qt>");
 	DSColor->setToolTip( "<qt>" + tr( "Limits the resolution of your bitmap images to the selected DPI. Images with a lower resolution will be left untouched. Leaving this unchecked will render them at their native resolution. Enabling this will increase memory usage and slow down export." ) + "</qt>" );
-	ValC->setToolTip( "<qt>" + tr( "DPI (Dots Per Inch) for image export.") + "</qt>" );
+	ValC->setToolTip( "<qt>" + tr( "DPI (Dots Per Inch) for image export") + "</qt>" );
 
 	// Tooltips : Fonts tab
 	EmbedFonts->setToolTip( "<qt>" + tr( "Embed fonts into the PDF. Embedding the fonts will preserve the layout and appearance of your document." ) + "</qt>");
@@ -250,15 +252,15 @@ TabPDFOptions::TabPDFOptions(QWidget* parent, PDFOptions & Optionen,
 	useThumbnails->setToolTip( "<qt>" + tr( "Display the page thumbnails upon opening" ) + "</qt>" );
 	useLayers2->setToolTip( "<qt>" + tr( "Forces the displaying of layers. Useful only for PDF 1.5+." ) + "</qt>" );
 	hideToolBar->setToolTip( "<qt>" + tr( "Hides the Tool Bar which has selection and other editing capabilities" ) + "</qt>" );
-	hideMenuBar->setToolTip( "<qt>" + tr( "Hides the Menu Bar for the viewer, the PDF will display in a plain window. " ) + "</qt>" );
-	fitWindow->setToolTip( "<qt>" + tr( "Fit the document page or pages to the available space in the viewer window." ) + "</qt>" );
+	hideMenuBar->setToolTip( "<qt>" + tr( "Hides the Menu Bar for the viewer, the PDF will display in a plain window" ) + "</qt>" );
+	fitWindow->setToolTip( "<qt>" + tr( "Fit the document page or pages to the available space in the viewer window" ) + "</qt>" );
 
 	// Tooltips : Security Tab
 	Encry->setToolTip( "<qt>" + tr( "Enable the security features in your exported PDF. If you selected PDF 1.3, the PDF will be protected by 40 bit encryption. If you selected PDF 1.4, the PDF will be protected by 128 bit encryption. Disclaimer: PDF encryption is not as reliable as GPG or PGP encryption and does have some limitations." ) + "</qt>" );
 	PassOwner->setToolTip( "<qt>" + tr( "Choose an owner password which enables or disables all the security features in your exported PDF" ) + "</qt>" );
-	PassUser->setToolTip( "<qt>" + tr( "Choose a password for users to be able to read your PDF." ) + "</qt>" );
-	PrintSec->setToolTip( "<qt>" + tr( "Allow printing of the PDF. If un-checked, printing is prevented. " ) + "</qt>" );
-	ModifySec->setToolTip( "<qt>" + tr( "Allow modifying of the PDF. If un-checked, modifying the PDF is prevented." ) + "</qt>" );
+	PassUser->setToolTip( "<qt>" + tr( "Choose a password for users to be able to read your PDF" ) + "</qt>" );
+	PrintSec->setToolTip( "<qt>" + tr( "Allow printing of the PDF. If unchecked, printing is prevented." ) + "</qt>" );
+	ModifySec->setToolTip( "<qt>" + tr( "Allow modifying of the PDF. If unchecked, modifying the PDF is prevented." ) + "</qt>" );
 	CopySec->setToolTip( "<qt>" + tr( "Allow copying of text or graphics from the PDF. If unchecked, text and graphics cannot be copied." ) + "</qt>" );
 	AddSec->setToolTip( "<qt>" + tr( "Allow adding annotations and fields to the PDF. If unchecked, editing annotations and fields is prevented." ) + "</qt>" );
 
@@ -1327,69 +1329,76 @@ void TabPDFOptions::EmbeddingModeChange()
 
 void TabPDFOptions::RemoveSubset()
 {
-	QString currentFont = SubsetList->currentItem()->text();
-	const ScFace fontFace = AllFonts[currentFont];
-	if ((fontFace.type() != ScFace::OTF) && (!fontFace.subset()))
+	QList<QListWidgetItem*> selection = SubsetList->selectedItems();
+	for (int i = 0; i < selection.count() ; ++i)
 	{
+		QListWidgetItem* fontItem = selection[i];
+		QString currentFont = fontItem->text();
+		const ScFace fontFace = AllFonts[currentFont];
+		if ((fontFace.type() == ScFace::OTF) || (fontFace.subset()))
+			continue;
 		addFontItem(currentFont, EmbedList);
-		delete SubsetList->takeItem(SubsetList->currentRow());
+		int currentRow = SubsetList->row(fontItem);
+		delete SubsetList->takeItem(currentRow);
 	}
+
 	SubsetList->clearSelection();
-	if (SubsetList->count() == 0)
-		FromSubset->setEnabled(false);
+	FromSubset->setEnabled(false);
 }
 
 void TabPDFOptions::PutToSubset()
 {
-	QString currentFont = EmbedList->currentItem()->text();
-	if (SubsetList->count() != 0)
+	QList<QListWidgetItem*> selection = EmbedList->selectedItems();
+	for (int i = 0; i < selection.count() ; ++i)
 	{
-		if (SubsetList->findItems(currentFont, Qt::MatchExactly).count() == 0)
-			addFontItem(currentFont, SubsetList);
-	}
-	else
-	{
-		addFontItem(currentFont, SubsetList);
-	}
-	delete EmbedList->takeItem(EmbedList->currentRow());
-	EmbedList->clearSelection();
-	if (EmbedList->count() == 0)
-	{
-		ToSubset->setEnabled(false);
-	}
-	else if (!(EmbedList->currentItem()->flags() & Qt::ItemIsSelectable))
-	{
-		ToSubset->setEnabled(false);
-	}
-}
-
-void TabPDFOptions::SelEFont(QListWidgetItem *c)
-{
-	if (c != NULL)
-	{
-		if (c->flags() & Qt::ItemIsSelectable)
-			ToSubset->setEnabled(true);
-		FromSubset->setEnabled(false);
-		SubsetList->clearSelection();
-	}
-}
-
-void TabPDFOptions::SelSFont(QListWidgetItem *c)
-{
-	if (c != NULL)
-	{
-		if (PDFVersionCombo->currentIndex() == 4)
+		QListWidgetItem* fontItem = selection[i];
+		QString currentFont = fontItem->text();
+		if (SubsetList->count() != 0)
 		{
-			if ((AllFonts[c->text()].type() == ScFace::OTF) || (AllFonts[c->text()].subset()))
-				FromSubset->setEnabled(false);
-			else
-				FromSubset->setEnabled(true);
+			if (SubsetList->findItems(currentFont, Qt::MatchExactly).count() == 0)
+				addFontItem(currentFont, SubsetList);
 		}
 		else
-			FromSubset->setEnabled(true);
-		ToSubset->setEnabled(false);
-		EmbedList->clearSelection();
+		{
+			addFontItem(currentFont, SubsetList);
+		}
+		int itemRow = EmbedList->row(fontItem);
+		delete EmbedList->takeItem(itemRow);
 	}
+
+	EmbedList->clearSelection();
+	ToSubset->setEnabled(false);
+}
+
+void TabPDFOptions::SelEFont(QListWidgetItem*)
+{
+	QList<QListWidgetItem*> selection = EmbedList->selectedItems();
+	bool enableToSubset = (selection.count() > 0);
+
+	ToSubset->setEnabled(enableToSubset);
+	FromSubset->setEnabled(false);
+	SubsetList->clearSelection();
+}
+
+void TabPDFOptions::SelSFont(QListWidgetItem*)
+{
+	QList<QListWidgetItem*> selection = SubsetList->selectedItems();
+	int enabledForEmbedding = selection.count();
+
+	if (PDFVersionCombo->currentIndex() == 4)
+	{
+		for (int i = 0; i < selection.count(); ++i)
+		{
+			const QListWidgetItem* item = selection.at(i);
+			const ScFace face = AllFonts[item->text()];
+			if ((face.type() == ScFace::OTF) || (face.subset()))
+				enabledForEmbedding--;
+		}
+	}
+
+	FromSubset->setEnabled(enabledForEmbedding > 0);
+	ToSubset->setEnabled(false);
+	EmbedList->clearSelection();
 }
 
 void TabPDFOptions::EmbedAll()
@@ -1448,13 +1457,13 @@ QListWidgetItem* TabPDFOptions::addFontItem(QString fontName, QListWidget* fontL
 
 	const ScFace& face = AllFonts.value(fontName);
 	if (face.isReplacement())
-		item = new QListWidgetItem( QIcon(loadIcon("font_subst16.png")), fontName, fontList );
+		item = new QListWidgetItem( IconManager::instance()->loadIcon("font_subst16.png"), fontName, fontList );
 	else if (face.type() == ScFace::TYPE1)
-		item = new QListWidgetItem( QIcon(loadIcon("font_type1_16.png")), fontName, fontList );
+		item = new QListWidgetItem( IconManager::instance()->loadIcon("font_type1_16.png"), fontName, fontList );
 	else if (face.type() == ScFace::TTF)
-		item = new QListWidgetItem( QIcon(loadIcon("font_truetype16.png")), fontName, fontList );
+		item = new QListWidgetItem( IconManager::instance()->loadIcon("font_truetype16.png"), fontName, fontList );
 	else if (face.type() == ScFace::OTF)
-		item = new QListWidgetItem( QIcon(loadIcon("font_otf16.png")), fontName, fontList );
+		item = new QListWidgetItem( IconManager::instance()->loadIcon("font_otf16.png"), fontName, fontList );
 
 	return item;
 }

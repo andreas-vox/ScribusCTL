@@ -24,7 +24,7 @@ for which a new license (GPL+exception) is in place.
 #include "colorchart.h"
 #include <QPainter>
 #include "util_color.h"
-#include "util_icon.h"
+#include "iconmanager.h"
 #include "sccolorengine.h"
 #include "scribuscore.h"
 #include "scribusdoc.h"
@@ -34,7 +34,7 @@ ColorChart::ColorChart(QWidget *parent) : QWidget(parent), m_doc(0)
 	Xp = 0;
 	Yp = 0;
 	doDrawMark = false;
-	isLabMode = false;
+	drawMode = 0;
 	setAutoFillBackground(false);
 	drawPalette(255);
 }
@@ -44,7 +44,7 @@ ColorChart::ColorChart(QWidget *parent, ScribusDoc* doc) : QWidget(parent), m_do
 	Xp = 0;
 	Yp = 0;
 	doDrawMark = false;
-	isLabMode = false;
+	drawMode = 0;
 	setAutoFillBackground(false);
 	drawPalette(255);
 }
@@ -52,8 +52,8 @@ ColorChart::ColorChart(QWidget *parent, ScribusDoc* doc) : QWidget(parent), m_do
 void ColorChart::mouseMoveEvent(QMouseEvent *m)
 {
 	drawMark(m->x(), m->y());
-	if (isLabMode)
-		emit ColorVal(m->x() * 256 / width() - 128, m->y() * 256 / height() - 128, true);
+	if (drawMode > 0)
+		emit ColorVal(m->x() * 256 / width() - 128, 256 - (m->y() * 256 / height()) - 128, true);
 	else
 		emit ColorVal(m->x() * 359 / width(), m->y() * 255 / height(), true);
 }
@@ -61,8 +61,8 @@ void ColorChart::mouseMoveEvent(QMouseEvent *m)
 void ColorChart::mousePressEvent(QMouseEvent *m)
 {
 	drawMark(m->x(), m->y());
-	if (isLabMode)
-		emit ColorVal(m->x() * 256 / width() - 128, m->y() * 256 / height() - 128, true);
+	if (drawMode > 0)
+		emit ColorVal(m->x() * 256 / width() - 128, 256 - (m->y() * 256 / height()) - 128, true);
 	else
 		emit ColorVal(m->x() * 359 / width(), m->y() * 255 / height(), true);
 }
@@ -70,8 +70,8 @@ void ColorChart::mousePressEvent(QMouseEvent *m)
 void ColorChart::mouseReleaseEvent(QMouseEvent *m)
 {
 	drawMark(m->x(), m->y());
-	if (isLabMode)
-		emit ColorVal(m->x() * 256 / width() - 128, m->y() * 256 / height() - 128, true);
+	if (drawMode > 0)
+		emit ColorVal(m->x() * 256 / width() - 128, 256 - (m->y() * 256 / height()) - 128, true);
 	else
 		emit ColorVal(m->x() * 359 / width(), m->y() * 255 / height(), true);
 }
@@ -109,8 +109,8 @@ void ColorChart::drawMark(int x, int y)
 
 void ColorChart::setMark(int h, int s)
 {
-	if (isLabMode)
-		drawMark((h + 128) / 256.0 * width(), (s + 128) / 256.0 * height());
+	if (drawMode > 0)
+		drawMark((h + 128) / 256.0 * width(), (-s + 128) / 256.0 * height());
 	else
 		drawMark(h * width() / 359, (255-s) * height() / 255);
 }
@@ -119,7 +119,7 @@ void ColorChart::drawPalette(int val)
 {
 	int xSize = width();
 	int ySize = height();
-	if (isLabMode)
+	if (drawMode > 0)
 	{
 		QImage image(128, 128, QImage::Format_ARGB32);
 		bool doSoftProofing = m_doc ? m_doc->SoftProofing : false;
@@ -127,7 +127,7 @@ void ColorChart::drawPalette(int val)
 		if (doSoftProofing && doGamutCheck)
 		{
 			QPainter p;
-			QBrush b(QColor(205,205,205), loadIcon("testfill.png"));
+			QBrush b(QColor(205,205,205), IconManager::instance()->loadPixmap("testfill.png"));
 			p.begin(&image);
 			p.fillRect(0, 0, image.width(), image.height(), b);
 			p.end();
@@ -139,7 +139,7 @@ void ColorChart::drawPalette(int val)
 			unsigned int* p = reinterpret_cast<unsigned int*>(image.scanLine(y));
 			for (int x = 0; x < 128; x++)
 			{
-				double yy = y * 2.0;
+				double yy = 256 - (y * 2.0);
 				if (doSoftProofing && doGamutCheck)
 				{
 					bool outOfG = false;

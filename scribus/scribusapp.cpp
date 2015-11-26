@@ -24,6 +24,7 @@ for which a new license (GPL+exception) is in place.
 #include <iostream>
 #include <cstdlib>
 
+
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
@@ -39,6 +40,7 @@ for which a new license (GPL+exception) is in place.
 
 #include "commonstrings.h"
 #include "downloadmanager/scdlmgr.h"
+#include "iconmanager.h"
 #include "langmgr.h"
 #include "localemgr.h"
 #include "prefsfile.h"
@@ -117,6 +119,7 @@ ScribusQApp::~ScribusQApp()
 	PrefsManager::deleteInstance();
 	LocaleManager::deleteInstance();
 	LanguageManager::deleteInstance();
+	IconManager::deleteInstance();
 }
 
 void ScribusQApp::initLang()
@@ -471,17 +474,9 @@ void ScribusQApp::changeGUILanguage(const QString & newGUILang)
 
 /*! \brief Format an arguments line for printing
 Helper procedure */
-static void printArgLine(QTextStream & ts, const char * smallArg,
-						  const char* fullArg, const QString desc)
+static void printArgLine(QTextStream & ts, const char * smallArg, const char* fullArg, const QString desc)
 {
-	const char* lineformat = "  %1, %2 %3";
-	const int saw = 4;   // Short argument width
-	const int aw = -18;   // Argument width (negative is left aligned)
-	QString line = QString(lineformat)
-		.arg(smallArg, saw)
-		.arg(fullArg, aw)
-		.arg(desc);
-	ts << line;
+	ts << QString("     %1 %2 %3").arg(QString("%1,").arg(smallArg), -5).arg(fullArg, -32).arg(desc);
 	endl(ts);
 }
 
@@ -497,12 +492,12 @@ void ScribusQApp::showUsage()
 	printArgLine(ts, ARG_LANG_SHORT, ARG_LANG, tr("Uses xx as shortcut for a language, eg `en' or `de'") );
 	printArgLine(ts, ARG_AVAILLANG_SHORT, ARG_AVAILLANG, tr("List the currently installed interface languages") );
 	printArgLine(ts, ARG_NOSPLASH_SHORT, ARG_NOSPLASH, tr("Do not show the splashscreen on startup") );
-	printArgLine(ts, ARG_NEVERSPLASH_SHORT, ARG_NEVERSPLASH, tr("Stop the showing of the splashscreen on startup. Writes an empty file called .neversplash in ~/.scribus.") );
-	printArgLine(ts, ARG_PREFS_SHORT, QString(QString(ARG_PREFS) + QString(" ") + tr("filename")).toLocal8Bit().constData(), tr("Use filename as path for user given preferences") );
-	printArgLine(ts, ARG_PROFILEINFO_SHORT, ARG_PROFILEINFO, tr("Show location ICC profile information on console while starting") );
-	printArgLine(ts, ARG_UPGRADECHECK_SHORT, ARG_UPGRADECHECK, tr("Download a file from the Scribus website and show the latest available version.") );
+	printArgLine(ts, ARG_NEVERSPLASH_SHORT, ARG_NEVERSPLASH, tr("Stop showing the splashscreen on startup. Writes an empty file called .neversplash in ~/.scribus") );
+	printArgLine(ts, ARG_PREFS_SHORT, qPrintable(QString("%1 <%2>").arg(ARG_PREFS).arg(tr("filename"))), tr("Use filename as path for user given preferences") );
+	printArgLine(ts, ARG_PROFILEINFO_SHORT, ARG_PROFILEINFO, tr("Show location of ICC profile information on console while starting") );
+	printArgLine(ts, ARG_UPGRADECHECK_SHORT, ARG_UPGRADECHECK, tr("Download a file from the Scribus website and show the latest available version") );
 	printArgLine(ts, ARG_VERSION_SHORT, ARG_VERSION, tr("Output version information and exit") );
-	printArgLine(ts, ARG_PYTHONSCRIPT_SHORT, QString(QString(ARG_PYTHONSCRIPT) + QString(" ") + tr("filename")).toLocal8Bit().constData(), tr("Run filename in Python scripter") );
+	printArgLine(ts, ARG_PYTHONSCRIPT_SHORT, qPrintable(QString("%1 <%2>").arg(ARG_PYTHONSCRIPT).arg(tr("filename"))), tr("Run filename in Python scripter") );
 	printArgLine(ts, ARG_NOGUI_SHORT, ARG_NOGUI, tr("Do not start GUI") );
 	
 #if defined(_WIN32) && !defined(_CONSOLE)
@@ -519,6 +514,7 @@ void ScribusQApp::showUsage()
 	std::cout << "QT specific options as -display ..." ; endl(ts);
 */
 	endl(ts);
+	f.close();
 }
 
 void ScribusQApp::showAvailLangs()

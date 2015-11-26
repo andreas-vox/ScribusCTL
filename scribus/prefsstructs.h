@@ -497,4 +497,15 @@ struct ApplicationPrefs
 	DocumentSectionMap docSectionMap;
 };
 
+struct ScIconSetData
+{
+	QString path;
+	QString baseName;
+	QString license;
+	QString author;
+	QString activeversion;
+	QMap<QString, QString> nameTranslations;
+};
+
+
 #endif

@@ -52,8 +52,6 @@ for which a new license (GPL+exception) is in place.
 #include "undomanager.h"
 #include "util.h"
 #include "util_formats.h"
-//#include "util_ghostscript.h"
-#include "util_icon.h"
 #include "util_math.h"
 
 #include "ui/customfdialog.h"
@@ -864,10 +862,18 @@ bool PdfPlug::convert(QString fn)
 							m_Doc->pdfOptions().PageLayout = PDFOptions::SinglePage;
 						else if (pgl == Catalog::pageLayoutOneColumn)
 							m_Doc->pdfOptions().PageLayout = PDFOptions::OneColumn;
-						else if (pgl == Catalog::pageLayoutTwoColumnLeft)
+						else if ((pgl == Catalog::pageLayoutTwoColumnLeft) || (pgl == Catalog::pageLayoutTwoPageLeft))
+						{
+							m_Doc->resetPage(1);
+							m_Doc->setPageSetFirstPage(1, 0);
 							m_Doc->pdfOptions().PageLayout = PDFOptions::TwoColumnLeft;
-						else if (pgl == Catalog::pageLayoutTwoColumnRight)
+						}
+						else if ((pgl == Catalog::pageLayoutTwoColumnRight) || (pgl == Catalog::pageLayoutTwoPageRight))
+						{
+							m_Doc->resetPage(1);
+							m_Doc->setPageSetFirstPage(1, 1);
 							m_Doc->pdfOptions().PageLayout = PDFOptions::TwoColumnRight;
+						}
 					}
 					else
 					{

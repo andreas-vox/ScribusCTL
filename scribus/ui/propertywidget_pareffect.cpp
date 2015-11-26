@@ -8,8 +8,9 @@ for which a new license (GPL+exception) is in place.
 #include "propertywidget_pareffect.h"
 
 
-#include "appmodes.h"
 #include "appmodehelper.h"
+#include "appmodes.h"
+#include "iconmanager.h"
 #include "pageitem.h"
 #include "pageitem_table.h"
 #include "scribus.h"
@@ -18,8 +19,6 @@ for which a new license (GPL+exception) is in place.
 #include "ui/sctreewidget.h"
 #include "units.h"
 #include "util.h"
-#include "util_icon.h"
-
 
 PropertyWidget_ParEffect::PropertyWidget_ParEffect(QWidget *parent) : QFrame(parent), m_enhanced(NULL), m_item(NULL), m_ScMW(NULL)
 {
@@ -36,7 +35,7 @@ PropertyWidget_ParEffect::PropertyWidget_ParEffect(QWidget *parent) : QFrame(par
 	fillBulletStrEditCombo();
 	fillNumFormatCombo();
 	enableParEffect(false);
-	bulletCharTableButton->setIcon(loadIcon("22/insert-table.png"));
+	bulletCharTableButton->setIcon(IconManager::instance()->loadIcon("22/insert-table.png"));
 	numStart->setMinimum(1);
 	numStart->setMaximum(9999);
 	numLevelSpin->setMinimum(1);
@@ -270,7 +269,7 @@ void PropertyWidget_ParEffect::connectSignals()
 	connect(numStart, SIGNAL(valueChanged(int)), this, SLOT(handleNumStart(int)), Qt::UniqueConnection);
 	connect(peOffset, SIGNAL(valueChanged(double)), this, SLOT(handlePEOffset(double)), Qt::UniqueConnection);
 	connect(peIndent, SIGNAL(toggled(bool)), this, SLOT(handlePEIndent(bool)), Qt::UniqueConnection);
-	connect(peCharStyleCombo, SIGNAL(activated(QString)), this, SLOT(handlePECharStyle(QString)), Qt::UniqueConnection);
+	connect(peCharStyleCombo, SIGNAL(newStyle(QString)), this, SLOT(handlePECharStyle(QString)), Qt::UniqueConnection);
 }
 
 void PropertyWidget_ParEffect::disconnectSignals()
@@ -286,7 +285,7 @@ void PropertyWidget_ParEffect::disconnectSignals()
 	disconnect(numStart, SIGNAL(valueChanged(int)), this, SLOT(handleNumStart(int)));
 	disconnect(peOffset, SIGNAL(valueChanged(double)), this, SLOT(handlePEOffset(double)));
 	disconnect(peIndent, SIGNAL(toggled(bool)), this, SLOT(handlePEIndent(bool)));
-	disconnect(peCharStyleCombo, SIGNAL(activated(QString)), this, SLOT(handlePECharStyle(QString)));
+	disconnect(peCharStyleCombo, SIGNAL(newStyle(QString)), this, SLOT(handlePECharStyle(QString)));
 }
 
 void PropertyWidget_ParEffect::configureWidgets(void)
@@ -522,8 +521,7 @@ void PropertyWidget_ParEffect::handlePECharStyle(QString name)
 	if (!m_doc || !m_item)
 		return;
 	ParagraphStyle newStyle;
-	if (!name.isEmpty())
-		newStyle.setPeCharStyleName(name);
+	newStyle.setPeCharStyleName(name);
 	handleChanges(m_item, newStyle);
 }
 

@@ -46,11 +46,12 @@ for which a new license (GPL+exception) is in place.
 #include <cmath>
 
 
+
 #include "appmodes.h"
 #include "commonstrings.h"
+#include "iconmanager.h"
 #include "sccombobox.h"
 #include "scraction.h"
-
 #include "scribuscore.h"
 #include "scribusdoc.h"
 #include "scribusview.h"
@@ -64,8 +65,8 @@ for which a new license (GPL+exception) is in place.
 #include "undomanager.h"
 #include "units.h"
 #include "util.h"
-#include "util_icon.h"
 #include "util_math.h"
+
 
 
 PropertiesPalette_Group::PropertiesPalette_Group( QWidget* parent) : QWidget(parent)
@@ -82,11 +83,11 @@ PropertiesPalette_Group::PropertiesPalette_Group( QWidget* parent) : QWidget(par
 	setupUi(this);
 	setSizePolicy( QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum));
 
-	textFlowDisabled->setIcon(QIcon(loadIcon("flow-none.png")));
-	textFlowUsesFrameShape->setIcon(QIcon(loadIcon("flow-frame.png")));
-	textFlowUsesBoundingBox->setIcon(QIcon(loadIcon("flow-bounding.png")));
-	textFlowUsesContourLine->setIcon(QIcon(loadIcon("flow-contour.png")));
-	textFlowUsesImageClipping->setIcon(QIcon(loadIcon("flow-contour.png")));
+	textFlowDisabled->setIcon(IconManager::instance()->loadIcon("flow-none.png"));
+	textFlowUsesFrameShape->setIcon(IconManager::instance()->loadIcon("flow-frame.png"));
+	textFlowUsesBoundingBox->setIcon(IconManager::instance()->loadIcon("flow-bounding.png"));
+	textFlowUsesContourLine->setIcon(IconManager::instance()->loadIcon("flow-contour.png"));
+	textFlowUsesImageClipping->setIcon(IconManager::instance()->loadIcon("flow-contour.png"));
 
 	textFlowDisabled->setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
 	textFlowUsesFrameShape->setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
@@ -637,10 +638,13 @@ void PropertiesPalette_Group::languageChange()
 	textFlowUsesImageClipping->setText( tr("Use Image Clip Path"));
 
 	textFlowDisabled->setToolTip( tr("Disable text flow from lower frames around object"));
-	textFlowUsesFrameShape->setToolTip( tr("Use the frame shape for text flow of text frames below the object."));
-	textFlowUsesBoundingBox->setToolTip(  "<qt>" + tr("Use the bounding box, which is always rectangular, instead of the frame's shape for text flow of text frames below the object. ") + "</qt>" );
+	textFlowUsesFrameShape->setToolTip( tr("Use the frame shape for text flow of text frames below the object"));
+	textFlowUsesBoundingBox->setToolTip(  "<qt>" + tr("Use the bounding box, which is always rectangular, instead of the frame's shape for text flow of text frames below the object") + "</qt>" );
 	textFlowUsesContourLine->setToolTip(  "<qt>" + tr("When chosen, the contour line can be edited with the Edit Shape Tool on the palette further above. When edited via the shape palette, this becomes a second separate line originally based on the frame's shape for text flow of text frames below the object.") + "</qt>" );
 	textFlowUsesImageClipping->setToolTip(  "<qt>" + tr("Use the clipping path of the image") + "</qt>" );
+
+	evenOdd->setToolTip( "<qt>" + tr("Any path self-intersections or subpaths create holes in the fill")  + "</qt>");
+	nonZero->setToolTip( "<qt>" + tr("Fill is solid unless a subpath is counter-directional")  + "</qt>");
 }
 
 void PropertiesPalette_Group::unitChange()

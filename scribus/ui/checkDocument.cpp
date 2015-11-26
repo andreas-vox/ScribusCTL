@@ -25,7 +25,7 @@ for which a new license (GPL+exception) is in place.
 #include "scpage.h"
 #include "scribuscore.h"
 #include "scribusdoc.h"
-#include "util_icon.h"
+#include "iconmanager.h"
 #include "util.h"
 
 
@@ -46,9 +46,9 @@ CheckDocument::CheckDocument( QWidget* parent, bool modal )
 	showPagesWithoutErrors=PrefsManager::instance()->appPrefs.verifierPrefs.showPagesWithoutErrors;
 	showNonPrintingLayerErrors=PrefsManager::instance()->appPrefs.verifierPrefs.showNonPrintingLayerErrors;
 
-	graveError = loadIcon("22/dialog-error.png");
-	onlyWarning = loadIcon("22/dialog-warning.png");
-	noErrors = loadIcon("ok.png");
+	graveError = IconManager::instance()->loadPixmap("22/dialog-error.png");
+	onlyWarning = IconManager::instance()->loadPixmap("22/dialog-warning.png");
+	noErrors = IconManager::instance()->loadPixmap("ok.png");
 	checkDocumentLayout = new QVBoxLayout( this );
 	checkDocumentLayout->setMargin(5);
 	checkDocumentLayout->setSpacing(5);
@@ -118,7 +118,7 @@ void CheckDocument::languageChange()
 	ignoreErrors->setText( tr("&Ignore Errors"));
 	reScan->setText( tr("Check again"));
 
-	textLabel1->setToolTip( "<qt>"+ tr( "Preflight profile to base the report generation on. Options can be set in Document Setup or Preferences") + "</qt>");
+	textLabel1->setToolTip( "<qt>"+ tr( "Preflight profile to base the report generation on. Options can be set in Document Setup or Preferences.") + "</qt>");
 	ignoreErrors->setToolTip( "<qt>"+ tr( "Ignore found errors and continue to export or print. Be sure to understand the errors you are ignoring before continuing.") + "</qt>");
 	reScan->setToolTip( "<qt>"+ tr( "Rerun the document scan to check corrections you may have made" ) + "</qt>");
 

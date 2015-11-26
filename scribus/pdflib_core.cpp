@@ -1930,10 +1930,41 @@ void PDFLibCore::PDF_Begin_WriteUsedFonts(SCFonts &AllFonts, const QMap<QString,
 		PdfFont pdfFont;
 		QByteArray fontName = QByteArray("Fo") + Pdf::toPdf(a);
 		
+		QMap<uint, FPointArray> usedGlyphs = it.value();
+		
+		// Check for control glyphs
+		QList<uint> glyphIDs = usedGlyphs.keys();
+		for (int i = 0; i < glyphIDs.count(); ++i)
+		{
+			uint glyph = glyphIDs.at(i);
+			if (glyph < ScFace::CONTROL_GLYPHS)
+				continue;
+			FPointArray glyphPath = usedGlyphs[glyph];
+
+			uint realGlyph = 0;
+			if (glyph == (ScFace::CONTROL_GLYPHS + SpecialChars::NBSPACE.unicode()) ||
+				glyph == (ScFace::CONTROL_GLYPHS + 32))
+			{
+				realGlyph = face.char2CMap(QChar(' '));
+			}
+			else if (glyph == (ScFace::CONTROL_GLYPHS + SpecialChars::NBHYPHEN.unicode()))
+			{
+				realGlyph = face.char2CMap(QChar('-'));
+			}
+
+			usedGlyphs.remove(glyph);
+			if (realGlyph <= 0 || realGlyph >= ScFace::CONTROL_GLYPHS)
+				continue;
+			usedGlyphs.insert(glyph, glyphPath);
+		}
+
+		if (usedGlyphs.count() <= 0)
+			continue;
+		
 		qDebug() << "pdf font" << it.key();
 		if (Options.OutlineList.contains(it.key()))
 		{
-			pdfFont = PDF_WriteGlyphsAsXForms(fontName, face, it.value());
+			pdfFont = PDF_WriteGlyphsAsXForms(fontName, face, usedGlyphs);
 		}
 		else
 		{
@@ -1943,16 +1974,16 @@ void PDFLibCore::PDF_Begin_WriteUsedFonts(SCFonts &AllFonts, const QMap<QString,
 				{
 					if (face.type() == ScFace::TTF)
 					{
-						pdfFont = PDF_WriteTtfSubsetFont(fontName, face, it.value());
+						pdfFont = PDF_WriteTtfSubsetFont(fontName, face, usedGlyphs);
 					}
 					else
 					{
-						pdfFont = PDF_WriteCffSubsetFont(fontName, face, it.value());
+						pdfFont = PDF_WriteCffSubsetFont(fontName, face, usedGlyphs);
 					}
 				}
 				else
 				{
-					pdfFont = PDF_WriteType3Font(fontName, face, it.value());
+					pdfFont = PDF_WriteType3Font(fontName, face, usedGlyphs);
 				}
 			}
 			else
@@ -3569,32 +3600,19 @@ QByteArray PDFLibCore::Write_FormXObject(QByteArray &data, PageItem *controlItem
 	double maxBoxY = ActPageP->height()+Options.bleeds.top()+Options.bleeds.bottom();
 	if (controlItem != NULL)
 	{
-		double scaleW, scaleH;
+		double groupW, groupH;
 		if (controlItem->isGroup())
 		{
-			if (controlItem->groupWidth > controlItem->width())
-				scaleW = controlItem->groupWidth / controlItem->width();
-			else
-				scaleW = 1.0 / (controlItem->groupWidth / controlItem->width());
-			if (controlItem->groupHeight > controlItem->height())
-				scaleH = controlItem->groupHeight / controlItem->height();
-			else
-				scaleH = 1.0 / (controlItem->groupHeight / controlItem->height());
-		//	PutDoc("/BBox [ "+FToStr(0)+" "+FToStr(-controlItem->height() * scaleH)+" "+FToStr(controlItem->groupWidth * scaleW)+" "+FToStr(controlItem->groupHeight * scaleH)+" ]\n");
-			PutDoc("/BBox [ "+FToStr(0)+" "+FToStr(-controlItem->height() * scaleH)+" "+FToStr(ActPageP->width())+" "+FToStr(controlItem->groupHeight * scaleH)+" ]\n");
+			groupW = std::max(ActPageP->width(), std::max(controlItem->groupWidth,  controlItem->width()));
+			groupH = std::max(controlItem->groupHeight, controlItem->height());
+			PutDoc("/BBox [ "+FToStr(0)+" "+FToStr(-groupH)+" "+FToStr(groupW)+" "+FToStr(groupH)+" ]\n");
 		}
 		if (controlItem->isSymbol())
 		{
 			ScPattern pat = doc.docPatterns[controlItem->pattern()];
-			if (pat.width > controlItem->width())
-				scaleW = pat.width / controlItem->width();
-			else
-				scaleW = 1.0 / (pat.width / controlItem->width());
-			if (pat.height > controlItem->height())
-				scaleH = pat.height / controlItem->height();
-			else
-				scaleH = 1.0 / (pat.height / controlItem->height());
-			PutDoc("/BBox [ "+FToStr(0)+" "+FToStr(-controlItem->height() * scaleH)+" "+FToStr(pat.width * scaleW)+" "+FToStr(pat.height * scaleH)+" ]\n");
+			groupW = std::max(pat.width,  controlItem->width());
+			groupH = std::max(pat.height, controlItem->height());
+			PutDoc("/BBox [ "+FToStr(0)+" "+FToStr(-groupH)+" "+FToStr(groupW)+" "+FToStr(groupH)+" ]\n");
 		}
 	}
 	else
@@ -3611,7 +3629,6 @@ QByteArray PDFLibCore::Write_FormXObject(QByteArray &data, PageItem *controlItem
 	dict.ColorSpace.append(asColorSpace(spotMap.values()));
 	writer.write(dict);
 
-	PutDoc(">>\n");
 	if (Options.Compress)
 		data = CompressArray(data);
 	PutDoc("/Length "+QByteArray::number(data.length()+1));
@@ -3669,32 +3686,19 @@ QByteArray PDFLibCore::Write_TransparencyGroup(double trans, int blend, QByteArr
 	double maxBoxY = ActPageP->height()+Options.bleeds.top()+Options.bleeds.bottom();
 	if (controlItem != NULL)
 	{
-		double scaleW, scaleH;
+		double groupW, groupH;
 		if (controlItem->isGroup())
 		{
-			if (controlItem->groupWidth > controlItem->width())
-				scaleW = controlItem->groupWidth / controlItem->width();
-			else
-				scaleW = 1.0 / (controlItem->groupWidth / controlItem->width());
-			if (controlItem->groupHeight > controlItem->height())
-				scaleH = controlItem->groupHeight / controlItem->height();
-			else
-				scaleH = 1.0 / (controlItem->groupHeight / controlItem->height());
-		//	PutDoc("/BBox [ "+FToStr(0)+" "+FToStr(-controlItem->height() * scaleH)+" "+FToStr(controlItem->groupWidth * scaleW)+" "+FToStr(controlItem->groupHeight * scaleH)+" ]\n");
-			PutDoc("/BBox [ "+FToStr(0)+" "+FToStr(-controlItem->height() * scaleH)+" "+FToStr(ActPageP->width())+" "+FToStr(controlItem->groupHeight * scaleH)+" ]\n");
+			groupW = std::max(ActPageP->width(), std::max(controlItem->groupWidth,  controlItem->width()));
+			groupH = std::max(controlItem->groupHeight, controlItem->height());
+			PutDoc("/BBox [ "+FToStr(0)+" "+FToStr(-groupH)+" "+FToStr(groupW)+" "+FToStr(groupH)+" ]\n");
 		}
 		if (controlItem->isSymbol())
 		{
 			ScPattern pat = doc.docPatterns[controlItem->pattern()];
-			if (pat.width > controlItem->width())
-				scaleW = pat.width / controlItem->width();
-			else
-				scaleW = 1.0 / (pat.width / controlItem->width());
-			if (pat.height > controlItem->height())
-				scaleH = pat.height / controlItem->height();
-			else
-				scaleH = 1.0 / (pat.height / controlItem->height());
-			PutDoc("/BBox [ "+FToStr(0)+" "+FToStr(-controlItem->height() * scaleH)+" "+FToStr(pat.width * scaleW)+" "+FToStr(pat.height * scaleH)+" ]\n");
+			groupW = std::max(pat.width,  controlItem->width());
+			groupH = std::max(pat.height, controlItem->height());
+			PutDoc("/BBox [ "+FToStr(0)+" "+FToStr(-groupH)+" "+FToStr(groupW)+" "+FToStr(groupH)+" ]\n");
 		}
 	}
 	else

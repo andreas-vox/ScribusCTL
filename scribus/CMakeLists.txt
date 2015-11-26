@@ -94,6 +94,7 @@ SET(SCRIBUS_ITEMSETTERS_SRC
 SET(SCRIBUS_UI_SRC
 	ui/aboutplugins.ui
 	ui/aligndistribute.ui
+	ui/annot.ui
 	ui/arcvectorbase.ui
 	ui/arcwidgetbase.ui
 	ui/charselect.ui
@@ -218,6 +219,7 @@ SET(SCRIBUS_MOC_CLASSES
 	canvasgesture_table.h
 	canvasgesture_tableresize.h
 	canvasmode.h
+	canvasmode_create.h
 	canvasmode_edit.h
 	canvasmode_editarc.h
 	canvasmode_editpolygon.h
@@ -245,6 +247,7 @@ SET(SCRIBUS_MOC_CLASSES
 	guidesmodel.h
 	guidesview.h
 	hyphenator.h
+	iconmanager.h
 	latexhelpers.h
 	loadsaveplugin.h
 	menumanager.h
@@ -609,6 +612,7 @@ SET(SCRIBUS_SOURCES
 	guidesmodel.cpp
 	guidesview.cpp
 	hyphenator.cpp
+	iconmanager.cpp
 	ioapi.c
 	KarbonCurveFit.cpp
 	langdef.cpp
@@ -749,7 +753,6 @@ SET(SCRIBUS_SOURCES
 	util_file.cpp
 	util_formats.cpp
 	util_ghostscript.cpp
-	util_icon.cpp
 	util_layer.cpp
 	util_math.cpp
 	util_os.cpp

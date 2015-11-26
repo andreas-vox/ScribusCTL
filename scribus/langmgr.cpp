@@ -22,10 +22,12 @@ for which a new license (GPL+exception) is in place.
 #include <iostream>
 #include <QDebug>
 #include <QDir>
+#include <QFile>
 #include <QFileInfo>
 #include <QMap>
 #include <QObject>
 #include <QStringList> 
+#include <QTextStream>
 
 #include "scconfig.h"
 #include "langmgr.h"
@@ -98,7 +100,7 @@ void LanguageManager::generateLangList()
 	langTable.append(LangDef("bs_BA",  "bs_BA", "Bosnian",                QObject::tr( "Bosnian" )) );
 	langTable.append(LangDef("ca",     "",      "Catalan",                QObject::tr( "Catalan" )) );
 	langTable.append(LangDef("cs",     "cs_CZ", "Czech",                  QObject::tr( "Czech" )) );
-	langTable.append(LangDef("cy",     "",      "Welsh",                  QObject::tr( "Welsh" )) );
+	langTable.append(LangDef("cy",     "cy_GB", "Welsh",                  QObject::tr( "Welsh" )) );
 	langTable.append(LangDef("da",     "da_DK", "Danish",                 QObject::tr( "Danish" )) );
 	langTable.append(LangDef("de",     "de_DE", "German",                 QObject::tr( "German" )) );
 	langTable.append(LangDef("de_1901","",      "German (Trad.)",         QObject::tr( "German (Trad.)" )) );
@@ -394,8 +396,8 @@ void LanguageManager::fillInstalledGUIStringList(QStringList *stringListToFill, 
 			if (langTable[i].m_transAvailable)
 				stringListToFill->append(langTable[i].m_transName);
 		}
+		stringListToFill->sort();
 	}
-	stringListToFill->sort();
 }
 
 void LanguageManager::fillInstalledHyphStringList(QStringList *stringListToFill)
@@ -428,8 +430,16 @@ QStringList LanguageManager::languageList(bool getTranslated)
 
 void LanguageManager::printInstalledList()
 {
+	QFile f;
+	f.open(stderr, QIODevice::WriteOnly);
+	QTextStream ts(&f);
 	for (int i = 0; i < langTable.size(); ++i)
-		qDebug() << langTable[i].m_priAbbrev.leftJustified(6) << ": " << langTable[i].m_name;
+	{
+		ts << "  " << langTable[i].m_priAbbrev.leftJustified(8) << ": " << langTable[i].m_name;
+		endl(ts);
+	}
+	endl(ts);
+	f.close();
 }
 
 QString LanguageManager::numericSequence(QString seq)

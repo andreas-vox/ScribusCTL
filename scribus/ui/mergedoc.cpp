@@ -5,17 +5,16 @@ a copyright and/or license notice that predates the release of Scribus 1.3.2
 for which a new license (GPL+exception) is in place.
 */
 
-#include "scconfig.h"
-#include "mergedoc.h"
-
-#include "fileloader.h"
 #include "commonstrings.h"
+#include "fileloader.h"
+#include "iconmanager.h"
+#include "mergedoc.h"
 #include "prefsfile.h"
 #include "prefsmanager.h"
 #include "sccombobox.h"
+#include "scconfig.h"
 #include "scpaths.h"
 #include "ui/customfdialog.h"
-#include "util_icon.h"
 
 #include <QApplication>
 #include <QCheckBox>
@@ -37,7 +36,7 @@ MergeDoc::MergeDoc(QWidget* parent, bool importMasterPages, int targetDocPageCou
 	masterPages = importMasterPages;
 	setModal(true);
 	setWindowTitle((masterPages) ? tr("Import Master Page") : tr( "Import Page(s)" ));
-	setWindowIcon(QIcon(loadIcon ( "AppIcon.png" )));
+	setWindowIcon(IconManager::instance()->loadIcon("AppIcon.png"));
 
 	count = 0;
 	dialogLayout = new QVBoxLayout(this);
@@ -71,8 +70,8 @@ MergeDoc::MergeDoc(QWidget* parent, bool importMasterPages, int targetDocPageCou
 		pageNumberData->setEnabled(false);
 		importPageLabel->setBuddy( pageNumberData );
 		pageNumberData->setToolTip( "<qt>" + tr( "Insert a comma separated list of tokens import where "
-		                           "a token can be * for all the pages, 1-5 for "
-		                           "a range of pages or a single page number.") + "</qt>");
+									"a token can be * for all the pages, 1-5 for "
+									"a range of pages or a single page number") + "</qt>");
 		fromInfoLayout->addWidget( pageNumberData, 1, 1 );
 		fromLabel = new QLabel(this);
 		fromInfoLayout->addWidget( fromLabel, 1, 2 );
