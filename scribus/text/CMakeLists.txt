@@ -7,6 +7,7 @@ INCLUDE_DIRECTORIES(
 
 SET(SCRIBUS_TEXT_MOC_CLASSES
 	storytext.h
+        boxes.h
 )
 
 SET(SCRIBUS_TEXT_LIB_SOURCES
@@ -16,6 +17,7 @@ SET(SCRIBUS_TEXT_LIB_SOURCES
 	sctext_shared.cpp
 	fsize.cpp
 	frect.cpp
+        boxes.cpp
 )
 
 QT5_WRAP_CPP(SCRIBUS_TEXT_MOC_SOURCES ${SCRIBUS_TEXT_MOC_CLASSES})
