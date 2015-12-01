@@ -15,7 +15,6 @@ GroupBox::GroupBox()
 	m_lastChar = -1;
 }
 
-
 int GroupBox::pointToPosition(FPoint coord) const
 {
 	FPoint rel = coord - FPoint(m_x, m_y);
@@ -33,7 +32,7 @@ int GroupBox::pointToPosition(FPoint coord) const
 }
 
 
-FRect GroupBox::boundingBox(int pos, uint len) const;
+FRect GroupBox::boundingBox(int pos, uint len) const
 {
 	FRect result;
 	for (int i=0; i < m_boxes.count(); ++i)
@@ -44,13 +43,16 @@ FRect GroupBox::boundingBox(int pos, uint len) const;
 			result = result.unite(b->boundingBox(pos, len));
 		}
 	}
-	return result.valid()? result + FPoint(m_x, m_y) : result;
+	if(result.isValid()){
+
+	}
+	return result.isValid()? result.unite(FRect(m_x, m_y,m_width,m_ascent+m_descent)) : result;
 }
 
 
 void GroupBox::addBox(const Box* box)
 {
-	m_boxes.append(box);
+	m_boxes.append(const_cast<Box*>(box));
 	
 	if (box->firstChar() < m_firstChar)
 		m_firstChar = box->firstChar();
@@ -58,9 +60,10 @@ void GroupBox::addBox(const Box* box)
 		m_lastChar = box->lastChar();
 	
 	if (0 == m_ascent)
-		m_ascent = b->ascent();
+		m_ascent = box->ascent();
 
-	FRect newRect = b->bbox().moveBy(m_x, m_y);
+	FRect newRect = box->bbox();
+	newRect.moveBy(m_x, m_y);
 	newRect = bbox().unite(newRect);
 	m_y = newRect.y() + m_ascent;
 	m_x = newRect.x();
@@ -69,28 +72,28 @@ void GroupBox::addBox(const Box* box)
 }
 
 Box* GroupBox::addBox(uint i)
-{
-	Box* result = m_boxes.removeAt(i);
-TODO: recalc bounds
-	int lastsLastChar = last->lastChar();
-	delete last;
+{	m_boxes.removeAt(i);
+	Box* result = m_boxes.at(i);
+//TODO: recalc bounds;
+	int lastsLastChar = m_last->lastChar();
+	delete m_last;
 	if (m_lines->boxes().isEmpty()) {
-		clear();
-		return;
+		//clear();
+		return m_lines->boxes().at(i);
 	}
 	// fix lastInFrame
-	if (m_lines->lastChar() != lastsLastChar) return;
+	if (m_lines->lastChar() != lastsLastChar) return m_lines->boxes().at(i);//fix me
 	m_lastChar = m_lines->boxes().last()->lastChar();
 
 	return result;
 }
 
-
-GlypHBox::GlyphBox()
+/*
+GlyphBox::GlyphBox(const GlyphRun& glyphrun)
 {
 	m_type = T_Glyphs;
 }
-
+*/
 
 int GlyphBox::pointToPosition(FPoint coord) const
 {
