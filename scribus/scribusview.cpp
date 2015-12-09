@@ -108,7 +108,7 @@ for which a new license (GPL+exception) is in place.
 #include "ui/extimageprops.h"
 #include "ui/guidemanager.h"
 #include "ui/hruler.h"
-#include <pageitem_textframe.cpp>
+#include <pageitem_textframe.h>
 #include "ui/insertTable.h"
 #include "ui/oneclick.h"
 #include "ui/pageitemattributes.h"

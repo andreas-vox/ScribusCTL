@@ -10,7 +10,7 @@ for which a new license (GPL+exception) is in place.
 #include <QPointF>
 #include <QRectF>
 #include <QStack>
-#include <pageitem_textframe.cpp>
+#include <pageitem_textframe.h>
 #include "cmsettings.h"
 #include "commonstrings.h"
 #include "pageitem.h"

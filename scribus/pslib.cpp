@@ -34,7 +34,7 @@ for which a new license (GPL+exception) is in place.
 #include <QRegExp>
 #include <QBuffer>
 #include <QStack>
-#include <pageitem_textframe.cpp>
+#include <pageitem_textframe.h>
 #include "cmsettings.h"
 #include "commonstrings.h"
 #include "scconfig.h"
