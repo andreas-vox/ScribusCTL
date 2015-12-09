@@ -34,7 +34,7 @@ for which a new license (GPL+exception) is in place.
 #include <QRegExp>
 #include <QBuffer>
 #include <QStack>
-
+#include <pageitem_textframe.cpp>
 #include "cmsettings.h"
 #include "commonstrings.h"
 #include "scconfig.h"
@@ -1668,6 +1668,7 @@ int PSLib::CreatePS(ScribusDoc* Doc, PrintOptions &options)
 
 bool PSLib::ProcessItem(ScribusDoc* Doc, ScPage* a, PageItem* c, uint PNr, bool sep, bool farb, bool ic, bool gcr, bool master, bool embedded, bool useTemplate)
 {
+	LineControl item;
 	double tsz;
 	int h, s, v, k;
 	int d;
@@ -2172,7 +2173,7 @@ bool PSLib::ProcessItem(ScribusDoc* Doc, ScPage* a, PageItem* c, uint PNr, bool 
                 
                 const CharStyle & style(c->asPathText()->itemRenderText.charStyle(d));
 				const PathData& pdata(c->textLayout.point(d));
-                const GlyphLayout* glyphs(c->asPathText()->itemRenderText.getGlyphs(d));
+				const GlyphLayout glyphs(item.glyphRuns.at(d).glyphs().at(d));
                 PageItem* embItem = c->asPathText()->itemRenderText.hasObject(d)?
                                           c->asPathText()->itemRenderText.object(d) : NULL;
                 
@@ -2297,8 +2298,8 @@ bool PSLib::ProcessItem(ScribusDoc* Doc, ScPage* a, PageItem* c, uint PNr, bool 
 							PS_translate(0, (tsz / 10.0));
 							if (c->BaseOffs != 0)
 								PS_translate(0, -c->BaseOffs);
-							if (glyphs->xoffset !=0 || glyphs->yoffset != 0)
-								PS_translate(glyphs->xoffset, -glyphs->yoffset);
+							if (glyphs.xoffset !=0 || glyphs.yoffset != 0)
+								PS_translate(glyphs.xoffset, -glyphs.yoffset);
 							if (style.scaleH() != 1000)
 								PS_scale(style.scaleH() / 1000.0, 1);
 							if (((style.effects() & ScStyle_Underline) && !SpecialChars::isBreak(chstr)) //FIXME && (chstr != QChar(13)))  
@@ -2306,7 +2307,7 @@ bool PSLib::ProcessItem(ScribusDoc* Doc, ScPage* a, PageItem* c, uint PNr, bool 
 							{
 								PS_save();
 								PS_translate(0, -(tsz / 10.0));
-								double Ulen = glyphs->xadvance;
+								double Ulen = glyphs.xadvance;
 								double Upos, Uwid;
 								if ((style.underlineOffset() != -1) || (style.underlineWidth() != -1))
 								{
@@ -2325,7 +2326,7 @@ bool PSLib::ProcessItem(ScribusDoc* Doc, ScPage* a, PageItem* c, uint PNr, bool 
 									Uwid = qMax(style.font().strokeWidth(style.fontSize() / 10.0), 1.0);
 								}
 								if (style.baselineOffset() != 0)
-									Upos += (style.fontSize() / 10.0) * glyphs->scaleV * (style.baselineOffset() / 1000.0);
+									Upos += (style.fontSize() / 10.0) * glyphs.scaleV * (style.baselineOffset() / 1000.0);
 								if (style.fillColor() != CommonStrings::None)
 								{
 									SetColor(style.fillColor(), style.fillShade(), &h, &s, &v, &k, gcr);
@@ -2334,13 +2335,13 @@ bool PSLib::ProcessItem(ScribusDoc* Doc, ScPage* a, PageItem* c, uint PNr, bool 
 								PS_setlinewidth(Uwid);
 								if (style.effects() & ScStyle_Subscript)
 								{
-									PS_moveto(glyphs->xoffset     , Upos);
-									PS_lineto(glyphs->xoffset+Ulen, Upos);
+									PS_moveto(glyphs.xoffset     , Upos);
+									PS_lineto(glyphs.xoffset+Ulen, Upos);
 								}
 								else
 								{
-									PS_moveto(glyphs->xoffset     , glyphs->yoffset+Upos);
-									PS_lineto(glyphs->xoffset+Ulen, glyphs->yoffset+Upos);
+									PS_moveto(glyphs.xoffset     , glyphs.yoffset+Upos);
+									PS_lineto(glyphs.xoffset+Ulen, glyphs.yoffset+Upos);
 								}
 								putColor(style.fillColor(), style.fillShade(), false);
 								PS_restore();
@@ -2373,7 +2374,7 @@ bool PSLib::ProcessItem(ScribusDoc* Doc, ScPage* a, PageItem* c, uint PNr, bool 
 							{
 								PS_save();
 								PS_translate(0, -(tsz / 10.0));
-								double Ulen = glyphs->xadvance;
+								double Ulen = glyphs.xadvance;
 								double Upos, Uwid;
 								if ((style.strikethruOffset() != -1) || (style.strikethruWidth() != -1))
 								{
@@ -2392,15 +2393,15 @@ bool PSLib::ProcessItem(ScribusDoc* Doc, ScPage* a, PageItem* c, uint PNr, bool 
 									Uwid = qMax(style.font().strokeWidth(style.fontSize() / 10.0), 1.0);
 								}
 								if (style.baselineOffset() != 0)
-									Upos += (style.fontSize() / 10.0) * glyphs->scaleV * (style.baselineOffset() / 1000.0);
+									Upos += (style.fontSize() / 10.0) * glyphs.scaleV * (style.baselineOffset() / 1000.0);
 								if (style.fillColor() != CommonStrings::None)
 								{
 									SetColor(style.fillColor(), style.fillShade(), &h, &s, &v, &k, gcr);
 									PS_setcmykcolor_stroke(h / 255.0, s / 255.0, v / 255.0, k / 255.0);
 								}
 								PS_setlinewidth(Uwid);
-								PS_moveto(glyphs->xoffset     , Upos);
-								PS_lineto(glyphs->xoffset+Ulen, Upos);
+								PS_moveto(glyphs.xoffset     , Upos);
+								PS_lineto(glyphs.xoffset+Ulen, Upos);
 								putColor(style.fillColor(), style.fillShade(), false);
 								PS_restore();
 							}
@@ -2410,7 +2411,7 @@ bool PSLib::ProcessItem(ScribusDoc* Doc, ScPage* a, PageItem* c, uint PNr, bool 
 				}
 				else
 				{
-					uint glyph = glyphs->glyph;
+					uint glyph = glyphs.glyph;
 					PS_selectfont(style.font().replacementName(), tsz / 10.0);
 					PS_save();
 					PutStream( MatrixToStr(1.0, 0.0, 0.0, -1.0, -pdata.PDx, 0.0) + "\n");
@@ -2440,13 +2441,13 @@ bool PSLib::ProcessItem(ScribusDoc* Doc, ScPage* a, PageItem* c, uint PNr, bool 
 					PutStream("[0.0 0.0 0.0 0.0 0.0 0.0] concatmatrix\nconcat\n");
 					if (c->BaseOffs != 0)
 						PS_translate(0, -c->BaseOffs);
-					if (glyphs->xoffset !=0 || glyphs->yoffset != 0)
-						PS_translate(glyphs->xoffset, -glyphs->yoffset);
+					if (glyphs.xoffset !=0 || glyphs.yoffset != 0)
+						PS_translate(glyphs.xoffset, -glyphs.yoffset);
 					if (((style.effects() & ScStyle_Underline) && !SpecialChars::isBreak(chstr)) //FIXME && (chstr != QChar(13)))  
 						|| ((style.effects() & ScStyle_UnderlineWords) && !chstr.isSpace() && !SpecialChars::isBreak(chstr)))
 					{
 						PS_save();
-						double Ulen = glyphs->xadvance;
+						double Ulen = glyphs.xadvance;
 						double Upos, Uwid;
 						if ((style.underlineOffset() != -1) || (style.underlineWidth() != -1))
 						{
@@ -2465,7 +2466,7 @@ bool PSLib::ProcessItem(ScribusDoc* Doc, ScPage* a, PageItem* c, uint PNr, bool 
 							Uwid = qMax(style.font().strokeWidth(style.fontSize() / 10.0), 1.0);
 						}
 						if (style.baselineOffset() != 0)
-							Upos += (style.fontSize() / 10.0) * glyphs->scaleV * (style.baselineOffset() / 1000.0);
+							Upos += (style.fontSize() / 10.0) * glyphs.scaleV * (style.baselineOffset() / 1000.0);
 						if (style.fillColor() != CommonStrings::None)
 						{
 							SetColor(style.fillColor(), style.fillShade(), &h, &s, &v, &k, gcr);
@@ -2474,13 +2475,13 @@ bool PSLib::ProcessItem(ScribusDoc* Doc, ScPage* a, PageItem* c, uint PNr, bool 
 						PS_setlinewidth(Uwid);
 						if (style.effects() & ScStyle_Subscript)
 						{
-							PS_moveto(glyphs->xoffset     , Upos);
-							PS_lineto(glyphs->xoffset+Ulen, Upos);
+							PS_moveto(glyphs.xoffset     , Upos);
+							PS_lineto(glyphs.xoffset+Ulen, Upos);
 						}
 						else
 						{
-							PS_moveto(glyphs->xoffset     , glyphs->yoffset+Upos);
-							PS_lineto(glyphs->xoffset+Ulen, glyphs->yoffset+Upos);
+							PS_moveto(glyphs.xoffset     , glyphs.yoffset+Upos);
+							PS_lineto(glyphs.xoffset+Ulen, glyphs.yoffset+Upos);
 						}
 						putColor(style.fillColor(), style.fillShade(), false);
 						PS_restore();
@@ -2519,7 +2520,7 @@ bool PSLib::ProcessItem(ScribusDoc* Doc, ScPage* a, PageItem* c, uint PNr, bool 
 					if ((style.effects() & ScStyle_Strikethrough) && (chstr != SpecialChars::PARSEP))
 					{
 						PS_save();
-						double Ulen = glyphs->xadvance;
+						double Ulen = glyphs.xadvance;
 						double Upos, Uwid;
 						if ((style.strikethruOffset() != -1) || (style.strikethruWidth() != -1))
 						{
@@ -2538,7 +2539,7 @@ bool PSLib::ProcessItem(ScribusDoc* Doc, ScPage* a, PageItem* c, uint PNr, bool 
 							Uwid = qMax(style.font().strokeWidth(style.fontSize() / 10.0), 1.0);
 						}
 						if (style.baselineOffset() != 0)
-							Upos += (style.fontSize() / 10.0) * glyphs->scaleV * (style.baselineOffset() / 1000.0);
+							Upos += (style.fontSize() / 10.0) * glyphs.scaleV * (style.baselineOffset() / 1000.0);
 						if (style.fillColor() != CommonStrings::None)
 						if (style.fillColor() != CommonStrings::None)
 						{
@@ -2546,8 +2547,8 @@ bool PSLib::ProcessItem(ScribusDoc* Doc, ScPage* a, PageItem* c, uint PNr, bool 
 							PS_setcmykcolor_stroke(h / 255.0, s / 255.0, v / 255.0, k / 255.0);
 						}
 						PS_setlinewidth(Uwid);
-						PS_moveto(glyphs->xoffset     , Upos);
-						PS_lineto(glyphs->xoffset+Ulen, Upos);
+						PS_moveto(glyphs.xoffset     , Upos);
+						PS_lineto(glyphs.xoffset+Ulen, Upos);
 						putColor(style.fillColor(), style.fillShade(), false);
 						PS_restore();
 					}
@@ -2909,6 +2910,7 @@ void PSLib::ProcessPage(ScribusDoc* Doc, ScPage* a, uint PNr, bool sep, bool far
 
 bool PSLib::ProcessMasterPageLayer(ScribusDoc* Doc, ScPage* page, ScLayer& layer, uint PNr, bool sep, bool farb, bool ic, bool gcr)
 {
+	LineControl item;
 	bool success = true;
 	int h, s, v, k;
 	QVector<double> dum;
@@ -3285,7 +3287,7 @@ bool PSLib::ProcessMasterPageLayer(ScribusDoc* Doc, ScPage* page, ScLayer& layer
 					if ((chstr == QChar(13)) || (chstr == QChar(30)) || (chstr == QChar(9)) || (chstr == QChar(28)))
 						continue;
                     const PathData& pdata(ite->textLayout.point(d));
-                    const GlyphLayout* glyphs(ite->asPathText()->itemRenderText.getGlyphs(d));
+					const GlyphLayout glyphs(item.glyphRuns.at(d).glyphs().at(d));
                     PageItem* embItem = ite->asPathText()->itemRenderText.hasObject(d)?
                                               ite->asPathText()->itemRenderText.object(d) : NULL;
                     
@@ -3410,8 +3412,8 @@ bool PSLib::ProcessMasterPageLayer(ScribusDoc* Doc, ScPage* page, ScLayer& layer
 								PS_translate(0, (tsz / 10.0));
 								if (ite->BaseOffs != 0)
 									PS_translate(0, -ite->BaseOffs);
-								if (glyphs->xoffset !=0 || glyphs->yoffset != 0)
-									PS_translate(glyphs->xoffset, -glyphs->yoffset);
+								if (glyphs.xoffset !=0 || glyphs.yoffset != 0)
+									PS_translate(glyphs.xoffset, -glyphs.yoffset);
 								if (style.scaleH() != 1000)
 									PS_scale(style.scaleH() / 1000.0, 1);
 								if (((style.effects() & ScStyle_Underline) && !SpecialChars::isBreak(chstr)) //FIXME && (chstr != QChar(13)))
@@ -3419,7 +3421,7 @@ bool PSLib::ProcessMasterPageLayer(ScribusDoc* Doc, ScPage* page, ScLayer& layer
 								{
 									PS_save();
 									PS_translate(0, -(tsz / 10.0));
-									double Ulen = glyphs->xadvance;
+									double Ulen = glyphs.xadvance;
 									double Upos, Uwid;
 									if ((style.underlineOffset() != -1) || (style.underlineWidth() != -1))
 									{
@@ -3438,7 +3440,7 @@ bool PSLib::ProcessMasterPageLayer(ScribusDoc* Doc, ScPage* page, ScLayer& layer
 										Uwid = qMax(style.font().strokeWidth(style.fontSize() / 10.0), 1.0);
 									}
 									if (style.baselineOffset() != 0)
-										Upos += (style.fontSize() / 10.0) * glyphs->scaleV * (style.baselineOffset() / 1000.0);
+										Upos += (style.fontSize() / 10.0) * glyphs.scaleV * (style.baselineOffset() / 1000.0);
 									if (style.fillColor() != CommonStrings::None)
 									{
 										SetColor(style.fillColor(), style.fillShade(), &h, &s, &v, &k, gcr);
@@ -3447,13 +3449,13 @@ bool PSLib::ProcessMasterPageLayer(ScribusDoc* Doc, ScPage* page, ScLayer& layer
 									PS_setlinewidth(Uwid);
 									if (style.effects() & ScStyle_Subscript)
 									{
-										PS_moveto(glyphs->xoffset     , Upos);
-										PS_lineto(glyphs->xoffset+Ulen, Upos);
+										PS_moveto(glyphs.xoffset     , Upos);
+										PS_lineto(glyphs.xoffset+Ulen, Upos);
 									}
 									else
 									{
-										PS_moveto(glyphs->xoffset     , glyphs->yoffset+Upos);
-										PS_lineto(glyphs->xoffset+Ulen, glyphs->yoffset+Upos);
+										PS_moveto(glyphs.xoffset     , glyphs.yoffset+Upos);
+										PS_lineto(glyphs.xoffset+Ulen, glyphs.yoffset+Upos);
 									}
 									putColor(style.fillColor(), style.fillShade(), false);
 									PS_restore();
@@ -3486,7 +3488,7 @@ bool PSLib::ProcessMasterPageLayer(ScribusDoc* Doc, ScPage* page, ScLayer& layer
 								{
 									PS_save();
 									PS_translate(0, -(tsz / 10.0));
-									double Ulen = glyphs->xadvance;
+									double Ulen = glyphs.xadvance;
 									double Upos, Uwid;
 									if ((style.strikethruOffset() != -1) || (style.strikethruWidth() != -1))
 									{
@@ -3505,15 +3507,15 @@ bool PSLib::ProcessMasterPageLayer(ScribusDoc* Doc, ScPage* page, ScLayer& layer
 										Uwid = qMax(style.font().strokeWidth(style.fontSize() / 10.0), 1.0);
 									}
 									if (style.baselineOffset() != 0)
-										Upos += (style.fontSize() / 10.0) * glyphs->scaleV * (style.baselineOffset() / 1000.0);
+										Upos += (style.fontSize() / 10.0) * glyphs.scaleV * (style.baselineOffset() / 1000.0);
 									if (style.fillColor() != CommonStrings::None)
 									{
 										SetColor(style.fillColor(), style.fillShade(), &h, &s, &v, &k, gcr);
 										PS_setcmykcolor_stroke(h / 255.0, s / 255.0, v / 255.0, k / 255.0);
 									}
 									PS_setlinewidth(Uwid);
-									PS_moveto(glyphs->xoffset     , Upos);
-									PS_lineto(glyphs->xoffset+Ulen, Upos);
+									PS_moveto(glyphs.xoffset     , Upos);
+									PS_lineto(glyphs.xoffset+Ulen, Upos);
 									putColor(style.fillColor(), style.fillShade(), false);
 									PS_restore();
 								}
@@ -3523,7 +3525,7 @@ bool PSLib::ProcessMasterPageLayer(ScribusDoc* Doc, ScPage* page, ScLayer& layer
 					}
 					else
 					{
-						uint glyph = glyphs->glyph;
+						uint glyph = glyphs.glyph;
 						PS_selectfont(style.font().replacementName(), tsz / 10.0);
 						PS_save();
 						PutStream( MatrixToStr(1.0, 0.0, 0.0, -1.0, -pdata.PDx, 0.0) + "\n");
@@ -3553,13 +3555,13 @@ bool PSLib::ProcessMasterPageLayer(ScribusDoc* Doc, ScPage* page, ScLayer& layer
 						PutStream("[0.0 0.0 0.0 0.0 0.0 0.0] concatmatrix\nconcat\n");
 						if (ite->BaseOffs != 0)
 							PS_translate(0, -ite->BaseOffs);
-						if (glyphs->xoffset !=0 || glyphs->yoffset != 0)
-							PS_translate(glyphs->xoffset, -glyphs->yoffset);
+						if (glyphs.xoffset !=0 || glyphs.yoffset != 0)
+							PS_translate(glyphs.xoffset, -glyphs.yoffset);
 						if (((style.effects() & ScStyle_Underline) && !SpecialChars::isBreak(chstr)) //FIXME && (chstr != QChar(13)))
 							|| ((style.effects() & ScStyle_UnderlineWords) && !chstr.isSpace() && !SpecialChars::isBreak(chstr)))
 						{
 							PS_save();
-							double Ulen = glyphs->xadvance;
+							double Ulen = glyphs.xadvance;
 							double Upos, Uwid;
 							if ((style.underlineOffset() != -1) || (style.underlineWidth() != -1))
 							{
@@ -3578,7 +3580,7 @@ bool PSLib::ProcessMasterPageLayer(ScribusDoc* Doc, ScPage* page, ScLayer& layer
 								Uwid = qMax(style.font().strokeWidth(style.fontSize() / 10.0), 1.0);
 							}
 							if (style.baselineOffset() != 0)
-								Upos += (style.fontSize() / 10.0) * glyphs->scaleV * (style.baselineOffset() / 1000.0);
+								Upos += (style.fontSize() / 10.0) * glyphs.scaleV * (style.baselineOffset() / 1000.0);
 							if (style.fillColor() != CommonStrings::None)
 							{
 								SetColor(style.fillColor(), style.fillShade(), &h, &s, &v, &k, gcr);
@@ -3587,13 +3589,13 @@ bool PSLib::ProcessMasterPageLayer(ScribusDoc* Doc, ScPage* page, ScLayer& layer
 							PS_setlinewidth(Uwid);
 							if (style.effects() & ScStyle_Subscript)
 							{
-								PS_moveto(glyphs->xoffset     , Upos);
-								PS_lineto(glyphs->xoffset+Ulen, Upos);
+								PS_moveto(glyphs.xoffset     , Upos);
+								PS_lineto(glyphs.xoffset+Ulen, Upos);
 							}
 							else
 							{
-								PS_moveto(glyphs->xoffset     , glyphs->yoffset+Upos);
-								PS_lineto(glyphs->xoffset+Ulen, glyphs->yoffset+Upos);
+								PS_moveto(glyphs.xoffset     , glyphs.yoffset+Upos);
+								PS_lineto(glyphs.xoffset+Ulen, glyphs.yoffset+Upos);
 							}
 							putColor(style.fillColor(), style.fillShade(), false);
 							PS_restore();
@@ -3632,7 +3634,7 @@ bool PSLib::ProcessMasterPageLayer(ScribusDoc* Doc, ScPage* page, ScLayer& layer
 						if ((style.effects() & ScStyle_Strikethrough) && (chstr != SpecialChars::PARSEP))
 						{
 							PS_save();
-							double Ulen = glyphs->xadvance;
+							double Ulen = glyphs.xadvance;
 							double Upos, Uwid;
 							if ((style.strikethruOffset() != -1) || (style.strikethruWidth() != -1))
 							{
@@ -3651,7 +3653,7 @@ bool PSLib::ProcessMasterPageLayer(ScribusDoc* Doc, ScPage* page, ScLayer& layer
 								Uwid = qMax(style.font().strokeWidth(style.fontSize() / 10.0), 1.0);
 							}
 							if (style.baselineOffset() != 0)
-								Upos += (style.fontSize() / 10.0) * glyphs->scaleV * (style.baselineOffset() / 1000.0);
+								Upos += (style.fontSize() / 10.0) * glyphs.scaleV * (style.baselineOffset() / 1000.0);
 							if (style.fillColor() != CommonStrings::None)
 							if (style.fillColor() != CommonStrings::None)
 							{
@@ -3659,8 +3661,8 @@ bool PSLib::ProcessMasterPageLayer(ScribusDoc* Doc, ScPage* page, ScLayer& layer
 								PS_setcmykcolor_stroke(h / 255.0, s / 255.0, v / 255.0, k / 255.0);
 							}
 							PS_setlinewidth(Uwid);
-							PS_moveto(glyphs->xoffset     , Upos);
-							PS_lineto(glyphs->xoffset+Ulen, Upos);
+							PS_moveto(glyphs.xoffset     , Upos);
+							PS_lineto(glyphs.xoffset+Ulen, Upos);
 							putColor(style.fillColor(), style.fillShade(), false);
 							PS_restore();
 						}
@@ -5060,6 +5062,7 @@ void PSLib::SetColor(const ScColor& farb, double shade, int *h, int *s, int *v, 
  */
 void PSLib::setTextSt(ScribusDoc* Doc, PageItem* ite, bool gcr, uint argh, ScPage* pg, bool sep, bool farb, bool ic, bool master)
 {
+	LineControl item;
 //	qDebug() << QString("pslib setTextSt: ownPage=%1 pageNr=%2 OnMasterPage=%3;").arg(ite->OwnPage).arg(pg->pageNr()).arg(ite->OnMasterPage);
 	int tabCc = 0;
 	int savedOwnPage = ite->OwnPage;
@@ -5073,17 +5076,17 @@ void PSLib::setTextSt(ScribusDoc* Doc, PageItem* ite, bool gcr, uint argh, ScPag
 		tabDist += ite->lineWidth() / 2.0;
 
 	for (uint ll=0; ll < ite->textLayout.lines(); ++ll) {
-		LineSpec ls = ite->textLayout.line(ll);
-		tabDist = ls.x;
-		double CurX = ls.x;
+		const LineBox* ls = ite->textLayout.line(ll);
+		tabDist = ls->x();
+		double CurX = ls->x();
 
-		for (int d = ls.firstItem; d <= ls.lastItem; ++d)
+		for (int d = ls->firstChar(); d <= ls->lastChar(); ++d)
 		{
             //ScText *hl = ite->itemText.item_p(d);
             QChar chr = ite->itemText.text(d);
 			const CharStyle & cstyle(ite->itemText.charStyle(d));
 			const ParagraphStyle& pstyle(ite->itemText.paragraphStyle(d));
-			const GlyphLayout* glyphs(ite->itemText.getGlyphs(d));
+			const GlyphLayout glyphs(item.glyphRuns.at(d).glyphs().at(d));
             LayoutFlags flags = ite->itemText.flags(d);
             
 //			if ((hl->ch == QChar(13)) || (hl->ch == QChar(10)) || (hl->ch == QChar(28)) || (hl->ch == QChar(27)) || (hl->ch == QChar(26)))
@@ -5096,17 +5099,17 @@ void PSLib::setTextSt(ScribusDoc* Doc, PageItem* ite, bool gcr, uint argh, ScPag
 			if ((chr == SpecialChars::TAB) && (tTabValues.count() != 0))
 			{
 				QChar tabFillChar;
-				const TabLayout* tabLayout = dynamic_cast<const TabLayout*>(glyphs->more);
-				if (tabLayout)
-					tabFillChar = tabLayout->fillChar;
+				//const TabLayout* tabLayout = dynamic_cast<const TabLayout*>(glyphs->more);
+				//if (tabLayout)
+					//tabFillChar = tabLayout->fillChar;
 				if (!tabFillChar.isNull())
 				{
 					//ScText hl2;
 					//static_cast<CharStyle&>(hl2) = static_cast<const CharStyle&>(*hl);
-					const GlyphLayout * const gl = glyphs->more;
-					double scale = gl ? gl->scaleV : 1.0;
+					const GlyphLayout gl = item.glyphRuns.at(d).glyphs().at(d);
+					double scale =  gl.scaleV ;
 					double wt    = cstyle.font().charWidth(tabFillChar, cstyle.fontSize() * scale / 10.0);
-					double len   = glyphs->xadvance;
+					double len   = glyphs.xadvance;
 					int coun     = static_cast<int>(len / wt);
 					// JG - #6728 : update code according to fillInTabLeaders() and PageItem::layout()
 					double sPos  = 0.0 /*CurX - len + cstyle.fontSize() / 10.0 * 0.7 + 1*/;
@@ -5117,9 +5120,9 @@ void PSLib::setTextSt(ScribusDoc* Doc, PageItem* ite, bool gcr, uint argh, ScPag
 					//hl2.glyph.glyph   = cstyle.font().char2CMap(tabFillChar);
 					//hl2.glyph.yoffset = glyphs->yoffset;
                     
-                    GlyphLayout gl2 = *gl;
+					GlyphLayout gl2 = gl;
                     gl2.glyph   = cstyle.font().char2CMap(tabFillChar);
-                    gl2.yoffset = glyphs->yoffset;
+					gl2.yoffset = glyphs.yoffset;
                     
                     CharStyle shadow(cstyle);
                     shadow.setFillColor(cstyle.strokeColor());
@@ -5139,15 +5142,15 @@ void PSLib::setTextSt(ScribusDoc* Doc, PageItem* ite, bool gcr, uint argh, ScPag
 							GlyphLayout gl3 = gl2;
                             gl3.yoffset = gl2.yoffset - (cstyle.fontSize() * cstyle.shadowYOffset() / 10000.0);
 							gl3.xoffset = gl2.xoffset + (cstyle.fontSize() * cstyle.shadowXOffset() / 10000.0);
-							setTextCh(Doc, ite, CurX, ls.y, gcr, argh, d, tabFillChar, &gl3, shadow, pstyle, pg, sep, farb, ic, master);
+							setTextCh(Doc, ite, CurX, ls->y(), gcr, argh, d, tabFillChar, gl3, shadow, pstyle, pg, sep, farb, ic, master);
 						}
-						setTextCh(Doc, ite, CurX, ls.y, gcr, argh, d, tabFillChar, &gl2, cstyle, pstyle, pg, sep, farb, ic, master);
+						setTextCh(Doc, ite, CurX, ls->y(), gcr, argh, d, tabFillChar, gl2, cstyle, pstyle, pg, sep, farb, ic, master);
 					}
 				}
 				tabCc++;
 			}
 			if (chr == SpecialChars::TAB) {
-				CurX += glyphs->wide();
+				CurX += glyphs.xadvance;
 				continue;
 			}
 			if ((cstyle.effects() & ScStyle_Shadowed) && (cstyle.strokeColor() != CommonStrings::None))
@@ -5156,30 +5159,33 @@ void PSLib::setTextSt(ScribusDoc* Doc, PageItem* ite, bool gcr, uint argh, ScPag
 				//static_cast<CharStyle&>(hl2) = static_cast<const CharStyle&>(*hl);
 				//hl2.ch = chr;
 				//hl2.glyph.glyph = glyphs->glyph;
-				const GlyphLayout *gl1 = glyphs;
-				GlyphLayout* gl2 = new GlyphLayout(*gl1);
-				while (gl1->more)
+				GlyphLayout gl2(glyphs);
+				const GlyphLayout* gl1 = &glyphs;
+				GlyphLayout* glx = &gl2;
+				//GlyphLayout gl2 = new GlyphLayout(*gl1);
+
+				while (gl1)
 				{
-					gl2->more = new GlyphLayout(*gl1->more);
-					gl2->more->yoffset -= (cstyle.fontSize() * cstyle.shadowYOffset() / 10000.0);
-					gl2->more->xoffset += (cstyle.fontSize() * cstyle.shadowXOffset() / 10000.0);
-					gl2->more->more = NULL;
-					gl1 = gl1->more;
-					gl2 = gl2->more;
+					glx = new GlyphLayout(*gl1);
+					glx->yoffset -= (cstyle.fontSize() * cstyle.shadowYOffset() / 10000.0);
+					glx->xoffset += (cstyle.fontSize() * cstyle.shadowXOffset() / 10000.0);
+					//gl2->more->more = NULL;
+					//gl1 = gl1->more;
+					//gl2 = gl2->more;
 				}
                 CharStyle shadowed(cstyle);
 				shadowed.setFillColor(cstyle.strokeColor());
 				shadowed.setFillShade(cstyle.strokeShade());
-				gl2->xadvance = glyphs->xadvance;
-				gl2->yadvance = glyphs->yadvance;
-				gl2->yoffset = glyphs->yoffset - (cstyle.fontSize() * cstyle.shadowYOffset() / 10000.0);
-				gl2->xoffset = glyphs->xoffset + (cstyle.fontSize() * cstyle.shadowXOffset() / 10000.0);
-				gl2->scaleH = glyphs->scaleH;
-				gl2->scaleV = glyphs->scaleV;
+				gl2.xadvance = glyphs.xadvance;
+				gl2.yadvance = glyphs.yadvance;
+				gl2.yoffset = glyphs.yoffset - (cstyle.fontSize() * cstyle.shadowYOffset() / 10000.0);
+				gl2.xoffset = glyphs.xoffset + (cstyle.fontSize() * cstyle.shadowXOffset() / 10000.0);
+				gl2.scaleH = glyphs.scaleH;
+				gl2.scaleV = glyphs.scaleV;
 				
-				setTextCh(Doc, ite, CurX, ls.y, gcr, argh, d, chr, gl2, shadowed, pstyle, pg, sep, farb, ic, master);
+				setTextCh(Doc, ite, CurX, ls->y(), gcr, argh, d, chr, gl2, shadowed, pstyle, pg, sep, farb, ic, master);
 			}
-			setTextCh(Doc, ite, CurX, ls.y, gcr, argh, d, chr, glyphs, cstyle, pstyle, pg, sep, farb, ic, master);
+			setTextCh(Doc, ite, CurX, ls->y(), gcr, argh, d, chr, glyphs, cstyle, pstyle, pg, sep, farb, ic, master);
 			// Unneeded now that glyph xadvance is set appropriately for inline objects by PageItem_TextFrame::layout() - JG
 			/*if (hl->ch == SpecialChars::OBJECT)
 			{
@@ -5187,18 +5193,18 @@ void PSLib::setTextSt(ScribusDoc* Doc, PageItem* ite, bool gcr, uint argh, ScPag
 				CurX += (embedded.getItem()->gWidth + embedded.getItem()->lineWidth()) * glyphs->scaleH;
 			}
 			else*/
-			CurX += glyphs->wide();
+			CurX += glyphs.xadvance;
 			tabDist = CurX;
 		}
 	}
 }
 
-void PSLib::setTextCh(ScribusDoc* Doc, PageItem* ite, double x, double y, bool gcr, uint argh, uint doh, QChar chstr, const GlyphLayout* glyphs, const CharStyle& cstyle, const ParagraphStyle& pstyle, ScPage* pg, bool sep, bool farb, bool ic, bool master)
+void PSLib::setTextCh(ScribusDoc* Doc, PageItem* ite, double x, double y, bool gcr, uint argh, uint doh, QChar chstr, const GlyphLayout glyphs, const CharStyle& cstyle, const ParagraphStyle& pstyle, ScPage* pg, bool sep, bool farb, bool ic, bool master)
 {
 	//QChar chstr = hl->ch;
 	//const CharStyle & cstyle(*hl);
 	//const GlyphLayout* glyphs(&(hl->glyph));
-	uint glyph = glyphs->glyph;
+	uint glyph = glyphs.glyph;
 
 	int h, s, v, k;
 	double tsz;
@@ -5229,7 +5235,7 @@ void PSLib::setTextCh(ScribusDoc* Doc, PageItem* ite, double x, double y, bool g
 	{
 		PageItem* embedded = ite->itemText.object(doh-1);
 		PS_save();
-		PS_translate(x + glyphs->xoffset + embedded->gXpos * (cstyle.scaleH() / 1000.0), (y + glyphs->yoffset - (embedded->gHeight * (cstyle.scaleV() / 1000.0)) + embedded->gYpos * (cstyle.scaleV() / 1000.0)) * -1);
+		PS_translate(x + glyphs.xoffset + embedded->gXpos * (cstyle.scaleH() / 1000.0), (y + glyphs.yoffset - (embedded->gHeight * (cstyle.scaleV() / 1000.0)) + embedded->gYpos * (cstyle.scaleV() / 1000.0)) * -1);
 		if (doh == 0 || ite->itemText.text(doh-1) == SpecialChars::PARSEP)
 		{
 			if ((cstyle.baselineOffset() != 0) && (!pstyle.hasDropCap()))
@@ -5267,7 +5273,7 @@ void PSLib::setTextCh(ScribusDoc* Doc, PageItem* ite, double x, double y, bool g
 			|| ((cstyle.effects() & ScStyle_UnderlineWords) && !chstr.isSpace() && !SpecialChars::isBreak(chstr)))
 		{
 	//		double Ulen = cstyle.font().glyphWidth(glyph, cstyle.fontSize()) * glyphs->scaleH;
-			double Ulen = glyphs->xadvance;
+			double Ulen = glyphs.xadvance;
 			double Upos, lw;
 			if ((cstyle.underlineOffset() != -1) || (cstyle.underlineWidth() != -1))
 			{
@@ -5286,7 +5292,7 @@ void PSLib::setTextCh(ScribusDoc* Doc, PageItem* ite, double x, double y, bool g
 				lw = qMax(cstyle.font().strokeWidth(cstyle.fontSize() / 10.0), 1.0);
 			}
 			if (cstyle.baselineOffset() != 0)
-				Upos += (cstyle.fontSize() / 10.0) * glyphs->scaleV * (cstyle.baselineOffset() / 1000.0);
+				Upos += (cstyle.fontSize() / 10.0) * glyphs.scaleV * (cstyle.baselineOffset() / 1000.0);
 			if (cstyle.fillColor() != CommonStrings::None)
 			{
 				PS_setcapjoin(Qt::FlatCap, Qt::MiterJoin);
@@ -5297,13 +5303,13 @@ void PSLib::setTextCh(ScribusDoc* Doc, PageItem* ite, double x, double y, bool g
 			PS_setlinewidth(lw);
 			if (cstyle.effects() & ScStyle_Subscript)
 			{
-				PS_moveto(x + glyphs->xoffset     , -y - glyphs->yoffset+Upos);
-				PS_lineto(x + glyphs->xoffset+Ulen, -y - glyphs->yoffset+Upos);
+				PS_moveto(x + glyphs.xoffset     , -y - glyphs.yoffset+Upos);
+				PS_lineto(x + glyphs.xoffset+Ulen, -y - glyphs.yoffset+Upos);
 			}
 			else
 			{
-				PS_moveto(x + glyphs->xoffset     , -y + Upos);
-				PS_lineto(x + glyphs->xoffset+Ulen, -y + Upos);
+				PS_moveto(x + glyphs.xoffset     , -y + Upos);
+				PS_lineto(x + glyphs.xoffset+Ulen, -y + Upos);
 			}
 			putColor(cstyle.fillColor(), cstyle.fillShade(), false);
 		}
@@ -5315,20 +5321,20 @@ void PSLib::setTextCh(ScribusDoc* Doc, PageItem* ite, double x, double y, bool g
 				PS_save();
 				if (ite->reversed())
 				{
-					PS_translate(x + glyphs->xoffset, (y + glyphs->yoffset - (tsz / 10.0)) * -1);
+					PS_translate(x + glyphs.xoffset, (y + glyphs.yoffset - (tsz / 10.0)) * -1);
 					PS_scale(-1, 1);
-					PS_translate(-glyphs->xadvance, 0);
+					PS_translate(-glyphs.xadvance, 0);
 				}
 				else
-					PS_translate(x + glyphs->xoffset, (y + glyphs->yoffset - (cstyle.fontSize() / 10.0)) * -1);
+					PS_translate(x + glyphs.xoffset, (y + glyphs.yoffset - (cstyle.fontSize() / 10.0)) * -1);
 				if (cstyle.baselineOffset() != 0)
 					PS_translate(0, (cstyle.fontSize() / 10.0) * (cstyle.baselineOffset() / 1000.0));
-				if (glyphs->scaleH != 1.0)
-					PS_scale(glyphs->scaleH, 1);
-				if (glyphs->scaleV != 1.0)
+				if (glyphs.scaleH != 1.0)
+					PS_scale(glyphs.scaleH, 1);
+				if (glyphs.scaleV != 1.0)
 				{
-					PS_translate(0, -((tsz / 10.0) - (tsz / 10.0) * (glyphs->scaleV)));
-					PS_scale(1, glyphs->scaleV);
+					PS_translate(0, -((tsz / 10.0) - (tsz / 10.0) * (glyphs.scaleV)));
+					PS_scale(1, glyphs.scaleV);
 				}
 				if (cstyle.fillColor() != CommonStrings::None)
 				{
@@ -5342,16 +5348,16 @@ void PSLib::setTextCh(ScribusDoc* Doc, PageItem* ite, double x, double y, bool g
 		{
 			PS_selectfont(cstyle.font().replacementName(), tsz / 10.0);
 			PS_save();
-			PS_translate(x + glyphs->xoffset, -y - glyphs->yoffset);
+			PS_translate(x + glyphs.xoffset, -y - glyphs.yoffset);
 			if (ite->reversed())
 			{
 				PS_scale(-1, 1);
-				PS_translate(glyphs->xadvance, 0);
+				PS_translate(glyphs.xadvance, 0);
 			}
 			if (cstyle.baselineOffset() != 0)
 				PS_translate(0, (cstyle.fontSize() / 10.0) * (cstyle.baselineOffset() / 1000.0));
-			if (glyphs->scaleH != 1.0 || glyphs->scaleV != 1.0)
-				PS_scale(glyphs->scaleH, glyphs->scaleV);
+			if (glyphs.scaleH != 1.0 || glyphs.scaleV != 1.0)
+				PS_scale(glyphs.scaleH, glyphs.scaleV);
 			if (cstyle.fillColor() != CommonStrings::None)
 			{
 				PS_show_xyG(cstyle.font().replacementName(), glyph, 0, 0, cstyle.fillColor(), cstyle.fillShade());
@@ -5365,7 +5371,7 @@ void PSLib::setTextCh(ScribusDoc* Doc, PageItem* ite, double x, double y, bool g
 				FPointArray gly = cstyle.font().glyphOutline(glyph);
 				QTransform chma, chma2, chma3;
 				chma.scale(tsz / 100.0, tsz / 100.0);
-				chma2.scale(glyphs->scaleH, glyphs->scaleV);
+				chma2.scale(glyphs.scaleH, glyphs.scaleV);
 				if (cstyle.baselineOffset() != 0)
 					chma3.translate(0, -(cstyle.fontSize() / 10.0) * (cstyle.baselineOffset() / 1000.0));
 				gly.map(chma * chma2 * chma3);
@@ -5382,8 +5388,8 @@ void PSLib::setTextCh(ScribusDoc* Doc, PageItem* ite, double x, double y, bool g
 					PS_setlinewidth(tsz * cstyle.outlineWidth() / 10000.0);
 					PS_setcapjoin(Qt::FlatCap, Qt::MiterJoin);
 					PS_setdash(Qt::SolidLine, 0, dum);
-					PS_translate(x + glyphs->xoffset, (y + glyphs->yoffset - (tsz / 10.0)) * -1);
-					PS_translate(0, -((tsz / 10.0) - (tsz / 10.0) * glyphs->scaleV));
+					PS_translate(x + glyphs.xoffset, (y + glyphs.yoffset - (tsz / 10.0)) * -1);
+					PS_translate(0, -((tsz / 10.0) - (tsz / 10.0) * glyphs.scaleV));
 					SetColor(cstyle.strokeColor(), cstyle.strokeShade(), &h, &s, &v, &k, gcr);
 					PS_setcmykcolor_stroke(h / 255.0, s / 255.0, v / 255.0, k / 255.0);
 					SetClipPath(&gly);
@@ -5395,8 +5401,8 @@ void PSLib::setTextCh(ScribusDoc* Doc, PageItem* ite, double x, double y, bool g
 		}
 		if ((cstyle.effects() & ScStyle_Strikethrough))//&& (chstr != QChar(13)))
 		{
-			//		double Ulen = cstyle.font().glyphWidth(glyph, cstyle.fontSize()) * glyphs->scaleH;
-			double Ulen = glyphs->xadvance;
+			//		double Ulen = cstyle.font().glyphWidth(glyph, cstyle.fontSize()) * glyphs.scaleH;
+			double Ulen = glyphs.xadvance;
 			double Upos, lw;
 			if ((cstyle.strikethruOffset() != -1) || (cstyle.strikethruWidth() != -1))
 			{
@@ -5415,7 +5421,7 @@ void PSLib::setTextCh(ScribusDoc* Doc, PageItem* ite, double x, double y, bool g
 				lw = qMax(cstyle.font().strokeWidth(cstyle.fontSize() / 10.0), 1.0);
 			}
 			if (cstyle.baselineOffset() != 0)
-				Upos += (cstyle.fontSize() / 10.0) * glyphs->scaleV * (cstyle.baselineOffset() / 1000.0);
+				Upos += (cstyle.fontSize() / 10.0) * glyphs.scaleV * (cstyle.baselineOffset() / 1000.0);
 			if (cstyle.fillColor() != CommonStrings::None)
 			{
 				PS_setcapjoin(Qt::FlatCap, Qt::MiterJoin);
@@ -5424,19 +5430,19 @@ void PSLib::setTextCh(ScribusDoc* Doc, PageItem* ite, double x, double y, bool g
 				PS_setcmykcolor_stroke(h / 255.0, s / 255.0, v / 255.0, k / 255.0);
 			}
 			PS_setlinewidth(lw);
-			PS_moveto(x + glyphs->xoffset     , -y-glyphs->yoffset+Upos);
-			PS_lineto(x + glyphs->xoffset+Ulen, -y-glyphs->yoffset+Upos);
+			PS_moveto(x + glyphs.xoffset     , -y-glyphs.yoffset+Upos);
+			PS_lineto(x + glyphs.xoffset+Ulen, -y-glyphs.yoffset+Upos);
 			putColor(cstyle.fillColor(), cstyle.fillShade(), false);
 		}
 	}
-	if (glyphs->more) {
+	//if (&glyphs) {
 		//// ugly hack until setTextCh interface is changed
 		//ScText hl2(*hl);
 		//hl2.glyph = *glyphs->more;
-		setTextCh(Doc, ite, x + glyphs->xadvance, y, gcr, argh, doh, chstr, glyphs->more, cstyle, pstyle, pg, sep, farb, ic, master);
+		setTextCh(Doc, ite, x + glyphs.xadvance, y, gcr, argh, doh, chstr, glyphs, cstyle, pstyle, pg, sep, farb, ic, master);
 		//// don't let hl2's destructor delete these!
 		//hl2.glyph.more = 0;
-	}
+	//}
 /*	if (cstyle.effects() & ScStyle_SoftHyphenVisible)
 	{
 		int chs = cstyle.fontSize();
