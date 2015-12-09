@@ -10,7 +10,7 @@ for which a new license (GPL+exception) is in place.
 #include <QPointF>
 #include <QRectF>
 #include <QStack>
-
+#include <pageitem_textframe.cpp>
 #include "cmsettings.h"
 #include "commonstrings.h"
 #include "pageitem.h"
@@ -496,7 +496,7 @@ void ScPageOutput::drawItem_Post( PageItem* item, ScPainterExBase* painter )
 	painter->restore();
 }
 
-void ScPageOutput::drawGlyphs(PageItem* item, ScPainterExBase *painter, const CharStyle& style, GlyphLayout& glyphs, const QRect& clip)
+void ScPageOutput::drawGlyphs(PageItem* item, ScPainterExBase *painter, const CharStyle& style, GlyphLayout glyphs, const QRect& clip)
 {
 	uint glyph = glyphs.glyph;
 	if (glyph == (ScFace::CONTROL_GLYPHS + SpecialChars::NBSPACE.unicode())) // NBSPACE
@@ -506,11 +506,11 @@ void ScPageOutput::drawGlyphs(PageItem* item, ScPainterExBase *painter, const Ch
 	
 	if (glyph >= ScFace::CONTROL_GLYPHS)
 	{
-		if (glyphs.more)
-		{
+		//if (glyphs)
+		//{
 			painter->translate(glyphs.xadvance, 0);
-			drawGlyphs(item, painter, style, *glyphs.more, clip);
-		}
+			drawGlyphs(item, painter, style, glyphs, clip);
+		//}
 		return;
 	}
 	
@@ -642,11 +642,11 @@ void ScPageOutput::drawGlyphs(PageItem* item, ScPainterExBase *painter, const Ch
 		painter->setFillMode(1);
 		painter->drawRect(glyphs.xoffset, glyphs.yoffset - (style.fontSize() / 10.0) * glyphs.scaleV , (style.fontSize() / 10.0) * glyphs.scaleH, (style.fontSize() / 10.0) * glyphs.scaleV);
 	}*/
-	if (glyphs.more)
-	{
+	//if (glyphs)
+	//{
 		painter->translate(glyphs.xadvance, 0);
-		drawGlyphs(item, painter, style, *glyphs.more, clip);
-	}
+		drawGlyphs(item, painter, style, glyphs, clip);
+	//}
 }
 
 void ScPageOutput::drawItem_Embedded( PageItem* item, ScPainterExBase *p, const QRect& clip, const CharStyle& style, PageItem* cembedded)
@@ -1067,6 +1067,7 @@ void ScPageOutput::drawItem_Line( PageItem_Line* item, ScPainterExBase* painter,
 
 void ScPageOutput::drawItem_PathText( PageItem_PathText* item, ScPainterExBase* painter, const QRect& clip )
 {
+	LineControl lincont;
 	QString chstr;
 	//ScText *hl;
 	FPoint point = FPoint(0, 0);
@@ -1110,20 +1111,21 @@ void ScPageOutput::drawItem_PathText( PageItem_PathText* item, ScPainterExBase* 
 	}
 	for (int a = 0; a < itemText.length(); ++a)
 	{
-        GlyphLayout* glyphs = itemText.getGlyphs(a);
+		GlyphLayout glyphs = lincont.glyphRuns.at(a).glyphs().at(a);
         chstr =itemText.text(a,1);
 		if (chstr[0] == SpecialChars::PAGENUMBER || chstr[0] == SpecialChars::PARSEP || chstr[0] == SpecialChars::PAGECOUNT
 			|| chstr[0] == SpecialChars::TAB || chstr == SpecialChars::LINEBREAK)
 			continue;
 		if (a < itemText.length()-1)
 			chstr += itemText.text(a+1, 1);
-        glyphs->yadvance = 0;
-        item->layoutGlyphs(itemText.charStyle(a), chstr, itemText.flags(a), *glyphs);
-        glyphs->shrink();
+		glyphs.yadvance = 0;
+		GlyphRun runs = lincont.glyphRuns.at(a);
+		item->layoutGlyphs(chstr,runs);
+		//glyphs->shrink();
         if (item->itemText.hasObject(a))
-            totalTextLen += (item->itemText.object(a)->width() + item->itemText.object(a)->lineWidth()) * glyphs->scaleH;
+			totalTextLen += (item->itemText.object(a)->width() + item->itemText.object(a)->lineWidth()) * glyphs.scaleH;
 		else
-            totalTextLen += glyphs->wide()+itemText.charStyle(a).fontSize() * itemText.charStyle(a).tracking() / 10000.0;
+			totalTextLen += glyphs.xadvance+itemText.charStyle(a).fontSize() * itemText.charStyle(a).tracking() / 10000.0;
 	}
 	for (int segs = 0; segs < item->PoLine.size()-3; segs += 4)
 	{
@@ -1148,7 +1150,7 @@ void ScPageOutput::drawItem_PathText( PageItem_PathText* item, ScPainterExBase* 
 	int currPathIndex = 0;
 	for (int a = item->firstInFrame(); a < itemText.length(); ++a)
 	{
-        GlyphLayout* glyphs = itemText.getGlyphs(a);
+		GlyphLayout glyphs = lincont.glyphRuns.at(a).glyphs().at(a);
         PathData* pdata = &(item->textLayout.point(a));
         
         chstr = itemText.text(a,1);
@@ -1157,14 +1159,15 @@ void ScPageOutput::drawItem_PathText( PageItem_PathText* item, ScPainterExBase* 
 			continue;
 		if (a < itemText.length()-1)
 			chstr += itemText.text(a+1, 1);
-        glyphs->yadvance = 0;
-        item->layoutGlyphs(itemText.charStyle(a), chstr, itemText.flags(a), *glyphs);
-        glyphs->shrink();                                                           // HACK
+		glyphs.yadvance = 0;
+		GlyphRun runs = lincont.glyphRuns.at(a);
+		item->layoutGlyphs(chstr, runs);
+		//glyphs->shrink();                                                           // HACK
 		// Unneeded now that glyph xadvance is set appropriately for inline objects by PageItem_TextFrame::layout() - JG
 		/*if (hl->hasObject())
 			dx = (hl->embedded.getItem()->gWidth + hl->embedded.getItem()->lineWidth()) * hl->glyph.scaleH / 2.0;
 		else*/
-        dx = glyphs->wide() / 2.0;
+		dx = glyphs.xadvance / 2.0;
 
 		CurX += dx;
 
@@ -1188,7 +1191,7 @@ void ScPageOutput::drawItem_PathText( PageItem_PathText* item, ScPainterExBase* 
 		point = FPoint(currPoint.x(), currPoint.y());
 
         //hl = itemText.item_p(a);
-        glyphs->xoffset = 0;
+		glyphs.xoffset = 0;
 		pdata->PtransX = point.x();
 		pdata->PtransY = point.y();
 		pdata->PRot    = currAngle * M_PI / 180.0;
@@ -1234,15 +1237,15 @@ void ScPageOutput::drawItem_PathText( PageItem_PathText* item, ScPainterExBase* 
         if (itemText.hasObject(a))
             drawItem_Embedded(itemText.object(a), painter, clip, itemText.charStyle(a), itemText.object(a));
 		else
-            drawGlyphs(item, painter, itemText.charStyle(a), *glyphs, clip);
+			drawGlyphs(item, painter, itemText.charStyle(a), glyphs, clip);
 
 		painter->setWorldMatrix(savWM);
 		painter->restore();
 		CurX -= dx;
         if (itemText.hasObject(a))
-            CurX += (itemText.object(a)->width() + itemText.object(a)->lineWidth()) * glyphs->scaleH;
+			CurX += (itemText.object(a)->width() + itemText.object(a)->lineWidth()) * glyphs.scaleH;
 		else
-            CurX += glyphs->wide()+itemText.charStyle(a).fontSize() * itemText.charStyle(a).tracking() / 10000.0 + extraOffset;
+			CurX += glyphs.xadvance+itemText.charStyle(a).fontSize() * itemText.charStyle(a).tracking() / 10000.0 + extraOffset;
 	}
 }
 
@@ -1580,6 +1583,7 @@ void ScPageOutput::drawItem_Spiral( PageItem_Spiral* item, ScPainterExBase* pain
 
 void ScPageOutput::drawItem_TextFrame( PageItem_TextFrame* item, ScPainterExBase* painter, const QRect& clip )
 {
+	LineControl lincon;
 	QTransform wm;
 	QPoint pt1, pt2;
 	FPoint ColBound;
@@ -1628,11 +1632,11 @@ void ScPageOutput::drawItem_TextFrame( PageItem_TextFrame* item, ScPainterExBase
 
 		for (uint ll=0; ll < item->textLayout.lines(); ++ll)
 		{
-			LineSpec ls = item->textLayout.line(ll);
-			double CurX = ls.x;
-			for (a = ls.firstItem; a <= ls.lastItem; ++a)
+			const LineBox* ls = item->textLayout.line(ll);
+			double CurX = ls->x();
+			for (a = ls->firstChar(); a <= ls->lastChar(); ++a)
 			{
-                GlyphLayout* glyphs = item->itemText.getGlyphs(a);
+				GlyphLayout glyphs = lincon.glyphRuns.at(a).glyphs().at(a);
 				const CharStyle& charStyle  = item->itemText.charStyle(a);
 
 				if (charStyle.fillColor() != CommonStrings::None)
@@ -1656,21 +1660,21 @@ void ScPageOutput::drawItem_TextFrame( PageItem_TextFrame* item, ScPainterExBase
 						ScColorShade tmp(m_doc->PageColors[charStyle.strokeColor()], (int) charStyle.strokeShade());
 						painter->setPen(tmp, 1, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
 					}
-					if (e2.intersects(wm.mapRect(QRect(qRound(CurX + glyphs->xoffset),qRound(ls.y + glyphs->yoffset-asce), qRound(glyphs->xadvance+1), qRound(asce+desc)))))
+					if (e2.intersects(wm.mapRect(QRect(qRound(CurX + glyphs.xoffset),qRound(ls->y() + glyphs.yoffset-asce), qRound(glyphs.xadvance+1), qRound(asce+desc)))))
 					{
 						painter->save();
-						painter->translate(CurX, ls.y);
+						painter->translate(CurX, ls->y());
                         if (item->itemText.hasObject(a))
                             drawItem_Embedded(item, painter, clip, charStyle, item->itemText.object(a));
 						else
-                            drawGlyphs(item, painter, charStyle, *glyphs, clip);
+							drawGlyphs(item, painter, charStyle, glyphs, clip);
 						painter->restore();
 					}
 					// Unneeded now that glyph xadvance is set appropriately for inline objects by PageItem_TextFrame::layout() - JG
 					/*if (hl->hasObject())
 						CurX += (hl->embedded.getItem()->gWidth + hl->embedded.getItem()->lineWidth());
 					else*/
-                    CurX += glyphs->wide();
+					CurX += glyphs.xadvance;
 				}
 			}
 		}
