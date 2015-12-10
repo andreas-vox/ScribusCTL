@@ -3177,7 +3177,7 @@ void ScribusView::FromPathText()
 
 void ScribusView::TextToPath()
 {
-	LineControl item;
+	const GlyphBox* item = firstFrame->asTextFrame()->m_gb;
 	if (Doc->appMode == modeEditClip)
 		requestMode(submodeEndNodeEdit);
 	Selection tmpSelection(this, false);
@@ -3243,7 +3243,7 @@ void ScribusView::TextToPath()
 					//ScText * hl = currItem->asPathText()->itemRenderText.item_p(a);
 					const CharStyle& charStyle(currItem->asPathText()->itemRenderText.charStyle(a));
 					const PathData& pdata(currItem->textLayout.point(a));
-					const GlyphLayout glyphs =item.glyphRuns.at(a).glyphs().at(a);
+					const GlyphLayout glyphs =item->glyphs.glyphs().at(a);
 					LayoutFlags flags = currItem->asPathText()->itemRenderText.flags(a);
 					
 					chstr = currItem->asPathText()->itemRenderText.text(a,1);
@@ -3546,7 +3546,7 @@ void ScribusView::TextToPath()
 						pts.resize(0);
 						x = 0.0;
 						y = 0.0;
-						GlyphLayout glyphs = item.glyphRuns.at(a).glyphs().at(a);
+						GlyphLayout glyphs = item->glyphs.glyphs().at(a);
 						const CharStyle& charStyle(currItem->itemText.charStyle(a));
 
 						chstr = currItem->itemText.text(a,1);

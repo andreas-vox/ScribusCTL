@@ -1146,7 +1146,7 @@ QDomElement SVGExPlug::processImageItem(PageItem *Item, QString trans, QString f
 
 QDomElement SVGExPlug::processTextItem(PageItem *Item, QString trans, QString fill, QString stroke)
 {
-	LineControl lincon;
+	const GlyphBox* lincon = Item->asTextFrame()->m_gb ;
 	QDomElement ob;
 	ob = docu.createElement("g");
 	ob.setAttribute("transform", trans);
@@ -1180,7 +1180,7 @@ QDomElement SVGExPlug::processTextItem(PageItem *Item, QString trans, QString fi
 			y = 0.0;
 			//ScText * hl = Item->itemText.item_p(a);
 			const CharStyle& charStyle(Item->itemText.charStyle(a));
-			const GlyphLayout glyphs = lincon.glyphRuns.at(a).glyphs().at(a);
+			const GlyphLayout glyphs = lincon->glyphs.glyphs().at(a);
             PageItem* embItem = Item->itemText.hasObject(a)? Item->itemText.object(a) : NULL;
             LayoutFlags flags = Item->itemText.flags(a);
             
@@ -1394,7 +1394,7 @@ QDomElement SVGExPlug::processTextItem(PageItem *Item, QString trans, QString fi
 
 QDomElement SVGExPlug::processPathTextItem(PageItem *Item, QString trans, QString stroke)
 {
-	LineControl lincon;
+	const GlyphBox* lincon = Item->asTextFrame()->m_gb;
 	QDomElement ob;
 	ob = docu.createElement("g");
 	ob.setAttribute("transform", trans);
@@ -1428,7 +1428,7 @@ QDomElement SVGExPlug::processPathTextItem(PageItem *Item, QString trans, QStrin
 	{
 		//ScText *hl = Item->asPathText()->itemRenderText.item_p(a);
 		const CharStyle& charStyle(Item->asPathText()->itemRenderText.charStyle(a));
-		const GlyphLayout glyphs = lincon.glyphRuns.at(a).glyphs().at(a);
+		const GlyphLayout glyphs = lincon->glyphs.glyphs().at(a);
         const PathData* pdata = &(Item->textLayout.point(a));
         PageItem* embItem = Item->itemText.hasObject(a)? Item->itemText.object(a) : NULL;
         LayoutFlags flags = Item->itemText.flags(a);

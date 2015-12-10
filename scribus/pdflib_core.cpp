@@ -164,6 +164,8 @@ PDFLibCore::PDFLibCore(ScribusDoc & docu)
 		progressDialog->addExtraProgressBars(barNames, barTexts, barsNumeric);
 		connect(progressDialog, SIGNAL(canceled()), this, SLOT(cancelRequested()));
 	}
+
+
 }
 
 PDFLibCore::~PDFLibCore()
@@ -177,7 +179,7 @@ static inline QByteArray FToStr(double c)
 	if (fabs(c) < 0.0000001)
 		v = 0.0;
 	return QByteArray::number(v, 'f', 5);
-};
+}
 
 bool PDFLibCore::PDF_IsPDFX()
 {
@@ -5384,10 +5386,10 @@ QByteArray PDFLibCore::setTextSt(PageItem *ite, uint PNr, const ScPage* pag)
 			const LineBox* ls = ite->textLayout.line(ll);
 			tabDist = ls->x();
 			double CurX = ls->x();
-			LineControl* item;
+			const GlyphBox* item = ite->asTextFrame()->m_gb ;//= new GlyphBox();
 			for (int d = ls->firstChar(); d <= ls->lastChar(); ++d)
 			{
-				const GlyphLayout glyphs = item->glyphRuns.at(d).glyphs().at(d);
+				const GlyphLayout glyphs = item->glyphs.glyphs().at(d);//item->glyphRuns.at(d).glyphs().at(d);
 				PathData* pdata = &straightPath;
 				const QChar ch = ite->itemText.text(d);
 				const CharStyle& chstyle(ite->itemText.charStyle(d));
@@ -5499,10 +5501,10 @@ QByteArray PDFLibCore::setTextSt(PageItem *ite, uint PNr, const ScPage* pag)
 		ite->asPathText()->layout();
 		ite->OwnPage = savedOwnPage;
 		double CurX = 0;
-		LineControl item;
+		const GlyphBox* item = ite->asTextFrame()->m_gb;
 		for (int d = 0; d < ite->maxCharsInFrame(); ++d)
 		{
-			GlyphLayout glyphs = item.glyphRuns.at(d).glyphs().at(d);
+			GlyphLayout glyphs = item->glyphs.glyphs().at(d);//item.glyphRuns.at(d).glyphs().at(d);
 			PathData* pdata = &ite->textLayout.point(d);
 			const QChar ch = ite->asPathText()->itemRenderText.text(d);
 			const CharStyle& chstyle(ite->asPathText()->itemRenderText.charStyle(d));

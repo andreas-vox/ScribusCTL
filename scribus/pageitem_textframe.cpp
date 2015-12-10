@@ -76,6 +76,20 @@ PageItem_TextFrame::PageItem_TextFrame(ScribusDoc *pa, double x, double y, doubl
 	m_origAnnotPos = QRectF(xPos(), yPos(), width(), height());
 	verticalAlign = 0;
 	connect(&itemText,SIGNAL(changed()), this, SLOT(slotInvalidateLayout()));
+	const LineBox* linebox;
+	for (uint ll=0; ll < textLayout.lines(); ++ll)
+	{
+		linebox = textLayout.line(ll);
+		const GlyphBox* glyphbox;
+		for (int i = 0; i < linebox->boxes().count(); ++i)
+
+		{
+			glyphbox = dynamic_cast<const GlyphBox*>(linebox->boxes()[i]);
+		}
+		m_gb = glyphbox;
+	}
+
+
 }
 
 PageItem_TextFrame::PageItem_TextFrame(const PageItem & p) : PageItem(p)
@@ -89,6 +103,18 @@ PageItem_TextFrame::PageItem_TextFrame(const PageItem & p) : PageItem(p)
 	m_origAnnotPos = QRectF(xPos(), yPos(), width(), height());
 	verticalAlign = 0;
 	connect(&itemText,SIGNAL(changed()), this, SLOT(slotInvalidateLayout()));
+	const LineBox* linebox;
+	for (uint ll=0; ll < textLayout.lines(); ++ll)
+	{
+		linebox = textLayout.line(ll);
+	}
+	const GlyphBox* glyphbox;
+	for (int i = 0; i < linebox->boxes().count(); ++i)
+
+	{
+		glyphbox = dynamic_cast<const GlyphBox*>(linebox->boxes()[i]);
+	}
+	m_gb = glyphbox;
 }
 
 static QRegion itemShape(PageItem* docItem, double xOffset, double yOffset)
@@ -3326,6 +3352,7 @@ void PageItem_TextFrame::DrawObj_Item(ScPainter *p, QRectF cullingArea)
 			QColor tmp;
 			const GlyphBox* glyphbox;
 			for (int i = 0; i < linebox->boxes().count(); ++i)
+
 			{
 				glyphbox = dynamic_cast<const GlyphBox*>(linebox->boxes()[i]);
 				if (!isEmbedded && !cullingArea.intersects(pf2.mapRect(QRectF(glyphbox->x(), glyphbox->y() - glyphbox->ascent(), glyphbox->width(), glyphbox->height()))))
@@ -3415,7 +3442,9 @@ void PageItem_TextFrame::DrawObj_Item(ScPainter *p, QRectF cullingArea)
 					//CurX += glyphs->wide();
 				}
 			}
+		m_gb = glyphbox;
 		}
+
 	//	else {
 	//		//		qDebug("skipping textframe: len=%d", itemText.count());
 	//	}

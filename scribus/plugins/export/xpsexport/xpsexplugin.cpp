@@ -806,7 +806,7 @@ void XPSExPlug::processImageItem(double xOffset, double yOffset, PageItem *Item,
 
 void XPSExPlug::processTextItem(double xOffset, double yOffset, PageItem *Item, QDomElement &parentElem, QDomElement &rel_root)
 {
-	LineControl lincon;
+	const GlyphBox* lincon = Item->asTextFrame()->m_gb;
 	if (Item->isAnnotation())
 		return;
 	if (Item->GrType == 14)
@@ -892,7 +892,7 @@ void XPSExPlug::processTextItem(double xOffset, double yOffset, PageItem *Item, 
 			//ScText *hl = Item->itemText.item_p(a);
 			QChar chr = Item->itemText.text(a);
 			CharStyle charStyle = Item->itemText.charStyle(a);
-			GlyphLayout glyphs = lincon.glyphRuns.at(a).glyphs().at(a);
+			GlyphLayout glyphs = lincon->glyphs.glyphs().at(a);
 			LayoutFlags flags = Item->itemText.flags(a);
 			const ScFace* font = &charStyle.font();
 			txtRunItem txItem;
@@ -1209,7 +1209,7 @@ void XPSExPlug::processTextItem(double xOffset, double yOffset, PageItem *Item, 
 
 void XPSExPlug::processPathTextItem(double xOffset, double yOffset, PageItem *Item, QDomElement &parentElem, QDomElement &rel_root)
 {
-	LineControl lincon;
+	const GlyphBox* lincon = Item->asTextFrame()->m_gb;
 	QDomElement grp = p_docu.createElement("Canvas");
 	QTransform mpx;
 	mpx.translate(xOffset * conversionFactor, yOffset * conversionFactor);
@@ -1272,7 +1272,7 @@ void XPSExPlug::processPathTextItem(double xOffset, double yOffset, PageItem *It
 		//ScText *hl = Item->asPathText()->itemRenderText.item_p(a);
 		const CharStyle& charStyle(Item->asPathText()->itemRenderText.charStyle(a));
 		const PathData* pdata = &(Item->asPathText()->textLayout.point(a));
-		const GlyphLayout glyphs = lincon.glyphRuns.at(a).glyphs().at(a);
+		const GlyphLayout glyphs = lincon->glyphs.glyphs().at(a);
 		PageItem* embItem = Item->asPathText()->itemRenderText.hasObject(a)?
 		                    Item->asPathText()->itemRenderText.object(a) : NULL;
 		

@@ -1067,7 +1067,7 @@ void ScPageOutput::drawItem_Line( PageItem_Line* item, ScPainterExBase* painter,
 
 void ScPageOutput::drawItem_PathText( PageItem_PathText* item, ScPainterExBase* painter, const QRect& clip )
 {
-	LineControl lincont;
+	const GlyphBox* lincont = item->asTextFrame()->m_gb;
 	QString chstr;
 	//ScText *hl;
 	FPoint point = FPoint(0, 0);
@@ -1111,7 +1111,7 @@ void ScPageOutput::drawItem_PathText( PageItem_PathText* item, ScPainterExBase* 
 	}
 	for (int a = 0; a < itemText.length(); ++a)
 	{
-		GlyphLayout glyphs = lincont.glyphRuns.at(a).glyphs().at(a);
+		GlyphLayout glyphs = lincont->glyphs.glyphs().at(a);
         chstr =itemText.text(a,1);
 		if (chstr[0] == SpecialChars::PAGENUMBER || chstr[0] == SpecialChars::PARSEP || chstr[0] == SpecialChars::PAGECOUNT
 			|| chstr[0] == SpecialChars::TAB || chstr == SpecialChars::LINEBREAK)
@@ -1119,7 +1119,7 @@ void ScPageOutput::drawItem_PathText( PageItem_PathText* item, ScPainterExBase* 
 		if (a < itemText.length()-1)
 			chstr += itemText.text(a+1, 1);
 		glyphs.yadvance = 0;
-		GlyphRun runs = lincont.glyphRuns.at(a);
+		GlyphRun runs = lincont->glyphs;
 		item->layoutGlyphs(chstr,runs);
 		//glyphs->shrink();
         if (item->itemText.hasObject(a))
@@ -1150,7 +1150,7 @@ void ScPageOutput::drawItem_PathText( PageItem_PathText* item, ScPainterExBase* 
 	int currPathIndex = 0;
 	for (int a = item->firstInFrame(); a < itemText.length(); ++a)
 	{
-		GlyphLayout glyphs = lincont.glyphRuns.at(a).glyphs().at(a);
+		GlyphLayout glyphs = lincont->glyphs.glyphs().at(a);
         PathData* pdata = &(item->textLayout.point(a));
         
         chstr = itemText.text(a,1);
@@ -1160,7 +1160,7 @@ void ScPageOutput::drawItem_PathText( PageItem_PathText* item, ScPainterExBase* 
 		if (a < itemText.length()-1)
 			chstr += itemText.text(a+1, 1);
 		glyphs.yadvance = 0;
-		GlyphRun runs = lincont.glyphRuns.at(a);
+		GlyphRun runs = lincont->glyphs;
 		item->layoutGlyphs(chstr, runs);
 		//glyphs->shrink();                                                           // HACK
 		// Unneeded now that glyph xadvance is set appropriately for inline objects by PageItem_TextFrame::layout() - JG
@@ -1583,7 +1583,7 @@ void ScPageOutput::drawItem_Spiral( PageItem_Spiral* item, ScPainterExBase* pain
 
 void ScPageOutput::drawItem_TextFrame( PageItem_TextFrame* item, ScPainterExBase* painter, const QRect& clip )
 {
-	LineControl lincon;
+	const GlyphBox* lincon = item->asTextFrame()->m_gb;
 	QTransform wm;
 	QPoint pt1, pt2;
 	FPoint ColBound;
@@ -1636,7 +1636,7 @@ void ScPageOutput::drawItem_TextFrame( PageItem_TextFrame* item, ScPainterExBase
 			double CurX = ls->x();
 			for (a = ls->firstChar(); a <= ls->lastChar(); ++a)
 			{
-				GlyphLayout glyphs = lincon.glyphRuns.at(a).glyphs().at(a);
+				GlyphLayout glyphs = lincon->glyphs.glyphs().at(a);
 				const CharStyle& charStyle  = item->itemText.charStyle(a);
 
 				if (charStyle.fillColor() != CommonStrings::None)

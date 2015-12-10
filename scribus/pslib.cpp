@@ -1668,7 +1668,7 @@ int PSLib::CreatePS(ScribusDoc* Doc, PrintOptions &options)
 
 bool PSLib::ProcessItem(ScribusDoc* Doc, ScPage* a, PageItem* c, uint PNr, bool sep, bool farb, bool ic, bool gcr, bool master, bool embedded, bool useTemplate)
 {
-	LineControl item;
+	const GlyphBox* item = c->asTextFrame()->m_gb;
 	double tsz;
 	int h, s, v, k;
 	int d;
@@ -2173,7 +2173,7 @@ bool PSLib::ProcessItem(ScribusDoc* Doc, ScPage* a, PageItem* c, uint PNr, bool 
                 
                 const CharStyle & style(c->asPathText()->itemRenderText.charStyle(d));
 				const PathData& pdata(c->textLayout.point(d));
-				const GlyphLayout glyphs(item.glyphRuns.at(d).glyphs().at(d));
+				const GlyphLayout glyphs(item->glyphs.glyphs().at(d));
                 PageItem* embItem = c->asPathText()->itemRenderText.hasObject(d)?
                                           c->asPathText()->itemRenderText.object(d) : NULL;
                 
@@ -2910,7 +2910,7 @@ void PSLib::ProcessPage(ScribusDoc* Doc, ScPage* a, uint PNr, bool sep, bool far
 
 bool PSLib::ProcessMasterPageLayer(ScribusDoc* Doc, ScPage* page, ScLayer& layer, uint PNr, bool sep, bool farb, bool ic, bool gcr)
 {
-	LineControl item;
+	const GlyphBox* item;
 	bool success = true;
 	int h, s, v, k;
 	QVector<double> dum;
@@ -3287,7 +3287,8 @@ bool PSLib::ProcessMasterPageLayer(ScribusDoc* Doc, ScPage* page, ScLayer& layer
 					if ((chstr == QChar(13)) || (chstr == QChar(30)) || (chstr == QChar(9)) || (chstr == QChar(28)))
 						continue;
                     const PathData& pdata(ite->textLayout.point(d));
-					const GlyphLayout glyphs(item.glyphRuns.at(d).glyphs().at(d));
+					item = ite->asTextFrame()->m_gb;
+					const GlyphLayout glyphs(item->glyphs.glyphs().at(d));
                     PageItem* embItem = ite->asPathText()->itemRenderText.hasObject(d)?
                                               ite->asPathText()->itemRenderText.object(d) : NULL;
                     
@@ -5062,7 +5063,7 @@ void PSLib::SetColor(const ScColor& farb, double shade, int *h, int *s, int *v, 
  */
 void PSLib::setTextSt(ScribusDoc* Doc, PageItem* ite, bool gcr, uint argh, ScPage* pg, bool sep, bool farb, bool ic, bool master)
 {
-	LineControl item;
+	const GlyphBox* item = ite->asTextFrame()->m_gb;
 //	qDebug() << QString("pslib setTextSt: ownPage=%1 pageNr=%2 OnMasterPage=%3;").arg(ite->OwnPage).arg(pg->pageNr()).arg(ite->OnMasterPage);
 	int tabCc = 0;
 	int savedOwnPage = ite->OwnPage;
@@ -5086,7 +5087,7 @@ void PSLib::setTextSt(ScribusDoc* Doc, PageItem* ite, bool gcr, uint argh, ScPag
             QChar chr = ite->itemText.text(d);
 			const CharStyle & cstyle(ite->itemText.charStyle(d));
 			const ParagraphStyle& pstyle(ite->itemText.paragraphStyle(d));
-			const GlyphLayout glyphs(item.glyphRuns.at(d).glyphs().at(d));
+			const GlyphLayout glyphs(item->glyphs.glyphs().at(d));
             LayoutFlags flags = ite->itemText.flags(d);
             
 //			if ((hl->ch == QChar(13)) || (hl->ch == QChar(10)) || (hl->ch == QChar(28)) || (hl->ch == QChar(27)) || (hl->ch == QChar(26)))
@@ -5106,7 +5107,7 @@ void PSLib::setTextSt(ScribusDoc* Doc, PageItem* ite, bool gcr, uint argh, ScPag
 				{
 					//ScText hl2;
 					//static_cast<CharStyle&>(hl2) = static_cast<const CharStyle&>(*hl);
-					const GlyphLayout gl = item.glyphRuns.at(d).glyphs().at(d);
+					const GlyphLayout gl = item->glyphs.glyphs().at(d);
 					double scale =  gl.scaleV ;
 					double wt    = cstyle.font().charWidth(tabFillChar, cstyle.fontSize() * scale / 10.0);
 					double len   = glyphs.xadvance;
