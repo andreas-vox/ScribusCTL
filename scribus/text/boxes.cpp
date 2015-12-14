@@ -88,11 +88,6 @@ Box* GroupBox::addBox(uint i)
 	return result;
 }
 
-
-Box*GroupBox::removeBox(uint i){
-	delete m_lines->boxes().at(i);
-}
-
 /*
 GlyphBox::GlyphBox(const GlyphRun& glyphrun)
 {
