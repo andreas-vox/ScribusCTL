@@ -94,6 +94,11 @@ GlyphBox::GlyphBox(const GlyphRun& glyphrun)
 	m_type = T_Glyphs;
 }
 */
+Box* GroupBox::removeBox(uint i)
+{
+	delete m_lines->boxes().at(i);
+	return m_lines;
+}
 
 int GlyphBox::pointToPosition(FPoint coord) const
 {
