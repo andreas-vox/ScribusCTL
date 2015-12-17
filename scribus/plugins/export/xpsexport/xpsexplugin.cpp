@@ -887,12 +887,18 @@ void XPSExPlug::processTextItem(double xOffset, double yOffset, PageItem *Item, 
 		QList<QList<txtRunItem> > textRuns;
 		QList<txtRunItem> specialText;
 		double CurX = ls->x();
-		for (int a = ls->firstChar(); a <= ls->lastChar(); ++a)
-		{
+		for (int a = 0; a < ls->boxes().length(); ++a)
+			  {
+				  const GlyphBox* box = dynamic_cast<const GlyphBox*> (ls->boxes()[a]);
+				  if (box) {
+					  //const GlyphRun pther = box->glyphs
+					  const GlyphRun glyphss(box->glyphs);
+		//for (int a = ls->firstChar(); a <= ls->lastChar(); ++a)
+		//{
 			//ScText *hl = Item->itemText.item_p(a);
 			QChar chr = Item->itemText.text(a);
 			CharStyle charStyle = Item->itemText.charStyle(a);
-			GlyphLayout glyphs = lincon->glyphs.glyphs().at(a);
+			GlyphLayout glyphs = glyphss.glyphs().at(a);
 			LayoutFlags flags = Item->itemText.flags(a);
 			const ScFace* font = &charStyle.font();
 			txtRunItem txItem;
@@ -954,7 +960,7 @@ void XPSExPlug::processTextItem(double xOffset, double yOffset, PageItem *Item, 
 				current_run.append(txItem);
 			}
 			CurX += txItem.glyphs.xadvance;
-		}
+		}}
 		textRuns.append(current_run);
 		for (int txr = 0; txr < textRuns.count(); txr++)
 		{

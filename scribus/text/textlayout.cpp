@@ -43,7 +43,6 @@ TextLayout::~TextLayout()
 	delete m_lines;
 }
 
-
 uint TextLayout::lines() const
 {
 	return m_lines->boxes().count();

@@ -11,6 +11,7 @@
 
 GroupBox::GroupBox()
 {
+	//m_boxes.append();
 	m_firstChar = 0;
 	m_lastChar = -1;
 }

@@ -78,7 +78,6 @@ public:
 
 protected:
 	friend class FrameControl;
-	
 	StoryText* m_story;
     PageItem* m_frame;
 	GroupBox* m_lines;

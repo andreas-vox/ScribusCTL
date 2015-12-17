@@ -1146,7 +1146,7 @@ QDomElement SVGExPlug::processImageItem(PageItem *Item, QString trans, QString f
 
 QDomElement SVGExPlug::processTextItem(PageItem *Item, QString trans, QString fill, QString stroke)
 {
-	const GlyphBox* lincon = Item->asTextFrame()->m_gb ;
+//	const GlyphBox* lincon = Item->asTextFrame()->m_gb ;
 	QDomElement ob;
 	ob = docu.createElement("g");
 	ob.setAttribute("transform", trans);
@@ -1174,13 +1174,19 @@ QDomElement SVGExPlug::processTextItem(PageItem *Item, QString trans, QString fi
 	{
 		const LineBox* ls = Item->textLayout.line(ll);
 		double CurX = ls->x();
-		for (int a = ls->firstChar(); a <= ls->lastChar(); ++a)
-		{
+		for (int a = 0; a < ls->boxes().length(); ++a)
+			  {
+				  const GlyphBox* box = dynamic_cast<const GlyphBox*> (ls->boxes()[a]);
+				  if (box) {
+					  //const GlyphRun pther = box->glyphs
+					  const GlyphRun glyphss(box->glyphs);
+		//for (int a = ls->firstChar(); a <= ls->lastChar(); ++a)
+		//{
 			x = 0.0;
 			y = 0.0;
 			//ScText * hl = Item->itemText.item_p(a);
 			const CharStyle& charStyle(Item->itemText.charStyle(a));
-			const GlyphLayout glyphs = lincon->glyphs.glyphs().at(a);
+			const GlyphLayout glyphs = glyphss.glyphs().at(a);
             PageItem* embItem = Item->itemText.hasObject(a)? Item->itemText.object(a) : NULL;
             LayoutFlags flags = Item->itemText.flags(a);
             
@@ -1364,7 +1370,7 @@ QDomElement SVGExPlug::processTextItem(PageItem *Item, QString trans, QString fi
 				}
 				CurX += glyphs.xadvance;
 			}
-		}
+		}}
 	}
 	if (Item->NamedLStyle.isEmpty())
 	{

@@ -120,14 +120,17 @@ class GlyphRun
 public:
 	GlyphRun(const CharStyle* style, LayoutFlags flags) : m_style(style), m_flags(flags) {}
 	GlyphRun(const GlyphRun& other) : m_style(other.m_style), m_flags(other.m_flags), m_glyphs(other.m_glyphs) {}
-	
+
 	const CharStyle&         style()  const { return *m_style; }
 	const LayoutFlags&       flags()  const { return m_flags; }
 	LayoutFlags&             flags()        { return m_flags; }
 	bool       hasFlag(LayoutFlags f) const { return (m_flags & f) == f; }
 	void       setFlag(LayoutFlags f)       { m_flags = static_cast<LayoutFlags>(m_flags | f); }
 	void     clearFlag(LayoutFlags f)       { m_flags = static_cast<LayoutFlags>(m_flags & ~f); }
-	
+	void appendGlyph(GlyphLayout glyph)
+	{
+		m_glyphs.append(glyph);
+	}
 	QList<GlyphLayout>       glyphs()       { return m_glyphs; }
 	const QList<GlyphLayout> glyphs() const { return m_glyphs; }
 	

@@ -937,6 +937,7 @@ void PageItem_TextFrame::layout()
 	current.initColumns(columnWidth(), ColGap);
 	current.hyphenCount = 0;
 
+
 	//hold Y position of last computed line of text (with glyphs descent)
 	//for moving next line if glyphs are higher than that
 	double lastLineY = 0;
@@ -3826,6 +3827,7 @@ void PageItem_TextFrame::handleModeEditKey(QKeyEvent *k, bool& keyRepeat)
 					}
 				}
 				itemText.insertChars(QString(QChar(conv)), true);
+
 				if (trans)
 					trans.commit();
 //				Tinput = true;
