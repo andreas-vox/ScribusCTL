@@ -48,13 +48,13 @@ class SCRIBUS_API TextLayout
 public:
 	TextLayout(StoryText* text, PageItem* frame);
 	~TextLayout();
-	
+	void render(ScPainter *p);
 	bool overflows() const;
 	
 	StoryText* story() { return m_story; }
 	const StoryText* story() const { return m_story; }
 	void setStory(StoryText* story);
-
+	void initBoxes(int i);
 	int startOfLine(int pos) const;
 	int endOfLine(int pos) const;
 	int prevLine(int pos) const;
@@ -81,7 +81,7 @@ protected:
 	
 	StoryText* m_story;
     PageItem* m_frame;
-	GroupBox* m_lines;
+	LineBox* m_lines;
 	
 	QVector<PathData> m_path;
 	bool m_validLayout;

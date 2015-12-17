@@ -12,11 +12,13 @@
 #include "fpoint.h"
 #include "frect.h"
 #include "sctextstruct.h"
-
+#include "scpainter.h"
 
 
 /**
- class Box has a similar role as TeX's boxes. Scribus packs glyph runs into GlyphBoxes, GlyphBoxes and InlineBoxes into LineBoxes and LineBoxes into GroupBox(T_Block). (and in the future: math atoms, tables & table cells, ...)
+ class Box has a similar role as TeX's boxes. Scribus packs glyph runs into GlyphBoxes,
+ GlyphBoxes and InlineBoxes into LineBoxes and LineBoxes into GroupBox(T_Block).
+ (and in the future: math atoms, tables & table cells, ...)
  */
 class Box {
 public:
@@ -81,8 +83,7 @@ public:
 	const QList<const Box*>& boxes() const {
 		return reinterpret_cast<const QList<const Box*> & > (m_boxes);
 	}
-	
-	//	virtual void render(ScPainter* p, const RenderOptions& renderOptions) const = 0;
+		//virtual void Render(ScPainter* p, const RenderOptions& RenderOptions);
 	//	virtual qreal naturalWidth() const { return width(); }
 	//	virtual qreal naturalHeight() const { return height(); }
 	//	virtual qreal minWidth() const { return width(); }
@@ -93,7 +94,7 @@ public:
 	//	virtual void  justifyBlock(qreal width) {}
 	//
 	//	virtual QString toString() const = 0;
-	//	virtual void renderPDF(QTextStream &cStr, const QMap<QString, QString>& fontMap) const = 0;
+	//	virtual void RenderPDF(QTextStream &cStr, const QMap<QString, QString>& fontMap) const = 0;
 };
 
 
@@ -111,6 +112,7 @@ public:
 	void addBox(const Box* box);
 	Box* addBox(uint i);
 	Box* removeBox(uint i);
+	void render(ScPainter* p);
 };
 
 
@@ -121,10 +123,11 @@ public:
 	GlyphBox(const CharStyle* style, LayoutFlags flags) : glyphs(style, flags) {m_type = T_Glyphs;}
 	GlyphBox(const GlyphRun& glyphrun) : glyphs(glyphrun) {m_type = T_Glyphs;}
 	GlyphRun glyphs;
-	
+	QList<GlyphLayout> m_glyphs;
 	int pointToPosition(FPoint coord) const;
 	FRect boundingBox(int pos, uint len = 1) const;
 //	QList<const Box*> pathForPos(int pos) const;
+	void render(ScPainter* p);
 };
 
 
@@ -133,7 +136,10 @@ class LineBox : public GroupBox
 public:	
 	LineBox();
 	
+
 	qreal colLeft;
+
+
 };
 
 

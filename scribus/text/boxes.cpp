@@ -31,6 +31,27 @@ int GroupBox::pointToPosition(FPoint coord) const
 	return -1;
 }
 
+GroupBox::render(ScPainter *p)
+{
+	p->moveTo(x(),y());
+ foreach (Box b , boxes())
+ {
+	 b->render(p);
+ }
+	p->moveTo(-x(),-y());
+}
+GlyphBox::render(ScPainter *p)
+{
+	p->save();
+
+	 for (int i = 0; i < glyphs().length(); ++i)
+	 {
+		 render glyph[i] ;
+
+		 p->moveBy( glyph[i].xAdvance, glyph[i].yAdvance);
+	 }
+	 p->restore();
+}
 
 FRect GroupBox::boundingBox(int pos, uint len) const
 {
@@ -70,6 +91,10 @@ void GroupBox::addBox(const Box* box)
 	m_width = newRect.width();
 	m_descent = newRect.height() - m_ascent;
 }
+Box* GroupBox::removeBox(uint i)
+{
+	delete m_lines->boxes().at(i);
+}
 
 Box* GroupBox::addBox(uint i)
 {	m_boxes.removeAt(i);
@@ -99,9 +124,9 @@ int GlyphBox::pointToPosition(FPoint coord) const
 {
 	qreal relX = coord.x() - m_x;
 	qreal xPos = 0.0;
-	for (int i = 0; i < m_gylphs.length(); ++i)
+	for (int i = 0; i < m_glyphs.length(); ++i)
 	{
-		qreal width = m_glyphs[i].xadvance;
+		qreal width = m_glyphs.at(i).xadvance;
 		if (xPos <= relX && relX <= xPos + width)
 		{
 			return m_firstChar + i; // FIXME: use clusters
@@ -114,7 +139,7 @@ int GlyphBox::pointToPosition(FPoint coord) const
 
 FRect GlyphBox::boundingBox(int pos, uint len) const
 {
-	int relPos = firstChar - pos;
+	int relPos = firstChar() - pos;
 	qreal xPos1 = m_x;
 	for (int i = 0; i < relPos - 1; ++i)
 	{
@@ -126,7 +151,7 @@ FRect GlyphBox::boundingBox(int pos, uint len) const
 	{
 		xPos2 += m_glyphs[i].xadvance;
 	}
-	return FRect(xPos1, -descent, xPos2 - xPos1, ascent);
+	return FRect(xPos1, -descent(), xPos2 - xPos1, ascent());
 }
 
 
@@ -134,6 +159,4 @@ LineBox::LineBox()
 {
 	m_type = T_Line;
 }
-
-
 
