@@ -169,7 +169,7 @@ struct LineControl {
 		line.lastChar = 0;
 		line.ascent = 0.0;
 		line.descent = 0.0;
-		line.width = 0.0;
+        line.width = 0.0;
 		line.naturalWidth = 0.0;
 		line.colLeft = colLeft;
 		breakIndex = -1;
@@ -198,7 +198,7 @@ struct LineControl {
 	/// called when a possible break is passed
 	void rememberBreak(int index, double pos, double morespace = 0)
 	{
-		if (pos > colRight - morespace)
+        if (pos > colRight - morespace)
 		{
 			// only look for the first break behind the right edge
 			//maxShrink = 0;
@@ -212,7 +212,7 @@ struct LineControl {
 				if (newLooseness >= oldLooseness)
 					return;
 			}
-		}
+        }
 		breakXPos = pos;
 		breakIndex = index;
 	}
@@ -227,6 +227,7 @@ struct LineControl {
 		{
 			if ( (glyphRuns[j].flags() & ScLayout_SuppressSpace) == 0 )
 				breakXPos += glyphRuns[j].width();
+                //ascend += glyphRuns.at(j).glyphs().at(j).xoffset;
 		}
 		// #8194, #8717 : update line ascent and descent with sensible values
 		// so that endOfLine() returns correct result
@@ -240,8 +241,11 @@ struct LineControl {
 	{
 		line.lastChar = breakIndex;
 		line.naturalWidth = breakXPos - line.x;
-		line.width = endX - line.x;
+        line.width = endX - line.x;
 		maxShrink = maxStretch = 0;
+        while (glyphRuns.count() > breakIndex + 1)
+            glyphRuns.removeLast();
+
 	}
 
 	int restartRow(bool recalcY)
@@ -270,9 +274,9 @@ struct LineControl {
 	{
 		bool res;
 		if (legacy)
-			res = ceil(xPos + lineCorr - maxShrink) + ceil(moreSpace) >= floor(colRight);
+            res = (ceil(xPos + lineCorr - maxShrink) + ceil(moreSpace)) >= floor(colRight);
 		else
-			res = ceil(xPos - maxShrink)  + ceil(moreSpace) >= floor(colRight);
+            res =( ceil(xPos - maxShrink)  + ceil(moreSpace)) >= floor(colRight);
 		return res;
 	}
 
@@ -537,16 +541,17 @@ struct LineControl {
 	{
 		LineBox* result = new LineBox();
 		result->moveTo(line.x, line.y);
-		result->setWidth(line.width);
+        result->setWidth(line.width);
 		result->setAscent(line.ascent);
 		result->setDescent(line.descent);
 		result->colLeft = line.colLeft;
 		qreal pos = line.colLeft;
+        qDebug()<<" gl ru "<<glyphRuns.count();
 		for (int i = 0; i < glyphRuns.count(); ++i)
 		{
 			GlyphBox* glyphbox = createGlyphBox(glyphRuns.at(i));
 			glyphbox->moveBy(pos, 0);
-			pos += glyphbox->width();
+            pos += (glyphbox->width()+1);
 			result->addBox(glyphbox);
 		}
 		return result;
@@ -555,7 +560,7 @@ struct LineControl {
 	GlyphBox* createGlyphBox(const GlyphRun& run)
 	{
 		GlyphBox* result = new GlyphBox(run);
-		result->setWidth(run.width());
+        result->setWidth(run.width()+1);
 		return result;
 	}
 

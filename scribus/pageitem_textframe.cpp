@@ -76,20 +76,6 @@ PageItem_TextFrame::PageItem_TextFrame(ScribusDoc *pa, double x, double y, doubl
 	m_origAnnotPos = QRectF(xPos(), yPos(), width(), height());
 	verticalAlign = 0;
 	connect(&itemText,SIGNAL(changed()), this, SLOT(slotInvalidateLayout()));
-	const LineBox* linebox;
-	for (uint ll=0; ll < textLayout.lines(); ++ll)
-	{
-		linebox = textLayout.line(ll);
-		const GlyphBox* glyphbox;
-		for (int i = 0; i < linebox->boxes().count(); ++i)
-
-		{
-			glyphbox = dynamic_cast<const GlyphBox*>(linebox->boxes()[i]);
-		}
-		m_gb = glyphbox;
-	}
-
-
 }
 
 PageItem_TextFrame::PageItem_TextFrame(const PageItem & p) : PageItem(p)
@@ -102,19 +88,7 @@ PageItem_TextFrame::PageItem_TextFrame(const PageItem & p) : PageItem(p)
 	m_notesFramesMap.clear();
 	m_origAnnotPos = QRectF(xPos(), yPos(), width(), height());
 	verticalAlign = 0;
-	connect(&itemText,SIGNAL(changed()), this, SLOT(slotInvalidateLayout()));
-	const LineBox* linebox;
-	for (uint ll=0; ll < textLayout.lines(); ++ll)
-	{
-		linebox = textLayout.line(ll);
-	}
-	const GlyphBox* glyphbox;
-	for (int i = 0; i < linebox->boxes().count(); ++i)
-
-	{
-		glyphbox = dynamic_cast<const GlyphBox*>(linebox->boxes()[i]);
-	}
-	m_gb = glyphbox;
+    connect(&itemText,SIGNAL(changed()), this, SLOT(slotInvalidateLayout()));
 }
 
 static QRegion itemShape(PageItem* docItem, double xOffset, double yOffset)
@@ -1947,11 +1921,11 @@ void PageItem_TextFrame::layout()
 			{
 				if ( a == firstInFrame() || !SpecialChars::isBreakingSpace(itemText.text(a-1)) )
 				{
-					current.rememberBreak(a, breakPos, style.rightMargin());
+                    current.rememberBreak(a, breakPos, style.rightMargin());
 				}
 			}
 			if  (HasObject)
-				current.rememberBreak(a, breakPos, style.rightMargin());
+                current.rememberBreak(a, breakPos, style.rightMargin());
 			// CJK break
 			if (a > current.line.firstChar)
 			{ // not the first char
@@ -1962,7 +1936,7 @@ void PageItem_TextFrame::layout()
 					// non-CJK char does not have CJK_NOBREAK_AFTER/CJK_NOBREAK_BEFORE
 					if ((lastStat & SpecialChars::CJK_NOBREAK_AFTER) == 0 &&
 							(curStat & SpecialChars::CJK_NOBREAK_BEFORE) == 0){
-						current.rememberBreak(a-1, breakPos, style.rightMargin());
+                        current.rememberBreak(a-1, breakPos, style.rightMargin());
 					}
 				}
 
@@ -1981,8 +1955,13 @@ void PageItem_TextFrame::layout()
 			bool inOverflow = false;
 			if (itemText.hasFlag(a,ScLayout_HyphenationPossible) || currentCh == SpecialChars::SHYPHEN)
 				hyphWidth = font.charWidth('-', hlcsize10) * (charStyle.scaleH() / 1000.0);
-			if ((current.isEndOfLine(style.rightMargin() + hyphWidth)) || current.isEndOfCol(realDesc) || SpecialChars::isBreak(currentCh, Cols > 1) || (current.xPos - current.maxShrink + hyphWidth) >= current.mustLineEnd)
+            if ((current.isEndOfLine(style.rightMargin() + hyphWidth)) ||
+                    current.isEndOfCol(realDesc) ||
+                    SpecialChars::isBreak(currentCh, Cols > 1) ||
+                    (current.xPos - current.maxShrink + hyphWidth) >= current.mustLineEnd)
 			{
+
+                outs = true;
 				//end of row reached - right column, end of column, break char or line must end
 				if (current.charsInLine == 0 && !current.afterOverflow && !SpecialChars::isBreak(currentCh, Cols > 1))
 				{
@@ -2026,7 +2005,7 @@ void PageItem_TextFrame::layout()
 					inOverflow = false;
 					continue;
 				}
-				outs = true;
+
 				current.addLine = true;
 				current.lastInRowLine = true;
 				current.rightMargin = style.rightMargin();
@@ -2108,7 +2087,7 @@ void PageItem_TextFrame::layout()
 						outs = false;
 						continue;
 					}
-					if (current.breakIndex < 0)
+                    if (current.breakIndex < 0)
 					{
 						a--;
 						current.breakLine(itemText, style, firstLineOffset(), a);
@@ -2180,7 +2159,7 @@ void PageItem_TextFrame::layout()
 				{
 					if ((current.hyphenCount < m_Doc->hyphConsecutiveLines()) || (m_Doc->hyphConsecutiveLines() == 0) || currentCh == SpecialChars::SHYPHEN)
 					{
-						current.rememberBreak(a, breakPos, style.rightMargin() + hyphWidth);
+                        current.rememberBreak(a, breakPos, style.rightMargin() + hyphWidth);
 					}
 				}
 			}
@@ -2191,7 +2170,7 @@ void PageItem_TextFrame::layout()
 				goNextColumn = true;
 
 			if (a != firstInFrame() && implicitBreak(itemText.text(a - 1), itemText.text(a)))
-				current.rememberBreak(a - 1, breakPos);
+                current.rememberBreak(a - 1, breakPos);
 
 			++current.charsInLine;
 

@@ -5406,8 +5406,7 @@ QByteArray PDFLibCore::setTextSt(PageItem *ite, uint PNr, const ScPage* pag)
 					{
 						const GlyphLayout glyphs = glyphss.glyphs().at(d);//item->glyphRuns.at(d).glyphs().at(d);
 						PathData* pdata = &straightPath;
-						if (SpecialChars::isBreak(ch, true) || (ch == QChar(10)))
-							continue;
+
 						if (ite->itemText.hasFlag(d, ScLayout_SuppressSpace))
 							continue;
 						tTabValues = pstyle.tabValues();
@@ -5460,7 +5459,7 @@ QByteArray PDFLibCore::setTextSt(PageItem *ite, uint PNr, const ScPage* pag)
 						}
 						if (ch == SpecialChars::TAB)
 						{
-							CurX += glyphs.xadvance;
+                            CurX += glyphs.xadvance;
 							continue;
 						}
 						if ((chstyle.effects() & ScStyle_Shadowed) && (chstyle.strokeColor() != CommonStrings::None))
@@ -5474,7 +5473,7 @@ QByteArray PDFLibCore::setTextSt(PageItem *ite, uint PNr, const ScPage* pag)
 								glx = new GlyphLayout(*gl1);
 								glx->yoffset -= (chstyle.fontSize() * chstyle.shadowYOffset() / 10000.0);
 								glx->xoffset += (chstyle.fontSize() * chstyle.shadowXOffset() / 10000.0);
-								//glx = NULL;
+                                glx = NULL;
 								//gl1 = gl1.more;
 								//glx = glx->more;
 							}
@@ -5491,7 +5490,7 @@ QByteArray PDFLibCore::setTextSt(PageItem *ite, uint PNr, const ScPage* pag)
 							gl2.scaleH = glyphs.scaleH;
 							gl2.scaleV = glyphs.scaleV;
 							setTextCh(ite, PNr, CurX, ls->y(), d, tmp, tmp2, cl2, gl2, pdata, pstyle, pag);
-							//gl2.shrink();
+                            //gl2.shrink();
 						}
 						//const GlyphLayout * x = &glyphs;
 						setTextCh(ite, PNr, CurX, ls->y(), d, tmp, tmp2, chstyle, glyphs, pdata, pstyle, pag);
@@ -5502,15 +5501,17 @@ QByteArray PDFLibCore::setTextSt(PageItem *ite, uint PNr, const ScPage* pag)
 					CurX += (embedded.getItem()->gWidth + embedded.getItem()->lineWidth()) * hl->glyph.scaleH;
 				}
 				else*/
-						CurX += glyphs.xadvance;
-						tabDist = CurX;
+                        CurX += glyphs.xadvance;
+                        tabDist = CurX;
 					}
-				}
-			}
+                    if (SpecialChars::isBreak(ch, true) || (ch == QChar(10)))
+                        continue;
+                }
+            }
 		}
 	}
 	else
-	{
+    {
 		ite->OwnPage = PNr;
 		ite->asPathText()->layout();
 		ite->OwnPage = savedOwnPage;
@@ -5539,7 +5540,7 @@ QByteArray PDFLibCore::setTextSt(PageItem *ite, uint PNr, const ScPage* pag)
 					double wt = chstyle.font().charWidth(tTabValues[tabCc].tabFillChar, chstyle.fontSize());
 					int coun = static_cast<int>((CurX+ glyphs.xoffset - tabDist) / wt);
 					// #6728 : update code according to fillInTabLeaders() and PageItem::layout() - JG
-					double sPos = 0.0 /* CurX+hl->glyph.xoffset - (CurX+hl->glyph.xoffset - tabDist) + 1 */;
+                    double sPos = 0.0 /* CurX+hl->glyph.xoffset - (CurX+hl->glyph.xoffset - tabDist) + 1 */;
 					gl2.glyph = chstyle.font().char2CMap(tTabValues[tabCc].tabFillChar);
 					cl2.setTracking(0);
 					cl2.setScaleH(1000);
@@ -5565,7 +5566,7 @@ QByteArray PDFLibCore::setTextSt(PageItem *ite, uint PNr, const ScPage* pag)
 						setTextCh(ite, PNr, 0, 0, d, tmp, tmp2, cl2, gl2, pdata, pstyle, pag);
 					}
 					tabCc++;
-				}
+                }
 				else
 				{
 					tabCc++;
