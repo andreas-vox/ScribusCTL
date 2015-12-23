@@ -43,14 +43,53 @@ GroupBox::render(ScPainter *p)
 GlyphBox::render(ScPainter *p)
 {
 	p->save();
+	const CharStyle& style(glyphs.style());
+	const ScFace font = style.font();
+	for (int i = 0; i < glyphs.glyphs().count(); ++i)
+	{
+		const GlyphLayout& glyphLayout(glyphs.glyphs().at(i));
+		uint glyph = glyphLayout.glyph;
+		FPointArray gly = font.glyphOutline(glyph);
+		if (gly.size() > 3)
+		{
+			p->translate(glyphLayout.xoffset, glyphLayout.yoffset - ((style.fontSize() / 10.0) * glyphLayout.scaleV));
+			if (style.baselineOffset() != 0)
+				p->translate(0, -(style.fontSize() / 10.0) * (style.baselineOffset() / 1000.0));
+			double glxSc = glyphLayout.scaleH * style.fontSize() / 100.00;
+			double glySc = glyphLayout.scaleV * style.fontSize() / 100.0;
+			p->scale(glxSc, glySc);
+			bool fr = p->fillRule();
+			p->setFillRule(false);
+			p->setupPolygon(&gly, true);
+			if (glyph == 0)
+			{
+				p->setPen(PrefsManager::instance()->appPrefs.displayPrefs.controlCharColor, 1, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
+				p->setLineWidth(style.fontSize() * glyphLayout.scaleV * style.outlineWidth() * 2 / 10000.0);
+				p->strokePath();
+			}
+			else if ((font.isStroked()) && (style.strokeColor() != CommonStrings::None) && ((style.fontSize() * glyphLayout.scaleV * style.outlineWidth() / 10000.0) != 0))
+			{
+				QColor tmp = p->brush();
+				p->setPen(tmp, 1, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
+				p->setLineWidth(style.fontSize() * glyphLayout.scaleV * style.outlineWidth() / 10000.0);
+				p->strokePath();
+			}
+			else
+			{
+				if (style.fillColor() != CommonStrings::None)
+					p->fillPath();
+				if ((style.effects() & ScStyle_Outline) && (style.strokeColor() != CommonStrings::None) && ((style.fontSize() * glyphLayout.scaleV * style.outlineWidth() / 10000.0) != 0))
+				{
+					p->setLineWidth((style.fontSize() * glyphLayout.scaleV * style.outlineWidth() / 10000.0) / glySc);
+					p->strokePath();
+				}
+			}
+			p->setFillRule(fr);
+		}
+		p->moveBy( glyph[i].xAdvance, glyph[i].yAdvance);
+	}
+	p->restore();
 
-	 for (int i = 0; i < glyphs().length(); ++i)
-	 {
-		 render glyph[i] ;
-
-		 p->moveBy( glyph[i].xAdvance, glyph[i].yAdvance);
-	 }
-	 p->restore();
 }
 
 FRect GroupBox::boundingBox(int pos, uint len) const
