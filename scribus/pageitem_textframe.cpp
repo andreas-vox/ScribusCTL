@@ -3330,7 +3330,7 @@ TODO: use Box methods
 #endif
 
             QColor tmp;
-
+            int x =0;
             const GlyphBox* glyphbox;
             for (int i = 0; i < linebox->boxes().count(); ++i)
 
@@ -3410,7 +3410,7 @@ TODO: use Box methods
                                 //TODO:							drawMark(p, charStyle, SpecialChars::OBJECT);
                                // GlyphLayout markGlyph;
                                // layoutGlyphs( );
-                                drawGlyphs(p, glyphbox->glyphs);
+                               // drawGlyphs(p, glyphbox->glyphs);
                                 //drawGlyphs(p, charStyle, ScLayout_None, markGlyph);
                                 textLayout.render(p);
                             }
@@ -3425,6 +3425,8 @@ TODO: use Box methods
                     else*/
                     //CurX += glyphs->wide();
                     //p->restore();
+                    x++;
+                    if (x<2)
                     textLayout.render(p);
 
                 }
