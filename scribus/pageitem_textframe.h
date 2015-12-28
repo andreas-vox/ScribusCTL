@@ -540,12 +540,12 @@ struct LineControl {
 	LineBox* createLineBox()
 	{
 		LineBox* result = new LineBox();
-		result->moveTo(line.x, line.y);
+        result->moveTo(line.x, line.y);
         result->setWidth(line.width);
 		result->setAscent(line.ascent);
 		result->setDescent(line.descent);
 		result->colLeft = line.colLeft;
-		qreal pos = line.colLeft;
+        qreal pos = line.colLeft;
         qDebug()<<" gl ru "<<glyphRuns.count();
 		for (int i = 0; i < glyphRuns.count(); ++i)
 		{

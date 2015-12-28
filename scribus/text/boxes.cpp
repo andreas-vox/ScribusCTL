@@ -63,6 +63,7 @@ void LineBox::render(ScPainter *p)
 void GlyphBox::render(ScPainter *p)
 {
     p->save();
+    p->translate(x(),y());
     const CharStyle& style(glyphs.style());
     const ScFace font = style.font();
     for (int i = 0; i < m_glyphs.count(); ++i)
@@ -146,7 +147,7 @@ void GroupBox::addBox(const Box* box)
 	newRect.moveBy(m_x, m_y);
 	newRect = bbox().unite(newRect);
 	m_y = newRect.y() + m_ascent;
-	m_x = newRect.x();
+    m_x = newRect.x();
 	m_width = newRect.width();
 	m_descent = newRect.height() - m_ascent;
 }

@@ -3415,7 +3415,7 @@ TODO: use Box methods
                                 textLayout.render(p);
                             }
                            // drawGlyphs(p, glyphbox->glyphs);
-                            textLayout.render(p);
+                            //textLayout.render(p);
                         }
                         p->restore();//RE4
                     }
@@ -3424,7 +3424,9 @@ TODO: use Box methods
                         CurX += (hl->embedded.getItem()->gWidth + hl->embedded.getItem()->lineWidth()) * hl->glyph.scaleH;
                     else*/
                     //CurX += glyphs->wide();
-                    //textLayout.render(p);
+                    //p->restore();
+                    textLayout.render(p);
+
                 }
             }
 
