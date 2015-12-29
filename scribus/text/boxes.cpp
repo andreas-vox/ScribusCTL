@@ -107,7 +107,6 @@ void GlyphBox::render(ScPainter *p)
             }
             p->setFillRule(fr);
         }
-        p->translate( glyphLayout.xadvance, glyphLayout.yadvance);
     }
     p->restore();
 

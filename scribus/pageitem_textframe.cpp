@@ -3237,6 +3237,7 @@ void PageItem_TextFrame::DrawObj_Item(ScPainter *p, QRectF cullingArea)
         assert( firstInFrame() >= 0 );
         assert( lastInFrame() < itemText.length() );
         const LineBox* linebox;
+        int x =0;
         for (uint ll=0; ll < textLayout.lines(); ++ll)
         {
             linebox = textLayout.line(ll);
@@ -3330,7 +3331,7 @@ TODO: use Box methods
 #endif
 
             QColor tmp;
-            int x =0;
+
             const GlyphBox* glyphbox;
             for (int i = 0; i < linebox->boxes().count(); ++i)
 
@@ -3425,12 +3426,15 @@ TODO: use Box methods
                     else*/
                     //CurX += glyphs->wide();
                     //p->restore();
-                    x++;
-                    if (x<2)
-                    textLayout.render(p);
 
                 }
+                x++;
+                if (x<2)
+                textLayout.render(p);
+
             }
+            if(x>1)
+                break;
 
         }
 

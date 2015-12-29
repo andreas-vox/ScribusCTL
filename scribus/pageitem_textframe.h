@@ -551,7 +551,7 @@ struct LineControl {
 		{
 			GlyphBox* glyphbox = createGlyphBox(glyphRuns.at(i));
 			glyphbox->moveBy(pos, 0);
-            pos += (glyphbox->width()+1);
+            pos += (glyphbox->width());
 			result->addBox(glyphbox);
 		}
 		return result;
@@ -560,7 +560,7 @@ struct LineControl {
 	GlyphBox* createGlyphBox(const GlyphRun& run)
 	{
 		GlyphBox* result = new GlyphBox(run);
-        result->setWidth(run.width()+1);
+        result->setWidth(run.width());
 		return result;
 	}
 
