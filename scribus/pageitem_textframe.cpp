@@ -226,10 +226,6 @@ struct LineControl {
         line.naturalWidth = breakXPos - line.x;
         line.width = endX - line.x;
         maxShrink = maxStretch = 0;
-        // FIXME: works only for first line!!
-        while (glyphRuns.count() > breakIndex + 1)
-            glyphRuns.removeLast();
-
     }
 
     int restartRow(bool recalcY)
@@ -531,7 +527,8 @@ struct LineControl {
         result->colLeft = line.colLeft;
         qreal pos = line.colLeft;
         qDebug()<<" gl ru "<<glyphRuns.count();
-        for (int i = 0; i < glyphRuns.count(); ++i)
+        int runCount = line.lastChar - line.firstChar;
+        for (int i = 0; i < runCount; ++i)
         {
             GlyphBox* glyphbox = createGlyphBox(glyphRuns.at(i));
             glyphbox->moveBy(pos, 0);
