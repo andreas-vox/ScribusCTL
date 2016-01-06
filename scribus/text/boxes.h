@@ -36,10 +36,9 @@ protected:
 	qreal m_width;
 	qreal m_descent;
 	qreal m_ascent;
-	QList<Box*> m_boxes;
-	int m_firstChar ;
-	int m_lastChar;
-	
+    QList<Box*> m_boxes;
+    int m_firstChar;
+    int m_lastChar;
 public:
 	Box() { m_type = T_Invalid; m_x = m_y = m_width = m_ascent = m_descent = m_firstChar= 0;m_lastChar=0; }
 	virtual ~Box() {}

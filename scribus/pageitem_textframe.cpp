@@ -528,7 +528,7 @@ struct LineControl {
         qreal pos = line.colLeft;
         qDebug()<<" gl ru "<<glyphRuns.count();
         int runCount = line.lastChar - line.firstChar;
-        for (int i = 0; i < runCount; ++i)
+        for (int i = 0; i < runCount+1; ++i)
         {
             GlyphBox* glyphbox = createGlyphBox(glyphRuns.at(i));
             glyphbox->moveBy(pos, 0);
@@ -541,6 +541,9 @@ struct LineControl {
     GlyphBox* createGlyphBox(const GlyphRun& run)
     {
         GlyphBox* result = new GlyphBox(run);
+        const CharStyle& face(run.style());
+        result->setAscent(-face.font().ascent(face.fontSize()/10.00));
+        result->setDescent(face.font().descent(face.fontSize()/10.00));
         result->setWidth(run.width());
         return result;
     }

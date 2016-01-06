@@ -156,6 +156,13 @@ private:
 	QMap<QString,StoryText> shadows;
 	bool checkKeyIsShortcut(QKeyEvent *k);
 	QRectF m_origAnnotPos;
+public:
+    bool isOpj(int i);
+    bool isPar(int i);
+    bool isBre(int i);
+    bool isSpe(int i);
+    double chWid(int i);
+    bool isTab(int i);
 	
 private slots:
 	void slotInvalidateLayout();

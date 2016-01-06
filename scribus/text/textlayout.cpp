@@ -70,7 +70,7 @@ void TextLayout::appendLine(const LineBox* ls)
 	{ 
 		assert( ls->firstChar() >= 0 );
 		assert( ls->firstChar() < story()->length() );
-		assert( ls->lastChar() >= 0 && ls->firstChar() - ls->lastChar() < 1 );
+        //ssert( ls->lastChar() >= 0 && ls->firstChar() - ls->lastChar() < 1 );
 		assert( ls->lastChar() < story()->length() );
 		m_lines->addBox(ls);
 	}
@@ -256,56 +256,39 @@ FRect TextLayout::boundingBox(int pos, uint len) const
 			result.moveBy(m_frame->xPos(), m_frame->yPos());
 			return result;
 		}
-	}
-	
+    }
 #if 0
-	LineBox* ls;
-	for (uint i=0; i < lines(); ++i)
-	{
-		ls = line(i);
+    for (uint i=0; i < lines(); ++i)
+    {
+        const LineBox* ls(line(i));
 		if (ls->lastChar() < pos)
 			continue;
 		if (ls->firstChar() <= pos) {
-			/*
-			//if (ls.lastChar == pos && (item(pos)->effects() & ScLayout_SuppressSpace)  )
+
 			{
-				if (i+1 < lines())
-				{
-					ls = line(i+1);
-					result.setRect(ls.x, ls.y - ls.ascent, 1, ls.ascent + ls.descent);
-				}
-				else
-				{
-					ls = line(lines()-1);
-					const ParagraphStyle& pstyle(paragraphStyle(pos));
-					result.setRect(ls.x, ls.y + pstyle.lineSpacing() - ls.ascent, 1, ls.ascent + ls.descent);
-				}
-			}
-			else */
-			{
-				qreal xpos = ls.x;
-				for (int j = ls.firstChar; j < pos; ++j)
-				{
+                qreal xpos = ls->x();
+                for (int j = 0; ls->boxes().length() ;++j)
+                {
 					if (story()->hasObject(j))
-						xpos += (story()->object(j)->width() + story()->object(j)->lineWidth()) * story()->getGlyphs(j)->scaleH;
+                        xpos += (story()->object(j)->width() + story()->object(j)->lineWidth()) * story()->getGlyphs(j)->scaleH;
 					else
-						xpos += story()->getGlyphs(j)->wide();
-				}
+                        xpos += story()->getGlyphs(j)->wide();
+                }
 				qreal finalw = 1;
 				if (story()->hasObject(pos))
-					finalw = (story()->object(pos)->width() + story()->object(pos)->lineWidth()) * story()->getGlyphs(pos)->scaleH;
+                    finalw = (story()->object(pos)->width() + story()->object(pos)->lineWidth()) * story()->getGlyphs(pos)->scaleH;
 				else
-					finalw = story()->getGlyphs(pos)->wide();
+                    finalw = story()->getGlyphs(pos)->wide();
 				const CharStyle& cs(story()->charStyle(pos));
 				qreal desc = -cs.font().descent(cs.fontSize() / 10.0);
 				qreal asce = cs.font().ascent(cs.fontSize() / 10.0);
-				result.setRect(xpos, ls.y - asce, pos < story()->length()? finalw : 1, desc+asce);
-			}
+                result.setRect(xpos, ls.y - asce, pos < story()->length()? finalw : 1, desc+asce);
+            }
 			return result;
-		}
+        }
 	}
-	
 #endif
+
 	const ParagraphStyle& pstyle(story()->paragraphStyle(qMin(pos, story()->length()))); // rather the trailing style than a segfault.
 	if (lines() > 0)
 	{
