@@ -247,59 +247,65 @@ int TextLayout::screenToPosition(FPoint coord) const
 
 FRect TextLayout::boundingBox(int pos, uint len) const
 {
-	FRect result;
-	if (m_lines->containsPos(pos))
-	{
-		result = m_lines->boundingBox(pos, len);
-		if (result.isValid())
-		{
-			result.moveBy(m_frame->xPos(), m_frame->yPos());
-			return result;
-		}
-    }
-#if 0
-    for (uint i=0; i < lines(); ++i)
+    FRect result;
+    // pos = story()->cursorPosition();
+    qDebug()<<"f : "<<m_lines->firstChar()<<" l: "<<m_lines->lastChar();
+    if (m_lines->containsPos(pos))
     {
-        const LineBox* ls(line(i));
-		if (ls->lastChar() < pos)
-			continue;
-		if (ls->firstChar() <= pos) {
-
-			{
-                qreal xpos = ls->x();
-                for (int j = 0; ls->boxes().length() ;++j)
-                {
-					if (story()->hasObject(j))
-                        xpos += (story()->object(j)->width() + story()->object(j)->lineWidth()) * story()->getGlyphs(j)->scaleH;
-					else
-                        xpos += story()->getGlyphs(j)->wide();
-                }
-				qreal finalw = 1;
-				if (story()->hasObject(pos))
-                    finalw = (story()->object(pos)->width() + story()->object(pos)->lineWidth()) * story()->getGlyphs(pos)->scaleH;
-				else
-                    finalw = story()->getGlyphs(pos)->wide();
-				const CharStyle& cs(story()->charStyle(pos));
-				qreal desc = -cs.font().descent(cs.fontSize() / 10.0);
-				qreal asce = cs.font().ascent(cs.fontSize() / 10.0);
-                result.setRect(xpos, ls.y - asce, pos < story()->length()? finalw : 1, desc+asce);
-            }
-			return result;
+        result = m_lines->boundingBox(pos, len);
+        if (result.isValid())
+        {
+//            result.moveBy(m_frame->xPos(), m_frame->yPos());
+            return result;
         }
-	}
-#endif
+    }
 
-	const ParagraphStyle& pstyle(story()->paragraphStyle(qMin(pos, story()->length()))); // rather the trailing style than a segfault.
-	if (lines() > 0)
-	{
-		const LineBox* ls = line(lines()-1);
-		result.setRect(ls->x(), ls->y() + pstyle.lineSpacing() - ls->ascent(), 1, ls->height());
-	}
-	else
-	{
-		result.setRect(1, 1, 1, pstyle.lineSpacing());
-	}
 
-	return result;
+    //    for (uint i=0; i < lines(); ++i)
+    //    {
+    //        const LineBox* ls(line(i));
+    //		if (ls->lastChar() < pos)
+    //			continue;
+    //		if (ls->firstChar() <= pos) {
+
+    //			{
+    //                qreal xpos = ls->x();
+    //                qreal finalw = 1;
+    //                for (int j = 0; ls->boxes().length() ;++j)
+    //                {
+    //                    const GlyphBox* box = dynamic_cast<const GlyphBox*> (ls->boxes()[j]);
+    //					if (story()->hasObject(j))
+    //                        xpos += (story()->object(j)->width() + story()->object(j)->lineWidth()) * box->glyphs.glyphs().at(j).scaleH;
+    //					else
+    //                        xpos += box->glyphs.glyphs().at(j).xadvance;
+
+
+    //				if (story()->hasObject(pos))
+    //                    finalw = (story()->object(pos)->width() + story()->object(pos)->lineWidth()) * box->glyphs.glyphs().at(j).scaleH;
+    //				else
+    //                    finalw = box->glyphs.glyphs().at(j).xadvance;
+    //                }
+    //				const CharStyle& cs(story()->charStyle(pos));
+    //				qreal desc = -cs.font().descent(cs.fontSize() / 10.0);
+    //				qreal asce = cs.font().ascent(cs.fontSize() / 10.0);
+    //                result.setRect(xpos, ls->y() - asce, pos < story()->length()? finalw : 1, desc+asce);
+    //            }
+    //			return result;
+
+    //}
+
+
+    const ParagraphStyle& pstyle(story()->paragraphStyle(qMin(pos, story()->length()))); // rather the trailing style than a segfault.
+    if (lines() > 0)
+    {
+        const LineBox* ls = line(lines()-1);
+        result.setRect(ls->x(), ls->y() + pstyle.lineSpacing() - ls->ascent(), 1, ls->height());
+    }
+    else
+    {
+        result.setRect(1, 1, 1, pstyle.lineSpacing());
+    }
+
+    return result;
 }
 

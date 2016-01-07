@@ -59,13 +59,15 @@ public:
 	void setHeight(double h, double vBase) { m_ascent = h * (1-vBase); m_descent = h * vBase; }
 	qreal ascent() const { return m_ascent; }
 	qreal descent() const { return m_descent; }
-	void setAscent(double a) { m_ascent = a; }
-	void setDescent(double d) { m_descent = d; }
-	FRect bbox() const { return FRect(m_x, m_y - m_ascent, m_width, height()); }
+    void setAscent(double a) { m_ascent = a; }
+    void setDescent(double d) { m_descent = d; }
+    FRect bbox() const { return FRect(m_x, m_y - m_ascent, m_width, height()); }
 	bool containsPoint(FPoint coord) const { return bbox().contains(coord); }
 
 	int firstChar() const { return m_firstChar; }
+    void setFirstChar(int c){ m_firstChar = c;}
 	int lastChar() const { return m_lastChar; }
+    void setLastChar(int c){ m_lastChar = c;}
 	bool containsPos(int pos) const { return m_firstChar <= pos && pos <= m_lastChar;}
 	
 	/// returns a char position for the point coord + (m_x, m_y)

@@ -525,6 +525,8 @@ struct LineControl {
         result->setAscent(line.ascent);
         result->setDescent(line.descent);
         result->colLeft = line.colLeft;
+        result->setFirstChar(line.firstChar);
+        result->setLastChar(line.lastChar);
         qreal pos = line.colLeft;
         qDebug()<<" gl ru "<<glyphRuns.count();
         int runCount = line.lastChar - line.firstChar;
@@ -532,8 +534,11 @@ struct LineControl {
         {
             GlyphBox* glyphbox = createGlyphBox(glyphRuns.at(i));
             glyphbox->moveBy(pos, 0);
+            glyphbox->setFirstChar(i+result->firstChar());
+            glyphbox->setLastChar(i+result->firstChar());
             pos += (glyphbox->width());
             result->addBox(glyphbox);
+
         }
         return result;
     }
