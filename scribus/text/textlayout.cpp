@@ -248,7 +248,6 @@ int TextLayout::screenToPosition(FPoint coord) const
 FRect TextLayout::boundingBox(int pos, uint len) const
 {
     FRect result;
-    // pos = story()->cursorPosition();
     qDebug()<<"f : "<<m_lines->firstChar()<<" l: "<<m_lines->lastChar();
     if (m_lines->containsPos(pos))
     {

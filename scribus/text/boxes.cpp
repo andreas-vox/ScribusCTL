@@ -73,7 +73,7 @@ void GlyphBox::render(ScPainter *p)
         FPointArray gly = font.glyphOutline(glyphId);
         if (gly.size() > 3)
         {
-            p->translate(glyphLayout.xoffset, glyphLayout.yoffset - ((style.fontSize() / 10.0) * glyphLayout.scaleV));
+			p->translate(glyphLayout.xoffset, glyphLayout.yoffset);
             if (style.baselineOffset() != 0)
                 p->translate(0, -(style.fontSize() / 10.0) * (style.baselineOffset() / 1000.0));
             double glxSc = glyphLayout.scaleH * style.fontSize() / 100.00;
@@ -123,10 +123,9 @@ FRect GroupBox::boundingBox(int pos, uint len) const
             result = result.unite(b->boundingBox(pos, len));
         }
     }
-    if (result.isValid())
-        return result;//.unite(FRect(m_x, m_y,m_width,m_ascent+m_descent));
-    else
-        return result;
+	if (result.isValid())
+		result.moveBy(0, -y());
+	return result;
 }
 
 
@@ -144,9 +143,9 @@ void GroupBox::addBox(const Box* box)
 
 	FRect newRect = box->bbox();
 	newRect.moveBy(m_x, m_y);
-    newRect = bbox().unite(newRect);
-    m_y = newRect.y() + m_ascent;
-    m_x = newRect.x() ;
+	newRect = bbox().unite(newRect);
+	m_y = newRect.y() + m_ascent;
+	m_x = newRect.x() ;
 	m_width = newRect.width();
 	m_descent = newRect.height() - m_ascent;
 }
@@ -199,29 +198,9 @@ int GlyphBox::pointToPosition(FPoint coord) const
 
 FRect GlyphBox::boundingBox(int pos, uint len) const
 {
-//    int relPos = firstChar() - pos;
-//    qreal xPos1 = m_x;
-//	for (int i = 0; i < relPos - 1; ++i)
-//	{
-//        xPos1 += m_glyphs[pos].xadvance;
-//	}
-//   // qreal width = m_glyphs[relPos].xadvance;
-//    //qreal xPos2 = xPos1 + width;
-//	for (int i = relPos + 1; i < pos + len; ++i)
-//	{
-//        //xPos2 += m_glyphs[pos].xadvance;
-//	}
-//    qreal hight = m_glyphs.at(pos).yadvance;
-//    qreal top = m_glyphs.at(pos).yoffset + m_glyphs.at(pos).yadvance;
-//    qreal xpos= 0;
-//    xpos += glyphs.glyphs().at(pos).xadvance;
-    qDebug()<<"x: "<<x()<<"  y: "<<y()<<" width : "<<width()<<" ascent: "<<ascent()<<"  descent: "<<descent();
-    FPoint topLeft(x(),y()+ascent());
-    FPoint bottomRight(x()+width(), y()- descent());
-    FRect result(topLeft, bottomRight);
-    //FRect result(x(), y() - ascent(), width(),height());
-    bool valid =  result.isValid();
-    return result;
+	FPoint topLeft(x(), y());
+	FPoint bottomRight(x() + width(), y() - height());
+	return FRect(topLeft, bottomRight);
 }
 
 
@@ -229,6 +208,3 @@ LineBox::LineBox()
 {
 	m_type = T_Line;
 }
-
-
-
