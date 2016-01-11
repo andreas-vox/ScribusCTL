@@ -55,13 +55,13 @@ public:
 	qreal width() const { return m_width; }
 	void addWidth(double w) { m_width += w; }
 	void setWidth(double w) { m_width = w; }
-	qreal height() const { return m_ascent + m_descent; }
+	qreal height() const { return m_ascent - m_descent; }
 	void setHeight(double h, double vBase) { m_ascent = h * (1-vBase); m_descent = h * vBase; }
 	qreal ascent() const { return m_ascent; }
 	qreal descent() const { return m_descent; }
     void setAscent(double a) { m_ascent = a; }
     void setDescent(double d) { m_descent = d; }
-    FRect bbox() const { return FRect(m_x, m_y - m_ascent, m_width, height()); }
+	FRect bbox() const { return FRect(m_x, m_y - m_ascent, m_width, height()); }
 	bool containsPoint(FPoint coord) const { return bbox().contains(coord); }
 
 	int firstChar() const { return m_firstChar; }

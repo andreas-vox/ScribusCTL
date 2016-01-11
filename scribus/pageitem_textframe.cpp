@@ -447,16 +447,20 @@ struct LineControl {
 
     void updateHeightMetrics(const StoryText& itemText)
     {
-        double asce, desc;
-        line.ascent  = 0;
-        line.descent = 0;
+		const CharStyle& cStyle(itemText.charStyle(line.firstChar));
+		double scaleV = cStyle.scaleV() / 1000.0;
+		double offset = (cStyle.fontSize() / 10) * (cStyle.baselineOffset() / 1000.0);
+		line.ascent = cStyle.font().ascent(cStyle.fontSize()/10.00) * scaleV + offset;
+		line.descent = cStyle.font().descent(cStyle.fontSize()/10.00) * scaleV - offset;
+#if 0
+		double asce, desc;
         for (int zc = 0; zc < charsInLine; ++zc)
         {
             QChar ch = itemText.text(line.firstChar+zc);
             if ((ch == SpecialChars::TAB) || (ch == QChar(10))
                 || SpecialChars::isBreak (ch, true) || (ch == SpecialChars::NBHYPHEN) || (ch.isSpace()))
                 continue;
-            const CharStyle& cStyle(itemText.charStyle(line.firstChar + zc));
+
             double scaleV = cStyle.scaleV() / 1000.0;
             double offset = (cStyle.fontSize() / 10) * (cStyle.baselineOffset() / 1000.0);
 
@@ -467,13 +471,14 @@ struct LineControl {
             }
             else //if ((itemText.flags(current.line.firstChar+zc) & ScLayout_DropCap) == 0)
             {
-                asce = cStyle.font().realCharAscent(ch, cStyle.fontSize() / 10.0) * scaleV + offset;
-                desc = cStyle.font().realCharDescent(ch, cStyle.fontSize() / 10.0) * scaleV - offset;
+				asce = cStyle.font().realCharAscent(ch, cStyle.fontSize() / 10.0) * scaleV + offset;
+				desc = cStyle.font().realCharDescent(ch, cStyle.fontSize() / 10.0) * scaleV - offset;
             }
             //	qDebug() << QString("checking char 'x%2' with ascender %1 > %3").arg(asce).arg(ch.unicode()).arg(result);
             line.ascent  = qMax(line.ascent, asce);
             line.descent = qMax(line.descent, desc);
         }
+#endif
     }
 
 // yPos should not be changed when all line is already calculated - at new y position there can be overflow!!!
@@ -533,6 +538,8 @@ struct LineControl {
         {
 			GlyphBox* glyphbox = createGlyphBox(glyphRuns.at(i));
 			glyphbox->moveBy(pos, 0);
+			glyphbox->setAscent(result->ascent());
+			glyphbox->setDescent(result->descent());
             glyphbox->setFirstChar(i+result->firstChar());
             glyphbox->setLastChar(i+result->firstChar());
             pos += (glyphbox->width());
@@ -545,9 +552,6 @@ struct LineControl {
     GlyphBox* createGlyphBox(const GlyphRun& run)
     {
         GlyphBox* result = new GlyphBox(run);
-        const CharStyle& face(run.style());
-        result->setAscent(-face.font().ascent(face.fontSize()/10.00));
-		result->setDescent(face.font().descent(face.fontSize()/10.00));
         result->setWidth(run.width());
         return result;
     }
