@@ -3254,7 +3254,6 @@ void PageItem_TextFrame::DrawObj_Item(ScPainter *p, QRectF cullingArea)
         return;
     QTransform pf2;
     QPoint pt1, pt2;
-    double wide;
     QString cachedStroke = "";
     QString cachedFill = "";
     double cachedFillShade = -1;
@@ -3737,83 +3736,50 @@ void PageItem_TextFrame::DrawObj_Item(ScPainter *p, QRectF cullingArea)
         }
         assert( firstInFrame() >= 0 );
         assert( lastInFrame() < itemText.length() );
-        const LineBox* linebox;
-        int x =0;
+
         for (uint ll=0; ll < textLayout.lines(); ++ll)
         {
-            linebox = textLayout.line(ll);
-            double colStart = linebox->colLeft; // was CurX
+		   const LineBox* ls = textLayout.line(ll);
+			double colStart = ls->colLeft; // was CurX
 
-#if 0
-TODO: use Box methods
-                    // Draw text selection rectangles
-                    QRectF selectedFrame;
-            QList<QRectF> sFList;
-            bool previousWasObject(false);
-            double selX = ls.x;
-            GlyphLayout* glyphs = 0;
-            int last = qMin(ls.lastItem, itemText.length() - 1);
-            for (int as = ls.firstItem; as <= last; ++as)
-            {
-                bool selecteds = itemText.selected(as);
-                glyphs = itemText.getGlyphs(as);
-                bool HasObject = itemText.hasObject(as);
-                Mark* mark = itemText.mark(as);
-                if (mark != NULL && (mark->isType(MARKAnchorType) || mark->isType(MARKIndexType)))
-                    continue;
-                if (selecteds)
-                {
-                    const CharStyle& charStyleS(itemText.charStyle(as));
-                    if (((as > ls.firstItem) && (charStyleS != itemText.charStyle(as-1)))
-                            || ((!selectedFrame.isNull()) && HasObject)
-                            || previousWasObject)
-                    {
-                        sFList << selectedFrame;
-                        selectedFrame = QRectF();
-                        previousWasObject = false;
-                    }
-                    if (!m_Doc->RePos)
-                    {
-                        if (((selecteds && m_isSelected) || ((NextBox != 0 || BackBox != 0) && selecteds))
-                                && (m_Doc->appMode == modeEdit || m_Doc->appMode == modeEditTable))
-                        {
-                            double xcoZli = selX + glyphs->xoffset;
-                            // ugly hack to make selection correct, as xoffset is used to
-                            // remove left-half of CJK lparen , which is blank.
-                            if (glyphs->xoffset)
-                            {
-                                int attr = SpecialChars::getCJKAttr(itemText.text(as)) & SpecialChars::CJK_CHAR_MASK;
-                                if (attr == SpecialChars::CJK_FENCE_BEGIN)
-                                {
-                                    xcoZli -= glyphs->xoffset;
-                                }
-                            }
-                            const ScFace font = charStyleS.font();
-                            double fontSize = charStyleS.fontSize() / 10.0;
-                            desc = - font.descent(fontSize);
-                            asce = font.ascent(fontSize);
-                            wide = glyphs->wide();
-                            QRectF scr;
-                            if (HasObject)
-                            {
-                                PageItem* obj = itemText.object(as);
-                                double ww = (obj->width() + obj->lineWidth()) * glyphs->scaleH;
-                                double hh = (obj->height() + obj->lineWidth()) * glyphs->scaleV;
-                                scr = QRectF(xcoZli, ls.y - hh, ww , hh);
-                                previousWasObject = true;
-                            }
-                            else
-                                scr = QRectF(xcoZli, ls.y + glyphs->yoffset - asce * glyphs->scaleV, wide , (asce+desc) * (glyphs->scaleV));
-                            selectedFrame |=  scr;
-                        }
-                    }
-                }
-                // Unneeded now that glyph xadvance is set appropriately for inline objects by layout() - JG
-                /*if ((hls->ch == SpecialChars::OBJECT) && (hls->embedded.hasItem()))
-                    selX += (hls->embedded.getItem()->gWidth + hls->embedded.getItem()->lineWidth()) * hls->glyph.scaleH;
-                else*/
-                selX += glyphs->wide();
-            }
+
+//TODO: use Box methods
+			// Draw text selection rectangles
+			QRectF selectedFrame;
+			QList<QRectF> sFList;
+			double selX = ls->x();
+			for (int as = 0; as < ls->boxes().length(); ++as)
+			{
+				const Box* box = ls->boxes()[as];
+				bool selecteds = itemText.selected(box->firstChar()) || itemText.selected(box->lastChar());
+				const CharStyle& charStyleS(itemText.charStyle(box->firstChar()));
+				const CharStyle& charStyleS2(itemText.charStyle(box->firstChar()-1));
+				Mark* mark = itemText.mark(box->firstChar());
+				if (mark != NULL && (mark->isType(MARKAnchorType) || mark->isType(MARKIndexType)))
+					continue;
+				if (selecteds)
+				{
+					if ((as > ls->lastChar()) && (charStyleS != charStyleS2))
+					{
+						sFList << selectedFrame;
+						selectedFrame = QRectF();
+					}
+					if (!m_Doc->RePos)
+					{
+						if (((selecteds && m_isSelected) || ((NextBox != 0 || BackBox != 0) && selecteds))
+								&& (m_Doc->appMode == modeEdit || m_Doc->appMode == modeEditTable))
+						{
+							selectedFrame |=  QRectF(box->x(), box->y(), box->width(), box->height());
+						}
+					}
+				}
+				selX += box->width();
+				// Unneeded now that glyph xadvance is set appropriately for inline objects by layout() - JG
+				/*if ((hls->ch == SpecialChars::OBJECT) && (hls->embedded.hasItem()))
+					selX += (hls->embedded.getItem()->gWidth + hls->embedded.getItem()->lineWidth()) * hls->glyph.scaleH;
+				else*/
+
+			}
             if (!selectedFrame.isNull())
                 sFList << selectedFrame;
             p->save();//SA3
@@ -3829,15 +3795,15 @@ TODO: use Box methods
             p->restore();//RE3
             //	End of selection
 
-#endif
+
 
             QColor tmp;
 
             const GlyphBox* glyphbox;
-            for (int i = 0; i < linebox->boxes().count(); ++i)
+			for (int i = 0; i < ls->boxes().count(); ++i)
 
             {
-                glyphbox = dynamic_cast<const GlyphBox*>(linebox->boxes()[i]);
+				glyphbox = dynamic_cast<const GlyphBox*>(ls->boxes()[i]);
                 //if (!isEmbedded && !cullingArea.intersects(pf2.mapRect(QRectF(glyphbox->x(), glyphbox->y() - glyphbox->ascent(), glyphbox->width(), glyphbox->height()))))
                  //   continue;
 
@@ -3929,13 +3895,11 @@ TODO: use Box methods
                     //p->restore();
 
                 }
-                x++;
-                if (x<2)
+
                 textLayout.render(p);
 
             }
-            if(x>1)
-                break;
+
 
         }
 
