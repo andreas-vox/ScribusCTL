@@ -83,6 +83,7 @@ public:
 		return reinterpret_cast<const QList<const Box*> & > (m_boxes);
 	}
 	
+	virtual void render(ScPainter* p) = 0;
 	//	virtual void render(ScPainter* p, const RenderOptions& renderOptions) const = 0;
 	//	virtual qreal naturalWidth() const { return width(); }
 	//	virtual qreal naturalHeight() const { return height(); }
@@ -112,7 +113,7 @@ public:
 	void addBox(const Box* box);
 	Box* addBox(uint i);
 	Box* removeBox(uint i);
-    void render(ScPainter* p);
+	void render(ScPainter* p);
 };
 
 
@@ -140,7 +141,6 @@ class LineBox : public GroupBox
 {
 public:	
 	LineBox();
-    void render(ScPainter *p);
 
 	qreal colLeft;
 };
