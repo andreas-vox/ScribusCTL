@@ -3740,10 +3740,7 @@ void PageItem_TextFrame::DrawObj_Item(ScPainter *p, QRectF cullingArea)
 		for (uint ll=0; ll < textLayout.lines(); ++ll)
 		{
 			const LineBox* line = textLayout.line(ll);
-			double colStart = line->colLeft; // was CurX
 
-
-			//TODO: use Box methods
 			// Draw text selection rectangles
 			QRectF selectedFrame;
 			double as = 0;
@@ -3754,6 +3751,7 @@ void PageItem_TextFrame::DrawObj_Item(ScPainter *p, QRectF cullingArea)
 				const CharStyle& charStyleS(itemText.charStyle(box->firstChar()));
 				const CharStyle& charStyleS2(itemText.charStyle(box->firstChar()-1));
 				Mark* mark = itemText.mark(box->firstChar());
+
 				if (mark != NULL && (mark->isType(MARKAnchorType) || mark->isType(MARKIndexType)))
 					continue;
 				if (selecteds)
@@ -3793,100 +3791,9 @@ void PageItem_TextFrame::DrawObj_Item(ScPainter *p, QRectF cullingArea)
 			p->restore();//RE3
 			//	End of selection
 
-			QColor tmp;
 
-			const GlyphBox* glyphbox;
-			for (int i = 0; i < line->boxes().count(); ++i)
-
-			{
-				glyphbox = dynamic_cast<const GlyphBox*>(line->boxes()[i]);
-				//if (!isEmbedded && !cullingArea.intersects(pf2.mapRect(QRectF(glyphbox->x(), glyphbox->y() - glyphbox->ascent(), glyphbox->width(), glyphbox->height()))))
-				//   continue;
-
-				const CharStyle& charStyle(glyphbox->glyphs.style());
-				// TODO: this code assumes one char per glyphbox
-				int charPos = glyphbox->firstChar();
-				bool selected = itemText.selected(charPos);
-				// BETTER:
-				int selMin = qMax(glyphbox->firstChar(), itemText.startOfSelection());
-				int selEnd = qMin(glyphbox->lastChar() + 1, itemText.endOfSelection());
-				FRect selBox = selMin < selEnd? glyphbox->boundingBox(selMin, selEnd- selMin) : FRect();
-
-				actFill = charStyle.fillColor();
-				actFillShade = charStyle.fillShade();
-				if (actFill != CommonStrings::None)
-				{
-					p->setFillMode(ScPainter::Solid);
-					if ((cachedFillShade != actFillShade) || (cachedFill != actFill))
-					{
-						SetQColor(&tmp, actFill, actFillShade);
-						p->setBrush(tmp);
-						cachedFillQ = tmp;
-						cachedFill = actFill;
-						cachedFillShade = actFillShade;
-					}
-					else
-						p->setBrush(cachedFillQ);
-				}
-				else
-					p->setFillMode(ScPainter::None);
-
-				if (!m_Doc->RePos)
-				{
-					if (((selected && m_isSelected) || ((NextBox != 0 || BackBox != 0) && selected)) && (m_Doc->appMode == modeEdit || m_Doc->appMode == modeEditTable))
-					{
-						// set text color to highlight if its selected
-						p->setBrush(qApp->palette().color(QPalette::Active, QPalette::HighlightedText));
-					}
-
-					actStroke = charStyle.strokeColor();
-					actStrokeShade = charStyle.strokeShade();
-					if (actStroke != CommonStrings::None)
-					{
-						if ((cachedStrokeShade != actStrokeShade) || (cachedStroke != actStroke))
-						{
-							SetQColor(&tmp, actStroke, actStrokeShade);
-							p->setPen(tmp, 1, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
-							cachedStrokeQ = tmp;
-							cachedStroke = actStroke;
-							cachedStrokeShade = actStrokeShade;
-						}
-						else
-							p->setPen(cachedStrokeQ, 1, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
-					}
-					// paint glyphs
-					//if (isEmbedded || cullingArea.intersects(pf2.mapRect(QRect(qRound(CurX + glyphs->xoffset),qRound(glyphbox->y() + glyphs->yoffset-asce), qRound(glyphs->xadvance+1), qRound(asce+desc)))))
-					{
-						p->save();//SA4
-						p->translate(colStart + glyphbox->x(), glyphbox->y());
-						if (itemText.hasObject(charPos))
-							DrawObj_Embedded(p, cullingArea, charStyle, itemText.object(charPos));
-						else
-						{
-							//control chars for marks
-							if (m_Doc->guidesPrefs().showControls && itemText.hasMark(charPos))
-								//&& (glyphs->glyph != SpecialChars::OBJECT))
-							{
-								//TODO:							drawMark(p, charStyle, SpecialChars::OBJECT);
-							}
-						}
-						p->restore();//RE4
-					}
-					// Unneeded now that glyph xadvance is set appropriately for inline objects by layout() - JG
-					/*if ((hl->ch == SpecialChars::OBJECT) && (hl->embedded.hasItem()))
-						CurX += (hl->embedded.getItem()->gWidth + hl->embedded.getItem()->lineWidth()) * hl->glyph.scaleH;
-					else*/
-					//CurX += glyphs->wide();
-					//p->restore();
-
-				}
-			}
 		}
-		textLayout.render(p);
-		//	else {
-		//		//		qDebug("skipping textframe: len=%d", itemText.count());
-		//	}
-		//	pf2.end();
+		textLayout.render(p, itemText);
 	}
 	m_textDistanceMargins=savedTextDistanceMargins;
     p->restore();//RE1
