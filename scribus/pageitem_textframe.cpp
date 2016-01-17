@@ -3253,19 +3253,7 @@ void PageItem_TextFrame::DrawObj_Item(ScPainter *p, QRectF cullingArea)
     if (invalid)
         return;
     QTransform pf2;
-    QPoint pt1, pt2;
-    QString cachedStroke = "";
-    QString cachedFill = "";
-    double cachedFillShade = -1;
-    double cachedStrokeShade = -1;
-    QString actStroke = "";
-    QString actFill = "";
-    double actFillShade = -1;
-    double actStrokeShade = -1;
-    QColor cachedFillQ;
-    QColor cachedStrokeQ;
-    //	QValueList<ParagraphStyle::TabRecord> tTabValues;
-    double desc, asce;
+
     //	tTabValues.clear();
     p->save(); //SA1
     //	QRect e2;
