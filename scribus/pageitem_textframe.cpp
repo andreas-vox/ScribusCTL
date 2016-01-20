@@ -1813,24 +1813,21 @@ void PageItem_TextFrame::layout()
                 kernVal = 0; // chs * charStyle.tracking() / 10000.0;
                 current.glyphRuns.last().clearFlag(ScLayout_StartOfLine);
             }
-            //			glyphs->yadvance = 0;
-            layoutGlyphs(chstr, current.glyphRuns.last());
+			//			glyphs->yadvance = 0;
 
             GlyphRun& currentRun(current.glyphRuns.last());
-
+			layoutGlyphs(chstr, currentRun);
 			if (currentRun.glyphs().isEmpty())
                 continue;
 
-			GlyphLayout *firstGlyph;
-			firstGlyph = &(currentRun.glyphs().first());
-			GlyphLayout *lastGlyph;
-			lastGlyph = &(currentRun.glyphs().last());
+			GlyphLayout& firstGlyph(currentRun.glyphs().first());
+			GlyphLayout& lastGlyph(currentRun.glyphs().last());
 
             // find out width, ascent and descent of char
             if (HasObject)
             {
                 wide = currentObject->width() + currentObject->lineWidth();
-				firstGlyph->xadvance = wide * firstGlyph->scaleH;
+				firstGlyph.xadvance = wide * firstGlyph.scaleH;
             }
             else
             {
@@ -1841,9 +1838,9 @@ void PageItem_TextFrame::layout()
                 if (a+1 < itemText.length())
                 {
                     uint glyph2 = font.char2CMap(itemText.text(a+1));
-					double kern = font.glyphKerning(lastGlyph->glyph, glyph2, chs / 10.0) * firstGlyph->scaleH;
+					double kern = font.glyphKerning(lastGlyph.glyph, glyph2, chs / 10.0) * firstGlyph.scaleH;
                     wide += kern;
-					lastGlyph->xadvance += kern;
+					lastGlyph.xadvance += kern;
                     // change xadvance, xoffset according to JIS X4051
                     int nextStat = SpecialChars::getCJKAttr(itemText.text(a+1));
                     int prevStat;
@@ -1856,7 +1853,7 @@ void PageItem_TextFrame::layout()
                             case SpecialChars::CJK_NOTOP:
                                 kern = charStyle.fontSize() / 10 / 4;
                                 wide += kern;
-								lastGlyph->xadvance += kern;
+								lastGlyph.xadvance += kern;
                             }
                         } else {	// next char is CJK, too
                             switch(curStat & SpecialChars::CJK_CHAR_MASK){
@@ -1869,7 +1866,7 @@ void PageItem_TextFrame::layout()
                                 case SpecialChars::CJK_MIDPOINT:
                                     kern = -charStyle.fontSize() / 10 / 2;
                                     wide += kern;
-									lastGlyph->xadvance += kern;
+									lastGlyph.xadvance += kern;
                                 }
                                 break;
                             case SpecialChars::CJK_COMMA:
@@ -1879,7 +1876,7 @@ void PageItem_TextFrame::layout()
                                 case SpecialChars::CJK_FENCE_END:
                                     kern = -charStyle.fontSize() / 10 / 2;
                                     wide += kern;
-									lastGlyph->xadvance += kern;
+									lastGlyph.xadvance += kern;
                                 }
                                 break;
                             case SpecialChars::CJK_MIDPOINT:
@@ -1887,7 +1884,7 @@ void PageItem_TextFrame::layout()
                                 case SpecialChars::CJK_FENCE_BEGIN:
                                     kern = -charStyle.fontSize() / 10 / 2;
                                     wide += kern;
-									lastGlyph->xadvance += kern;
+									lastGlyph.xadvance += kern;
                                 }
                                 break;
                             case SpecialChars::CJK_FENCE_BEGIN:
@@ -1899,8 +1896,8 @@ void PageItem_TextFrame::layout()
                                 if (prevStat == SpecialChars::CJK_FENCE_BEGIN){
                                     kern = -charStyle.fontSize() / 10 / 2;
                                     wide += kern;
-									lastGlyph->xadvance += kern;
-									lastGlyph->xoffset += kern;
+									lastGlyph.xadvance += kern;
+									lastGlyph.xoffset += kern;
                                 }
                                 break;
                             }
@@ -1915,7 +1912,7 @@ void PageItem_TextFrame::layout()
                                 // use the size of the current char instead of the next one
                                 kern = charStyle.fontSize() / 10 / 4;
                                 wide += kern;
-								lastGlyph->xadvance += kern;
+								lastGlyph.xadvance += kern;
                             }
                         }
                     }
@@ -1932,9 +1929,9 @@ void PageItem_TextFrame::layout()
                     wide = currentObject->width() + currentObject->lineWidth();
                     asce = currentObject->height() + currentObject->lineWidth();
                     realAsce = calculateLineSpacing (style, this) * DropLines;
-					firstGlyph->scaleH /= firstGlyph->scaleV;
-					firstGlyph->scaleV = (realAsce / itemHeight);
-					firstGlyph->scaleH *= firstGlyph->scaleV;
+					firstGlyph.scaleH /= firstGlyph.scaleV;
+					firstGlyph.scaleV = (realAsce / itemHeight);
+					firstGlyph.scaleH *= firstGlyph.scaleV;
                 }
                 else
                 {
@@ -1952,12 +1949,12 @@ void PageItem_TextFrame::layout()
                         realCharHeight = font.height(style.charStyle().fontSize() / 10.0);
                     asce = font.ascent(hlcsize10);
                     // qDebug() QString("dropcaps pre: chsd=%1 realCharHeight = %2 chstr=%3").arg(chsd).arg(asce).arg(chstr2[0]);
-					firstGlyph->scaleH /= firstGlyph->scaleV;
-					firstGlyph->scaleV = (realAsce / realCharHeight);
-					firstGlyph->scaleH *= firstGlyph->scaleV;
-					firstGlyph->xoffset -= 0.5; //drop caps are always to far from column left edge
+					firstGlyph.scaleH /= firstGlyph.scaleV;
+					firstGlyph.scaleV = (realAsce / realCharHeight);
+					firstGlyph.scaleH *= firstGlyph.scaleV;
+					firstGlyph.xoffset -= 0.5; //drop caps are always to far from column left edge
                 }
-				firstGlyph->xadvance = wide;
+				firstGlyph.xadvance = wide;
                 desc = realDesc = 0;
             }
             else // !DropCMode
@@ -1965,7 +1962,7 @@ void PageItem_TextFrame::layout()
                 if (SpecialChars::isExpandingSpace(currentCh))
                 {
                     double wordtracking = charStyle.wordTracking();
-					firstGlyph->xadvance *= wordtracking;
+					firstGlyph.xadvance *= wordtracking;
                     wide *= wordtracking;
                 }
                 // find ascent / descent
@@ -2366,14 +2363,14 @@ void PageItem_TextFrame::layout()
 							currentRun.setFlag(ScLayout_TabLeaders);
 							GlyphLayout tglyph;
 							tglyph.glyph    = font.char2CMap(tabs.fillChar);
-							tglyph.yoffset  = firstGlyph->yoffset;
+							tglyph.yoffset  = firstGlyph.yoffset;
 							tglyph.scaleV   = tglyph.scaleH = chs / charStyle.fontSize();
 							tglyph.xadvance = 0;
 							currentRun.glyphs().append(tglyph);
 						}
                     }
-					firstGlyph->xadvance = current.xPos + wide + kernVal - tabs.xPos;
-					tabs.tabGlyph = firstGlyph;
+					firstGlyph.xadvance = current.xPos + wide + kernVal - tabs.xPos;
+					tabs.tabGlyph = &firstGlyph;
                 }
             }
 
@@ -2383,7 +2380,7 @@ void PageItem_TextFrame::layout()
                 double yoffset = 0.0;
                 for (int i = 0; i < chstrLen; ++i)
                     yoffset = qMax(yoffset, font.realCharHeight(chstr[i], chsd / 10.0) - font.realCharAscent(chstr[i], chsd / 10.0));
-				firstGlyph->yoffset -= yoffset;
+				firstGlyph.yoffset -= yoffset;
             }
             // remember x pos
             double breakPos = current.xPos;
@@ -2678,7 +2675,7 @@ void PageItem_TextFrame::layout()
             if ((DropCmode || BulNumMode) && !outs)
             {
                 current.xPos += style.parEffectOffset();
-				lastGlyph->xadvance += style.parEffectOffset();
+				lastGlyph.xadvance += style.parEffectOffset();
                 if (DropCmode)
                 {
                     DropCmode = false;

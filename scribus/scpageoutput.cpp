@@ -1583,7 +1583,6 @@ void ScPageOutput::drawItem_Spiral( PageItem_Spiral* item, ScPainterExBase* pain
 
 void ScPageOutput::drawItem_TextFrame( PageItem_TextFrame* item, ScPainterExBase* painter, const QRect& clip )
 {
-    const GlyphBox* lincon = item->asTextFrame()->m_gb;
     QTransform wm;
     QPoint pt1, pt2;
     FPoint ColBound;
