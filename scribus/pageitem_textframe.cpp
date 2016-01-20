@@ -1524,7 +1524,7 @@ void PageItem_TextFrame::layout()
         int regionMinY = 0, regionMaxY= 0;
 
         double autoLeftIndent = 0.0;
-
+// TODO: this condition need to be write again to integerate harfbuzz
         for (int a = firstInFrame(); a < itLen; ++a)
         {
             currentCh = itemText.text(a);
