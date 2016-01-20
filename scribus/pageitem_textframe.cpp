@@ -540,8 +540,6 @@ struct LineControl {
 			glyphbox->moveBy(pos, 0);
 			glyphbox->setAscent(result->ascent());
 			glyphbox->setDescent(result->descent());
-            glyphbox->setFirstChar(i+result->firstChar());
-            glyphbox->setLastChar(i+result->firstChar());
             pos += (glyphbox->width());
 			result->addBox(glyphbox);
 
@@ -1816,7 +1814,7 @@ void PageItem_TextFrame::layout()
 			//			glyphs->yadvance = 0;
 
             GlyphRun& currentRun(current.glyphRuns.last());
-			layoutGlyphs(chstr, currentRun);
+			layoutGlyphs(chstr,a , currentRun);
 			if (currentRun.glyphs().isEmpty())
                 continue;
 
