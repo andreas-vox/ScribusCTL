@@ -1227,7 +1227,7 @@ bool PageItem::frameUnderflows() const
 	return (firstInFrame() > lastInFrame());
 }
 
-void PageItem::drawOverflowMarker(ScPainter *p)
+void PageItem::drawOverflowMarker(ScreenPainter *p)
 {
 	qreal sideLength = 10 / qMax(p->zoomFactor(), 1.0);
 	qreal offset = 1 / qMax(p->zoomFactor(), 1.0);
@@ -1252,7 +1252,7 @@ void PageItem::drawOverflowMarker(ScPainter *p)
 	p->setPenOpacity(1.0);
 	p->setBrush(Qt::white);
 	p->setBrushOpacity(1.0);
-	p->setFillMode(ScPainter::Solid);
+	p->setFillMode(ScreenPainter::Solid);
 	p->drawSharpRect(left, top, sideLength, sideLength);
 	p->drawSharpLine(QPointF(left, top), QPointF(right, bottom));
 	p->drawSharpLine(QPointF(left, bottom), QPointF(right, top));
@@ -1703,7 +1703,7 @@ void PageItem::setCornerRadius(double newRadius)
 /** Paints the item.
     CHANGE: cullingArea is in doc coordinates!
  */
-void PageItem::DrawObj(ScPainter *p, QRectF cullingArea)
+void PageItem::DrawObj(ScreenPainter *p, QRectF cullingArea)
 {
 	if (!m_Doc->DoDrawing)
 		return;
@@ -1731,7 +1731,7 @@ void PageItem::DrawObj(ScPainter *p, QRectF cullingArea)
 	DrawObj_Post(p);
 }
 
-void PageItem::DrawObj_Pre(ScPainter *p)
+void PageItem::DrawObj_Pre(ScreenPainter *p)
 {
 	p->save();
 	double lwCorr = m_lineWidth;
@@ -1745,7 +1745,7 @@ void PageItem::DrawObj_Pre(ScPainter *p)
 	if (m_Doc->layerOutline(LayerID))
 	{
 		p->setPen(m_Doc->layerMarker(LayerID), 0, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
-		p->setFillMode(ScPainter::None);
+		p->setFillMode(ScreenPainter::None);
 		p->setBrushOpacity(1.0);
 		p->setPenOpacity(1.0);
 		return;
@@ -1770,12 +1770,12 @@ void PageItem::DrawObj_Pre(ScPainter *p)
 				if (fillColor() != CommonStrings::None)
 				{
 					p->setBrush(fillQColor);
-					p->setFillMode(ScPainter::Solid);
+					p->setFillMode(ScreenPainter::Solid);
 				}
 				else
 				{
 					no_fill = true;
-					p->setFillMode(ScPainter::None);
+					p->setFillMode(ScreenPainter::None);
 				}
 				if ((!patternVal.isEmpty()) && (!m_Doc->docPatterns.contains(patternVal)))
 				{
@@ -1786,14 +1786,14 @@ void PageItem::DrawObj_Pre(ScPainter *p)
 			else
 			{
 				p->setPattern(pattern, patternScaleX, patternScaleY, patternOffsetX, patternOffsetY, patternRotation, patternSkewX, patternSkewY, patternMirrorX, patternMirrorY);
-				p->setFillMode(ScPainter::Pattern);
+				p->setFillMode(ScreenPainter::Pattern);
 			}
 		}
 		else
 		{
 			if (GrType == 9)
 			{
-				p->setFillMode(ScPainter::Gradient);
+				p->setFillMode(ScreenPainter::Gradient);
 				FPoint pG1 = FPoint(0, 0);
 				FPoint pG2 = FPoint(width(), 0);
 				FPoint pG3 = FPoint(width(), height());
@@ -1805,7 +1805,7 @@ void PageItem::DrawObj_Pre(ScPainter *p)
 			{
 				if (fillColor() != CommonStrings::None)
 					p->setBrush(fillQColor);
-				p->setFillMode(ScPainter::Hatch);
+				p->setFillMode(ScreenPainter::Hatch);
 				p->setHatchParameters(hatchType, hatchDistance, hatchAngle, hatchUseBackground, hatchBackgroundQ, hatchForegroundQ, width(), height());
 			}
 			else
@@ -1819,17 +1819,17 @@ void PageItem::DrawObj_Pre(ScPainter *p)
 					if (fillColor() != CommonStrings::None)
 					{
 						p->setBrush(fillQColor);
-						p->setFillMode(ScPainter::Solid);
+						p->setFillMode(ScreenPainter::Solid);
 					}
 					else
 					{
 						no_fill = true;
-						p->setFillMode(ScPainter::None);
+						p->setFillMode(ScreenPainter::None);
 					}
 				}
 				else
 				{
-					p->setFillMode(ScPainter::Gradient);
+					p->setFillMode(ScreenPainter::Gradient);
 					p->fill_gradient = fill_gradient;
 					p->fill_gradient.setRepeatMethod(GrExtend);
 					switch (GrType)
@@ -1846,16 +1846,16 @@ void PageItem::DrawObj_Pre(ScPainter *p)
 							p->setGradient(VGradient::radial, FPoint(GrStartX, GrStartY), FPoint(GrEndX, GrEndY), FPoint(GrFocalX, GrFocalY), GrScale, GrSkew);
 							break;
 						case 10:
-							p->setFillMode(ScPainter::Gradient);
+							p->setFillMode(ScreenPainter::Gradient);
 							p->setDiamondGeometry(FPoint(0, 0), FPoint(width(), 0), FPoint(width(), height()), FPoint(0, height()), GrControl1, GrControl2, GrControl3, GrControl4, GrControl5);
 							break;
 						case 11:
 						case 13:
-							p->setFillMode(ScPainter::Gradient);
+							p->setFillMode(ScreenPainter::Gradient);
 							p->setMeshGradient(FPoint(0, 0), FPoint(width(), 0), FPoint(width(), height()), FPoint(0, height()), meshGradientArray);
 							break;
 						case 12:
-							p->setFillMode(ScPainter::Gradient);
+							p->setFillMode(ScreenPainter::Gradient);
 							p->setMeshGradient(FPoint(0, 0), FPoint(width(), 0), FPoint(width(), height()), FPoint(0, height()), meshGradientPatches);
 							break;
 					}
@@ -1869,12 +1869,12 @@ void PageItem::DrawObj_Pre(ScPainter *p)
 		if (fillColor() != CommonStrings::None)
 		{
 			p->setBrush(fillQColor);
-			p->setFillMode(ScPainter::Solid);
+			p->setFillMode(ScreenPainter::Solid);
 		}
 		else
 		{
 			no_fill = true;
-			p->setFillMode(ScPainter::None);
+			p->setFillMode(ScreenPainter::None);
 		}
 	}
 	if ((lineColor() != CommonStrings::None) || (!patternStrokeVal.isEmpty()) || (GrTypeStroke > 0))
@@ -1928,7 +1928,7 @@ void PageItem::DrawObj_Pre(ScPainter *p)
 		p->setMaskMode(0);
 }
 
-void PageItem::DrawObj_Post(ScPainter *p)
+void PageItem::DrawObj_Post(ScreenPainter *p)
 {
 	bool doStroke=true;
 	double lwCorr = m_lineWidth;
@@ -1940,7 +1940,7 @@ void PageItem::DrawObj_Post(ScPainter *p)
 		if (itemType()!=Line)
 		{
 			p->setPen(m_Doc->layerMarker(LayerID), 0, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
-			p->setFillMode(ScPainter::None);
+			p->setFillMode(ScreenPainter::None);
 			p->setBrushOpacity(1.0);
 			p->setPenOpacity(1.0);
 			if (itemType()==PolyLine)
@@ -2002,7 +2002,7 @@ void PageItem::DrawObj_Post(ScPainter *p)
 						else
 						{
 							p->setPattern(strokePattern, patternStrokeScaleX, patternStrokeScaleY, patternStrokeOffsetX, patternStrokeOffsetY, patternStrokeRotation, patternStrokeSkewX, patternStrokeSkewY, patternStrokeMirrorX, patternStrokeMirrorY);
-							p->setStrokeMode(ScPainter::Pattern);
+							p->setStrokeMode(ScreenPainter::Pattern);
 							p->strokePath();
 						}
 					}
@@ -2017,17 +2017,17 @@ void PageItem::DrawObj_Post(ScPainter *p)
 							if (lineColor() != CommonStrings::None)
 							{
 								p->setBrush(strokeQColor);
-								p->setStrokeMode(ScPainter::Solid);
+								p->setStrokeMode(ScreenPainter::Solid);
 							}
 							else
 							{
 								no_stroke = true;
-								p->setStrokeMode(ScPainter::None);
+								p->setStrokeMode(ScreenPainter::None);
 							}
 						}
 						else
 						{
-							p->setStrokeMode(ScPainter::Gradient);
+							p->setStrokeMode(ScreenPainter::Gradient);
 							p->stroke_gradient = stroke_gradient;
 							p->stroke_gradient.setRepeatMethod(GrStrokeExtend);
 							if (GrTypeStroke == 6)
@@ -2039,7 +2039,7 @@ void PageItem::DrawObj_Post(ScPainter *p)
 					}
 					else if (lineColor() != CommonStrings::None)
 					{
-						p->setStrokeMode(ScPainter::Solid);
+						p->setStrokeMode(ScreenPainter::Solid);
 						p->setPen(strokeQColor, lwCorr, PLineArt, PLineEnd, PLineJoin);
 						if (DashValues.count() != 0)
 							p->setDash(DashValues, DashOffset);
@@ -2052,7 +2052,7 @@ void PageItem::DrawObj_Post(ScPainter *p)
 				}
 				else
 				{
-					p->setStrokeMode(ScPainter::Solid);
+					p->setStrokeMode(ScreenPainter::Solid);
 					multiLine ml = m_Doc->MLineStyles[NamedLStyle];
 					QColor tmp;
 					for (int it = ml.size()-1; it > -1; it--)
@@ -2071,14 +2071,14 @@ void PageItem::DrawObj_Post(ScPainter *p)
 			}
 		}
 	}
-	p->setFillMode(ScPainter::Solid);
+	p->setFillMode(ScreenPainter::Solid);
 	p->setBlendModeFill(0);
-	p->setStrokeMode(ScPainter::Solid);
+	p->setStrokeMode(ScreenPainter::Solid);
 	p->setBlendModeStroke(0);
 	p->restore();
 }
 
-void PageItem::DrawObj_Decoration(ScPainter *p)
+void PageItem::DrawObj_Decoration(ScreenPainter *p)
 {
 	p->save();
 	p->setAntialiasing(false);
@@ -2163,7 +2163,7 @@ void PageItem::DrawObj_Decoration(ScPainter *p)
 			p->setPenOpacity(1.0);
 			p->setBrush(m_Doc->layerMarker(LayerID));
 			p->setBrushOpacity(1.0);
-			p->setFillMode(ScPainter::Solid);
+			p->setFillMode(ScreenPainter::Solid);
 			double ofwh = 10;
 			double ofx = m_width - ofwh/2;
 			double ofy = m_height - ofwh*3;
@@ -2174,7 +2174,7 @@ void PageItem::DrawObj_Decoration(ScPainter *p)
 			p->setPen(PrefsManager::instance()->appPrefs.displayPrefs.frameNormColor, scpInv, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
 			if (m_Locked)
 				p->setPen(PrefsManager::instance()->appPrefs.displayPrefs.frameLockColor, scpInv, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
-			p->setFillMode(ScPainter::None);
+			p->setFillMode(ScreenPainter::None);
 			p->drawSharpRect(0, 0, m_width, m_height);
 			no_fill = false;
 			no_stroke = false;
@@ -2188,7 +2188,7 @@ void PageItem::DrawObj_Decoration(ScPainter *p)
 	p->restore();
 }
 
-void PageItem::DrawObj_Embedded(ScPainter *p, QRectF cullingArea, const CharStyle& style, PageItem* cembedded)
+void PageItem::DrawObj_Embedded(ScreenPainter *p, QRectF cullingArea, const CharStyle& style, PageItem* cembedded)
 {
 	if (!cembedded)
 		return;
@@ -2255,13 +2255,13 @@ void PageItem::DrawObj_Embedded(ScPainter *p, QRectF cullingArea, const CharStyl
 			p->translate(0, -cembedded->m_height * (style.baselineOffset() / 1000.0));
 		p->scale(style.scaleH() / 1000.0, style.scaleV() / 1000.0);
 		p->setPen(PrefsManager::instance()->appPrefs.displayPrefs.frameNormColor, 0, Qt::DotLine, Qt::FlatCap, Qt::MiterJoin);
-		p->setFillMode(ScPainter::None);
+		p->setFillMode(ScreenPainter::None);
 		p->drawSharpRect(0, 0, cembedded->m_width, cembedded->m_height);
 		p->restore();
 	}
 }
 
-void PageItem::DrawStrokePattern(ScPainter *p, QPainterPath &path)
+void PageItem::DrawStrokePattern(ScreenPainter *p, QPainterPath &path)
 {
 	ScPattern pat = m_Doc->docPatterns[patternStrokeVal];
 	double pLen = path.length() - ((pat.width / 2.0) * (patternStrokeScaleX / 100.0));
@@ -2316,7 +2316,7 @@ void PageItem::DrawStrokePattern(ScPainter *p, QPainterPath &path)
 	p->newPath();
 }
 
-void PageItem::DrawSoftShadow(ScPainter *p)
+void PageItem::DrawSoftShadow(ScreenPainter *p)
 {
 	if (m_softShadowColor == CommonStrings::None)
 		return;
@@ -2376,11 +2376,11 @@ void PageItem::DrawSoftShadow(ScPainter *p)
 		sh.translate(m_softShadowXOffset, m_softShadowYOffset);
 		p->setupPolygon(&sh);
 		p->setBrush(tmp);
-		p->setFillMode(ScPainter::Solid);
+		p->setFillMode(ScreenPainter::Solid);
 		p->fillPath();
 		if (hasStroke())
 		{
-			p->setStrokeMode(ScPainter::Solid);
+			p->setStrokeMode(ScreenPainter::Solid);
 			p->setPen(tmp, lwCorr, PLineArt, PLineEnd, PLineJoin);
 			p->strokePath();
 		}
@@ -2391,13 +2391,13 @@ void PageItem::DrawSoftShadow(ScPainter *p)
 			sh = PoLine.copy();
 			p->setupPolygon(&sh);
 			p->setBrush(tmp);
-			p->setFillMode(ScPainter::Solid);
+			p->setFillMode(ScreenPainter::Solid);
 			p->setBlendModeFill(19);
 			p->fillPath();
 			if (hasStroke())
 			{
 				p->setBlendModeStroke(19);
-				p->setStrokeMode(ScPainter::Solid);
+				p->setStrokeMode(ScreenPainter::Solid);
 				p->setPen(tmp, lwCorr, PLineArt, PLineEnd, PLineJoin);
 				p->strokePath();
 			}
@@ -2436,7 +2436,7 @@ QImage PageItem::DrawObj_toImage(double maxSize, int options)
 	m_Doc->guidesPrefs().framesShown = false;
 	QImage retImg = QImage(qMax(qRound(igWidth * sc), 1), qMax(qRound(igHeight * sc), 1), QImage::Format_ARGB32_Premultiplied);
 	retImg.fill( qRgba(0, 0, 0, 0) );
-	ScPainter *painter = new ScPainter(&retImg, retImg.width(), retImg.height(), 1, 0);
+	ScreenPainter *painter = new ScreenPainter(&retImg, retImg.width(), retImg.height(), 1, 0);
 	painter->setZoomFactor(sc);
 	painter->save();
 	painter->translate(igXpos, igYpos);
@@ -2465,7 +2465,7 @@ QImage PageItem::DrawObj_toImage(QList<PageItem*> &emG, double scaling)
 	m_Doc->guidesPrefs().framesShown = false;
 	QImage retImg = QImage(qRound(gWidth * scaling), qRound(gHeight * scaling), QImage::Format_ARGB32_Premultiplied);
 	retImg.fill( qRgba(0, 0, 0, 0) );
-	ScPainter *painter = new ScPainter(&retImg, retImg.width(), retImg.height(), 1, 0);
+	ScreenPainter *painter = new ScreenPainter(&retImg, retImg.width(), retImg.height(), 1, 0);
 	painter->setZoomFactor(scaling);
 	for (int em = 0; em < emG.count(); ++em)
 	{
@@ -2552,7 +2552,7 @@ void PageItem::SetQColor(QColor *tmp, QString colorName, double shad)
     sets xadvance to the advance width without kerning. If more than one glyph
     is generated, kerning is included in all but the last xadvance.
 */
-double PageItem::layoutGlyphs(const QString& chars,int index, GlyphRun& glyphrun)
+double PageItem::layoutGlyphs(const QString& chars,int firstChar, int lastChar, GlyphRun& glyphrun)
 {
 	double retval = 0.0;
 
@@ -2660,8 +2660,8 @@ double PageItem::layoutGlyphs(const QString& chars,int index, GlyphRun& glyphrun
 //			if (layout.yadvance > lastLayout.yadvance)
 //				lastLayout.yadvance = layout.yadvance;
 		}
-		glyphrun.setFirstChar(index);
-		glyphrun.setLastChar(index);
+		glyphrun.setFirstChar(firstChar);
+		glyphrun.setLastChar(lastChar);
 		glyphrun.glyphs().append(layout);
 
 	}
@@ -2669,7 +2669,7 @@ double PageItem::layoutGlyphs(const QString& chars,int index, GlyphRun& glyphrun
 }
 
 
-static void drawControlGlyph(ScPainter* p, const GlyphLayout& glyphs, LayoutFlags flags, const ScFace& font, qreal fontSize, ScribusDoc* m_Doc)
+static void drawControlGlyph(ScreenPainter* p, const GlyphLayout& glyphs, LayoutFlags flags, const ScFace& font, qreal fontSize, ScribusDoc* m_Doc)
 {
 	bool stroke = false;
 
@@ -2761,7 +2761,7 @@ static void drawControlGlyph(ScPainter* p, const GlyphLayout& glyphs, LayoutFlag
 }
 
 
-void PageItem::drawGlyphs(ScPainter *p, const GlyphRun& layout)
+void PageItem::drawGlyphs(ScreenPainter *p, const GlyphRun& layout)
 {
 	const CharStyle& style(layout.style());
 	const ScFace font = style.font();
@@ -2865,7 +2865,7 @@ void PageItem::drawGlyphs(ScPainter *p, const GlyphRun& layout)
 				{
 					p->save();
 					p->setPen(m_Doc->layerMarker(LayerID), 0.5, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
-					p->setFillMode(ScPainter::None);
+					p->setFillMode(ScreenPainter::None);
 					p->setBrushOpacity(1.0);
 					p->setPenOpacity(1.0);
 					p->strokePath();
@@ -9723,7 +9723,7 @@ bool PageItem::loadImage(const QString& filename, const bool reload, const int g
 }
 
 
-void PageItem::drawLockedMarker(ScPainter *p)
+void PageItem::drawLockedMarker(ScreenPainter *p)
 {
 	//TODO: CB clean
 	double scp1 = p->zoomFactor() ;// / ScMW->view->scale();
@@ -9738,7 +9738,7 @@ void PageItem::drawLockedMarker(ScPainter *p)
 	p->setPenOpacity(1.0);
 	p->setBrush(Qt::white);
 	p->setBrushOpacity(1.0);
-	p->setFillMode(ScPainter::Solid);
+	p->setFillMode(ScreenPainter::Solid);
 	p->drawRect(ofx, ofy, ofwh, ofwh);
 	p->setBrush(Qt::black);
 	p->drawRect(bx1, by1, bw, bh);
@@ -9749,7 +9749,7 @@ void PageItem::drawLockedMarker(ScPainter *p)
 	p->drawLine(FPoint(bx1+scp1/2, ofy+scp1), FPoint(bx1+scp1*3.5, ofy+scp1));
 }
 
-void PageItem::drawArrow(ScPainter *p, QTransform &arrowTrans, int arrowIndex)
+void PageItem::drawArrow(ScreenPainter *p, QTransform &arrowTrans, int arrowIndex)
 {
 	FPointArray arrow = m_Doc->arrowStyles().at(arrowIndex-1).points.copy();
 	if (NamedLStyle.isEmpty())
@@ -9775,7 +9775,7 @@ void PageItem::drawArrow(ScPainter *p, QTransform &arrowTrans, int arrowIndex)
 			if (strokePattern)
 			{
 				p->setPattern(strokePattern, patternStrokeScaleX, patternStrokeScaleY, patternStrokeOffsetX, patternStrokeOffsetY, patternStrokeRotation, patternStrokeSkewX, patternStrokeSkewY, patternStrokeMirrorX, patternStrokeMirrorY);
-				p->setFillMode(ScPainter::Pattern);
+				p->setFillMode(ScreenPainter::Pattern);
 				p->fillPath();
 			}
 			else if (GrTypeStroke > 0)
@@ -9791,14 +9791,14 @@ void PageItem::drawArrow(ScPainter *p, QTransform &arrowTrans, int arrowIndex)
 						p->setBrush(strokeQColor);
 						p->setBrushOpacity(1.0 - lineTransparency());
 						p->setLineWidth(0);
-						p->setFillMode(ScPainter::Solid);
+						p->setFillMode(ScreenPainter::Solid);
 					}
 					else
-						p->setFillMode(ScPainter::None);
+						p->setFillMode(ScreenPainter::None);
 				}
 				else
 				{
-					p->setFillMode(ScPainter::Gradient);
+					p->setFillMode(ScreenPainter::Gradient);
 					p->fill_gradient = stroke_gradient;
 					if (GrTypeStroke == 6)
 						p->setGradient(VGradient::linear, FPoint(GrStrokeStartX, GrStrokeStartY), FPoint(GrStrokeEndX, GrStrokeEndY), FPoint(GrStrokeStartX, GrStrokeStartY), GrStrokeScale, GrStrokeSkew);
@@ -9812,7 +9812,7 @@ void PageItem::drawArrow(ScPainter *p, QTransform &arrowTrans, int arrowIndex)
 				p->setBrush(strokeQColor);
 				p->setBrushOpacity(1.0 - lineTransparency());
 				p->setLineWidth(0);
-				p->setFillMode(ScPainter::Solid);
+				p->setFillMode(ScreenPainter::Solid);
 				p->fillPath();
 			}
 		}
@@ -9825,7 +9825,7 @@ void PageItem::drawArrow(ScPainter *p, QTransform &arrowTrans, int arrowIndex)
 				SetQColor(&tmp, ml[0].Color, ml[0].Shade);
 				p->setBrush(tmp);
 				p->setLineWidth(0);
-				p->setFillMode(ScPainter::Solid);
+				p->setFillMode(ScreenPainter::Solid);
 				p->fillPath();
 			}
 			for (int it = ml.size()-1; it > 0; it--)

@@ -83,7 +83,7 @@ void TextLayout::removeLastLine ()
 	delete last;
 }
 
-void TextLayout::render(ScPainter *p, const StoryText &text)
+void TextLayout::render(ScreenPainter *p, const StoryText &text)
 {
 
      p->save();

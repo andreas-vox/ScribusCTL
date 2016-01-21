@@ -27,7 +27,7 @@ for which a new license (GPL+exception) is in place.
 
 #include "scribusapi.h"
 #include "pageitem.h"
-class ScPainter;
+class ScreenPainter;
 class ScribusDoc;
 
 
@@ -46,7 +46,7 @@ public:
 	virtual QString infoDescription();
 	
 protected:
-	virtual void DrawObj_Item(ScPainter *p, QRectF e);
+	virtual void DrawObj_Item(ScreenPainter *p, QRectF e);
 
 };
 

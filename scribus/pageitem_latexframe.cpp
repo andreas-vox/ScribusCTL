@@ -117,7 +117,7 @@ void PageItem_LatexFrame::deleteImageFile()
 	imgValid = false;
 }
 
-void PageItem_LatexFrame::DrawObj_Item(ScPainter *p, QRectF e)
+void PageItem_LatexFrame::DrawObj_Item(ScreenPainter *p, QRectF e)
 {
 	layout();
 	if (!imgValid && !err)

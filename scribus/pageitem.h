@@ -59,7 +59,7 @@ class QFrame;
 class QGridLayout;
 class GlyphRun;
 class ResourceCollection;
-class ScPainter;
+class ScreenPainter;
 class ScribusDoc;
 class SimpleState;
 class UndoManager;
@@ -266,16 +266,16 @@ public: // Start public functions
 
 	//<< ********* Functions related to drawing the item *********
 
-	void DrawObj(ScPainter *p, QRectF e);
-	void DrawObj_Pre(ScPainter *p);
-	virtual void DrawObj_Post(ScPainter *p);
-	virtual void DrawObj_Decoration(ScPainter *p);
-	virtual void DrawObj_Item(ScPainter *p, QRectF e) = 0;
+	void DrawObj(ScreenPainter *p, QRectF e);
+	void DrawObj_Pre(ScreenPainter *p);
+	virtual void DrawObj_Post(ScreenPainter *p);
+	virtual void DrawObj_Decoration(ScreenPainter *p);
+	virtual void DrawObj_Item(ScreenPainter *p, QRectF e) = 0;
 	QImage DrawObj_toImage(double maxSize, int options = 0);
 	QImage DrawObj_toImage(QList<PageItem*> &emG, double scaling);
-	void DrawObj_Embedded(ScPainter *p, QRectF e, const CharStyle& style, PageItem* cembedded);
-	void DrawStrokePattern(ScPainter *p, QPainterPath &path);
-	void DrawSoftShadow(ScPainter *p);
+	void DrawObj_Embedded(ScreenPainter *p, QRectF e, const CharStyle& style, PageItem* cembedded);
+	void DrawStrokePattern(ScreenPainter *p, QPainterPath &path);
+	void DrawSoftShadow(ScreenPainter *p);
 	/**
 	 * @brief Set or get the redraw bounding box of the item, moved from the View
 	 */
@@ -390,7 +390,7 @@ public: // Start public functions
 	int frameOverflowCount() const;
 	int frameOverflowBlankCount() const;
 	/// Draws the overflow marker.
-	void drawOverflowMarker(ScPainter *p);
+	void drawOverflowMarker(ScreenPainter *p);
 	/// returns index of first char displayed in this frame, used to be 0
 	int firstInFrame() const;
 	/// returns index of last char displayed in this frame, used to be MaxChars-1
@@ -404,9 +404,9 @@ public: // Start public functions
 	/// Return current text properties (current char + paragraph properties)
 	void currentTextProps(ParagraphStyle& parStyle) const;
 	// deprecated:
-	double layoutGlyphs(const QString& chars, int index, GlyphRun& layout);
+	double layoutGlyphs(const QString& chars,int firstChar, int lastChar, GlyphRun& glyphrun);
 	void SetQColor(QColor *tmp, QString farbe, double shad);
-	void drawGlyphs(ScPainter *p, const GlyphRun& layout );
+	void drawGlyphs(ScreenPainter *p, const GlyphRun& layout );
 	void DrawPolyL(QPainter *p, QPolygon pts);
 	QString ExpandToken(uint base);
 	const FPointArray shape() const { return PoLine; }
@@ -1471,12 +1471,12 @@ public:	// Start public variables
 
 protected: // Start protected functions
 	PageItem(const PageItem & other);
-	void DrawObj_ImageFrame(ScPainter *p, double sc);
-	void DrawObj_Polygon(ScPainter *p);
-	void DrawObj_PolyLine(ScPainter *p);
-	void DrawObj_PathText(ScPainter *p, double sc);
-	void drawLockedMarker(ScPainter *p);
-	void drawArrow(ScPainter *p, QTransform &arrowTrans, int arrowIndex);
+	void DrawObj_ImageFrame(ScreenPainter *p, double sc);
+	void DrawObj_Polygon(ScreenPainter *p);
+	void DrawObj_PolyLine(ScreenPainter *p);
+	void DrawObj_PathText(ScreenPainter *p, double sc);
+	void drawLockedMarker(ScreenPainter *p);
+	void drawArrow(ScreenPainter *p, QTransform &arrowTrans, int arrowIndex);
 
 	/** @brief Manages undostack and is where all undo actions/states are sent. */
 	UndoManager * const undoManager;

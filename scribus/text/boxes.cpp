@@ -38,7 +38,7 @@ int GroupBox::pointToPosition(FPoint coord) const
 	return -1;
 }
 
-void GroupBox::render(ScPainter *p, const StoryText &text)
+void GroupBox::render(ScreenPainter *p, const StoryText &text)
 {
 	p->translate(x(),y());
 	for (int i = 0; i < boxes().count(); i++)
@@ -114,7 +114,7 @@ LineBox::LineBox()
 	m_type = T_Line;
 }
 
-void GlyphBox::render(ScPainter *p, const StoryText &text)
+void GlyphBox::render(ScreenPainter *p, const StoryText &text)
 {
 	const CharStyle& style(glyphs.style());
 	const ScFace font = style.font();
@@ -125,13 +125,13 @@ void GlyphBox::render(ScPainter *p, const StoryText &text)
 
 	if (style.fillColor() != CommonStrings::None)
 	{
-		p->setFillMode(ScPainter::Solid);
+		p->setFillMode(ScreenPainter::Solid);
 		QColor tmp;
 		//SetQColor(&tmp, style.fillColor(), style.fillShade());
 		p->setBrush(tmp);
 	}
 	else
-		p->setFillMode(ScPainter::None);
+		p->setFillMode(ScreenPainter::None);
 	if (selected/*((selected && m_isSelected) || ((NextBox != 0 || BackBox != 0) && selected)) && (m_Doc->appMode == modeEdit || m_Doc->appMode == modeEditTable)*/)
 	{
 		// set text color to highlight if its selected

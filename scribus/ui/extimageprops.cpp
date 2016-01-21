@@ -241,7 +241,7 @@ ExtImageProps::ExtImageProps( QWidget* parent, ImageInfoRecord *info, PageItem *
 		for (it = info->PDSpathData.begin(); it != info->PDSpathData.end(); ++it)
 		{
 			QImage pixm(40, 40, QImage::Format_ARGB32_Premultiplied);
-			ScPainter *p = new ScPainter(&pixm, 40, 40);
+			ScreenPainter *p = new ScreenPainter(&pixm, 40, 40);
 			p->clear();
 			p->translate(3.0, 3.0);
 			if (it.key() == info->clipPath)
@@ -263,8 +263,8 @@ ExtImageProps::ExtImageProps( QWidget* parent, ImageInfoRecord *info, PageItem *
 			p->setupPolygon(&Path);
 			p->setPen(Qt::black, 1, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
 			p->setBrush(Qt::white);
-			p->setFillMode(ScPainter::None);
-			p->setStrokeMode(ScPainter::Solid);
+			p->setFillMode(ScreenPainter::None);
+			p->setStrokeMode(ScreenPainter::Solid);
 			p->strokePath();
 			p->end();
 			delete p;

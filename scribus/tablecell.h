@@ -23,7 +23,7 @@ for which a new license (GPL+exception) is in place.
 #include "styles/cellstyle.h"
 
 class PageItem_Table;
-class ScPainter;
+class ScreenPainter;
 
 /**
  * Shared data class for TableCell.

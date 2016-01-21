@@ -3760,7 +3760,7 @@ QByteArray PDFLibCore::PDF_PutSoftShadow(PageItem* ite, const ScPage *pag)
 	ite->setFillTransparency(transF);
 	ite->setLineTransparency(transS);
 	QImage imgC = imgA.copy(-pixelRadius, -pixelRadius, imgA.width() + 2 * pixelRadius, imgA.height() + 2 * pixelRadius); // Add border
-	ScPainter *p = new ScPainter(&imgC, imgC.width(), imgC.height(), 1, 0);
+	ScreenPainter *p = new ScreenPainter(&imgC, imgC.width(), imgC.height(), 1, 0);
 	p->setZoomFactor(softShadowDPI / 72.0);
 	p->save();
 	p->blur(pixelRadius);
@@ -3769,7 +3769,7 @@ QByteArray PDFLibCore::PDF_PutSoftShadow(PageItem* ite, const ScPage *pag)
 	delete p;
 	if (ite->softShadowErasedByObject())
 	{
-		ScPainter *p = new ScPainter(&imgC, imgC.width(), imgC.height(), 1, 0);
+		ScreenPainter *p = new ScreenPainter(&imgC, imgC.width(), imgC.height(), 1, 0);
 		p->translate(pixelRadius, pixelRadius);
 		p->translate(-ite->softShadowXOffset() * (softShadowDPI / 72.0), -ite->softShadowYOffset() * (softShadowDPI / 72.0));
 		p->beginLayer(1.0, 18);
@@ -5398,7 +5398,7 @@ QByteArray PDFLibCore::setTextSt(PageItem *ite, uint PNr, const ScPage* pag)
 					//const GlyphBox* item = ite->asTextFrame()->m_gb ;//= new GlyphBox();
 					//for (int d = ls->firstChar(); d <= ls->lastChar(); ++d)
 					//{
-					const QChar ch = ite->itemText.text(a);
+					//const QChar ch = ite->itemText.text(a);
 					const CharStyle& chstyle(ite->itemText.charStyle(a));
 					const ParagraphStyle& pstyle(ite->itemText.paragraphStyle(a));
 
@@ -5412,56 +5412,57 @@ QByteArray PDFLibCore::setTextSt(PageItem *ite, uint PNr, const ScPage* pag)
 						tTabValues = pstyle.tabValues();
 						if (ite->itemText.hasFlag(d, ScLayout_StartOfLine))
 							tabCc = 0;
-						if ((ch == SpecialChars::TAB) && (tTabValues.count() != 0))
-						{
-							QChar tabFillChar;
-							//const TabLayout* tabLayout = dynamic_cast<const TabLayout*>(glyphs->more);
-							//if (tabLayout)
-							//	tabFillChar = tabLayout->fillChar;
-							if (!tabFillChar.isNull())
-							{
-								GlyphLayout gl2;
-								CharStyle cl2(chstyle);
-								const GlyphLayout  gl = glyphs;
-								double scale =  gl.scaleV ;
-								double wt    = chstyle.font().charWidth(tabFillChar, chstyle.fontSize() * scale / 10.0);
-								double len   = glyphs.xadvance;
-								int coun     = static_cast<int>(len / wt);
-								// #6728 : update code according to fillInTabLeaders() and PageItem::layout() - JG
-								double sPos  = 0.0 /*CurX - len + chstyle.fontSize() / 10.0 * 0.7 + 1*/;
-								//hl2.ch = tTabValues[tabCc].tabFillChar;
-								cl2.setTracking(0);
-								cl2.setScaleH(1000);
-								cl2.setScaleV(1000);
-								gl2.glyph   = chstyle.font().char2CMap(tabFillChar);
-								gl2.yoffset = glyphs.yoffset;
-								for (int cx = 0; cx < coun; ++cx)
-								{
-									gl2.xoffset =  sPos + wt * cx;
-									if ((chstyle.effects() & ScStyle_Shadowed) && (chstyle.strokeColor() != CommonStrings::None))
-									{
-										GlyphLayout gl3;
-										CharStyle cl3(cl2);
-										//<< HACK to fix Bug #8446
-										cl3.setEffects(cl3.effects() & (~(ScStyle_Outline)));
-										//>>
-										gl3.glyph = gl2.glyph;
-										cl3.setFillColor(cl2.strokeColor());
-										cl3.setFillShade(cl2.strokeShade());
-										gl3.yoffset = gl2.yoffset - (chstyle.fontSize() * chstyle.shadowYOffset() / 10000.0);
-										gl3.xoffset = gl2.xoffset + (chstyle.fontSize() * chstyle.shadowXOffset() / 10000.0);
-										setTextCh(ite, PNr, CurX, ls->y(), d, tmp, tmp2, cl3, gl3, pdata, pstyle, pag);
-									}
-									setTextCh(ite, PNr, CurX, ls->y(), d, tmp, tmp2, cl2, gl2, pdata, pstyle, pag);
-								}
-							}
-							tabCc++;
-						}
-						if (ch == SpecialChars::TAB)
-						{
-                            CurX += glyphs.xadvance;
-							continue;
-						}
+//                        //we dont need to check any thing related to layout here, every check shuld be in textFrame::layout
+//                        if ((ite->asTextFrame()->isTab(a)) && (tTabValues.count() != 0))
+//                    	{
+//                        	QChar tabFillChar;
+//                            const TabLayout* tabLayout = dynamic_cast<const TabLayout*>(glyphs->more);
+//                            if (tabLayout)
+//                            	tabFillChar = tabLayout->fillChar;
+//							if (!tabFillChar.isNull())
+//							{
+//								GlyphLayout gl2;
+//								CharStyle cl2(chstyle);
+//								const GlyphLayout  gl = glyphs;
+//								double scale =  gl.scaleV ;
+//								double wt    = chstyle.font().charWidth(tabFillChar, chstyle.fontSize() * scale / 10.0);
+//								double len   = glyphs.xadvance;
+//								int coun     = static_cast<int>(len / wt);
+//								// #6728 : update code according to fillInTabLeaders() and PageItem::layout() - JG
+//								double sPos  = 0.0 /*CurX - len + chstyle.fontSize() / 10.0 * 0.7 + 1*/;
+//								//hl2.ch = tTabValues[tabCc].tabFillChar;
+//								cl2.setTracking(0);
+//								cl2.setScaleH(1000);
+//								cl2.setScaleV(1000);
+//								gl2.glyph   = chstyle.font().char2CMap(tabFillChar);
+//								gl2.yoffset = glyphs.yoffset;
+//								for (int cx = 0; cx < coun; ++cx)
+//								{
+//									gl2.xoffset =  sPos + wt * cx;
+//									if ((chstyle.effects() & ScStyle_Shadowed) && (chstyle.strokeColor() != CommonStrings::None))
+//									{
+//										GlyphLayout gl3;
+//										CharStyle cl3(cl2);
+//										//<< HACK to fix Bug #8446
+//										cl3.setEffects(cl3.effects() & (~(ScStyle_Outline)));
+//										//>>
+//										gl3.glyph = gl2.glyph;
+//										cl3.setFillColor(cl2.strokeColor());
+//										cl3.setFillShade(cl2.strokeShade());
+//										gl3.yoffset = gl2.yoffset - (chstyle.fontSize() * chstyle.shadowYOffset() / 10000.0);
+//										gl3.xoffset = gl2.xoffset + (chstyle.fontSize() * chstyle.shadowXOffset() / 10000.0);
+//										setTextCh(ite, PNr, CurX, ls->y(), d, tmp, tmp2, cl3, gl3, pdata, pstyle, pag);
+//									}
+//									setTextCh(ite, PNr, CurX, ls->y(), d, tmp, tmp2, cl2, gl2, pdata, pstyle, pag);
+//								}
+//							}
+//                            tabCc++;
+//                        }
+//                        if (ite->asTextFrame()->isTab(a))
+//						{
+//                            CurX += glyphs.xadvance;
+//							continue;
+//						}
 						if ((chstyle.effects() & ScStyle_Shadowed) && (chstyle.strokeColor() != CommonStrings::None))
 						{
 							GlyphLayout gl2(glyphs);
@@ -5474,8 +5475,8 @@ QByteArray PDFLibCore::setTextSt(PageItem *ite, uint PNr, const ScPage* pag)
 								glx->yoffset -= (chstyle.fontSize() * chstyle.shadowYOffset() / 10000.0);
 								glx->xoffset += (chstyle.fontSize() * chstyle.shadowXOffset() / 10000.0);
                                 glx = NULL;
-								//gl1 = gl1.more;
-								//glx = glx->more;
+                                //gl1 = gl1.more;
+                                //glx = glx->more;
 							}
 							CharStyle cl2(chstyle);
 							//<< HACK to fix Bug #8446
@@ -5492,20 +5493,20 @@ QByteArray PDFLibCore::setTextSt(PageItem *ite, uint PNr, const ScPage* pag)
 							setTextCh(ite, PNr, CurX, ls->y(), d, tmp, tmp2, cl2, gl2, pdata, pstyle, pag);
                             //gl2.shrink();
 						}
-						//const GlyphLayout * x = &glyphs;
+                        //const GlyphLayout * x = &glyphs;
 						setTextCh(ite, PNr, CurX, ls->y(), d, tmp, tmp2, chstyle, glyphs, pdata, pstyle, pag);
-						// Unneeded now that glyph xadvance is set appropriately for inline objects by PageItem_TextFrame::layout() - JG
-						/*if (hl->ch == SpecialChars::OBJECT)
-				{
-					InlineFrame& embedded(const_cast<InlineFrame&>(hl->embedded));
-					CurX += (embedded.getItem()->gWidth + embedded.getItem()->lineWidth()) * hl->glyph.scaleH;
-				}
-				else*/
+                        // Unneeded now that glyph xadvance is set appropriately for inline objects by PageItem_TextFrame::layout() - JG
+                        /*if (hl->ch == SpecialChars::OBJECT)
+                {
+                    InlineFrame& embedded(const_cast<InlineFrame&>(hl->embedded));
+                    CurX += (embedded.getItem()->gWidth + embedded.getItem()->lineWidth()) * hl->glyph.scaleH;
+                }
+                else*/
                         CurX += glyphs.xadvance;
                         tabDist = CurX;
 					}
-                    if (SpecialChars::isBreak(ch, true) || (ch == QChar(10)))
-                        continue;
+                    //if (ite->asTextFrame()->isBre(a))
+                     //   continue;
                 }
             }
 		}
@@ -5519,7 +5520,7 @@ QByteArray PDFLibCore::setTextSt(PageItem *ite, uint PNr, const ScPage* pag)
 		const GlyphBox* item = ite->asTextFrame()->m_gb;
 		for (int d = 0; d < ite->maxCharsInFrame(); ++d)
 		{
-			GlyphLayout glyphs = item->glyphs.glyphs().at(d);//item.glyphRuns.at(d).glyphs().at(d);
+            GlyphLayout glyphs = item->glyphs.glyphs().at(d);//item.glyphRuns.at(d).glyphs().at(d);
 			PathData* pdata = &ite->textLayout.point(d);
 			const QChar ch = ite->asPathText()->itemRenderText.text(d);
 			const CharStyle& chstyle(ite->asPathText()->itemRenderText.charStyle(d));
@@ -5531,52 +5532,52 @@ QByteArray PDFLibCore::setTextSt(PageItem *ite, uint PNr, const ScPage* pag)
 			tTabValues = pstyle.tabValues();
 			if (ite->asPathText()->itemRenderText.hasFlag(d,  ScLayout_StartOfLine))
 				tabCc = 0;
-			if ((ch == SpecialChars::TAB) && (tTabValues.count() != 0))
-			{
-				if ((tabCc < tTabValues.count()) && (!tTabValues[tabCc].tabFillChar.isNull()))
-				{
-					GlyphLayout gl2;
-					CharStyle cl2(chstyle);
-					double wt = chstyle.font().charWidth(tTabValues[tabCc].tabFillChar, chstyle.fontSize());
-					int coun = static_cast<int>((CurX+ glyphs.xoffset - tabDist) / wt);
-					// #6728 : update code according to fillInTabLeaders() and PageItem::layout() - JG
-                    double sPos = 0.0 /* CurX+hl->glyph.xoffset - (CurX+hl->glyph.xoffset - tabDist) + 1 */;
-					gl2.glyph = chstyle.font().char2CMap(tTabValues[tabCc].tabFillChar);
-					cl2.setTracking(0);
-					cl2.setScaleH(1000);
-					cl2.setScaleV(1000);
-					gl2.yoffset = glyphs.yoffset;
-					for (int cx = 0; cx < coun; ++cx)
-					{
-						glyphs.xoffset =  sPos + wt * cx;
-						if ((chstyle.effects() & ScStyle_Shadowed) && (chstyle.strokeColor() != CommonStrings::None))
-						{
-							GlyphLayout gl3;
-							CharStyle cl3(cl2);
-							//<< HACK to fix Bug #8446
-							cl3.setEffects(cl3.effects() & (~(ScStyle_Outline)));
-							//>>
-							gl3.glyph = gl2.glyph;
-							cl3.setFillColor(cl2.strokeColor());
-							cl3.setFillShade(cl2.strokeShade());
-							gl3.yoffset = gl2.yoffset - (chstyle.fontSize() * chstyle.shadowYOffset() / 10000.0);
-							gl3.xoffset = gl2.xoffset + (chstyle.fontSize() * chstyle.shadowXOffset() / 10000.0);
-							setTextCh(ite, PNr, 0, 0, d, tmp, tmp2, cl3, gl3, pdata, pstyle, pag);
-						}
-						setTextCh(ite, PNr, 0, 0, d, tmp, tmp2, cl2, gl2, pdata, pstyle, pag);
-					}
-					tabCc++;
-                }
-				else
-				{
-					tabCc++;
-				}
-			}
-			if (ch == SpecialChars::TAB)
-			{
-				CurX += glyphs.xadvance;
-				continue;
-			}
+//			if ((ch == SpecialChars::TAB) && (tTabValues.count() != 0))
+//			{
+//				if ((tabCc < tTabValues.count()) && (!tTabValues[tabCc].tabFillChar.isNull()))
+//				{
+//					GlyphLayout gl2;
+//					CharStyle cl2(chstyle);
+//					double wt = chstyle.font().charWidth(tTabValues[tabCc].tabFillChar, chstyle.fontSize());
+//					int coun = static_cast<int>((CurX+ glyphs.xoffset - tabDist) / wt);
+//					// #6728 : update code according to fillInTabLeaders() and PageItem::layout() - JG
+//                    double sPos = 0.0 /* CurX+hl->glyph.xoffset - (CurX+hl->glyph.xoffset - tabDist) + 1 */;
+//					gl2.glyph = chstyle.font().char2CMap(tTabValues[tabCc].tabFillChar);
+//					cl2.setTracking(0);
+//					cl2.setScaleH(1000);
+//					cl2.setScaleV(1000);
+//					gl2.yoffset = glyphs.yoffset;
+//					for (int cx = 0; cx < coun; ++cx)
+//					{
+//						glyphs.xoffset =  sPos + wt * cx;
+//						if ((chstyle.effects() & ScStyle_Shadowed) && (chstyle.strokeColor() != CommonStrings::None))
+//						{
+//							GlyphLayout gl3;
+//							CharStyle cl3(cl2);
+//							//<< HACK to fix Bug #8446
+//							cl3.setEffects(cl3.effects() & (~(ScStyle_Outline)));
+//							//>>
+//							gl3.glyph = gl2.glyph;
+//							cl3.setFillColor(cl2.strokeColor());
+//							cl3.setFillShade(cl2.strokeShade());
+//							gl3.yoffset = gl2.yoffset - (chstyle.fontSize() * chstyle.shadowYOffset() / 10000.0);
+//							gl3.xoffset = gl2.xoffset + (chstyle.fontSize() * chstyle.shadowXOffset() / 10000.0);
+//							setTextCh(ite, PNr, 0, 0, d, tmp, tmp2, cl3, gl3, pdata, pstyle, pag);
+//						}
+//						setTextCh(ite, PNr, 0, 0, d, tmp, tmp2, cl2, gl2, pdata, pstyle, pag);
+//					}
+//					tabCc++;
+//                }
+//				else
+//				{
+//					tabCc++;
+//				}
+//			}
+//			if (ch == SpecialChars::TAB)
+//			{
+//				CurX += glyphs.xadvance;
+//				continue;
+//			}
 			if ((chstyle.effects() & ScStyle_Shadowed) && (chstyle.strokeColor() != CommonStrings::None))
 			{
 				GlyphLayout gl2;
@@ -5638,28 +5639,28 @@ bool PDFLibCore::setTextCh(PageItem *ite, uint PNr, double x, double y, uint d, 
 			tmp += "1 0 0 1 0 "+ FToStr( -ite->BaseOffs)+" cm\n";
 		if (glyphs.xoffset != 0.0 || glyphs.yoffset != 0.0)
 			tmp += "1 0 0 1 " + FToStr( glyphs.xoffset)+ " " + FToStr( -glyphs.yoffset)+" cm\n";
-		if (ite->itemText.text(d) != SpecialChars::OBJECT)
-			tmp += "BT\n";
+       // if (ite->itemText.text(d) != SpecialChars::OBJECT)
+        //	tmp += "BT\n";
 	}
-	QChar chstr = ite->itemText.text(d);
-	double tsz = style.fontSize();
+    //QChar chstr = ite->itemText.text(d);
+    double tsz = style.fontSize();
 
-	/*	if (hl->effects() & ScStyle_DropCap)
-	{
-		if (pstyle.lineSpacingMode() == ParagraphStyle::BaselineGridLineSpacing)
-			tsz = qRound(10 * ((doc.typographicSettings.valueBaseGrid * (pstyle.dropCapLines()-1)+(hl->font().ascent(pstyle.charStyle().fontSize() / 10.0))) / (hl->font().realCharHeight(chstr, 10))));
-		else
-		{
-			if (pstyle.lineSpacingMode() == ParagraphStyle::FixedLineSpacing)
-				tsz = qRound(10 * ((pstyle.lineSpacing() *  (pstyle.dropCapLines()-1)+(hl->font().ascent(pstyle.charStyle().fontSize() / 10.0))) / (hl->font().realCharHeight(chstr, 10))));
-			else
-			{
-				double currasce = hl->font().height(pstyle.charStyle().fontSize());
-				tsz = qRound(10 * ((currasce * (pstyle.dropCapLines()-1)+(hl->font().ascent(pstyle.charStyle().fontSize() / 10.0))) / hl->font().realCharHeight(chstr, 10)));
-			}
-		}
-	}
-	*/
+    /*	if (hl->effects() & ScStyle_DropCap)
+    {
+        if (pstyle.lineSpacingMode() == ParagraphStyle::BaselineGridLineSpacing)
+            tsz = qRound(10 * ((doc.typographicSettings.valueBaseGrid * (pstyle.dropCapLines()-1)+(hl->font().ascent(pstyle.charStyle().fontSize() / 10.0))) / (hl->font().realCharHeight(chstr, 10))));
+        else
+        {
+            if (pstyle.lineSpacingMode() == ParagraphStyle::FixedLineSpacing)
+                tsz = qRound(10 * ((pstyle.lineSpacing() *  (pstyle.dropCapLines()-1)+(hl->font().ascent(pstyle.charStyle().fontSize() / 10.0))) / (hl->font().realCharHeight(chstr, 10))));
+            else
+            {
+                double currasce = hl->font().height(pstyle.charStyle().fontSize());
+                tsz = qRound(10 * ((currasce * (pstyle.dropCapLines()-1)+(hl->font().ascent(pstyle.charStyle().fontSize() / 10.0))) / hl->font().realCharHeight(chstr, 10)));
+            }
+        }
+    }
+    */
 	if (ite->itemText.hasObject(d))
 	{
 		if (!ite->asPathText())
@@ -5708,12 +5709,12 @@ bool PDFLibCore::setTextCh(PageItem *ite, uint PNr, double x, double y, uint d, 
 			glyph == (ScFace::CONTROL_GLYPHS + 32))
 	{
 		glyph = style.font().char2CMap(QChar(' '));
-		chstr = ' ';
+        //chstr = ' ';
 	}
 	else if (glyph == (ScFace::CONTROL_GLYPHS + SpecialChars::NBHYPHEN.unicode()))
 	{
 		glyph = style.font().char2CMap(QChar('-'));
-		chstr = '-';
+        //chstr = '-';
 	}
 
 	if (glyph < ScFace::CONTROL_GLYPHS)
@@ -5728,7 +5729,7 @@ bool PDFLibCore::setTextCh(PageItem *ite, uint PNr, double x, double y, uint d, 
 			FillColor = "";
 			FillColor += putColor(style.fillColor(), style.fillShade(), true);
 		}
-		if (((style.effects() & ScStyle_Underline) && (chstr != SpecialChars::PARSEP))  || ((style.effects() & ScStyle_UnderlineWords) && (!chstr.isSpace())))
+        if (((style.effects() & ScStyle_Underline) /*&& (!ite->asTextFrame()->isPar(d))*/)  || ((style.effects() & ScStyle_UnderlineWords) /*&& (!ite->asTextFrame()->isSpe(d))*/))
 		{
 			//		double Ulen = style.font().charWidth(chstr, style.fontSize()) * (hl->glyph.scaleH);
 			double Ulen = glyphs.xadvance;
@@ -5812,10 +5813,10 @@ bool PDFLibCore::setTextCh(PageItem *ite, uint PNr, double x, double y, uint d, 
 				{
 					if (ite->reversed())
 					{
-						double wid = style.font().charWidth(chstr, style.fontSize()) * (glyphs.scaleH);
+//						double wid = style.font().charWidth(chstr, style.fontSize()) * (glyphs.scaleH);
 						tmp2 += "1 0 0 1 "+FToStr(x+ glyphs.xoffset)+" "+FToStr((y+ glyphs.yoffset - (tsz / 10.0)) * -1 + ((tsz / 10.0) * (style.baselineOffset() / 1000.0)))+" cm\n";
 						tmp2 += "-1 0 0 1 0 0 cm\n";
-						tmp2 += "1 0 0 1 "+FToStr(-wid)+" 0 cm\n";
+                        tmp2 += "1 0 0 1 "+FToStr(-glyphs.xadvance)+" 0 cm\n";
 						tmp2 += FToStr(tsz / 10.0)+" 0 0 "+FToStr(tsz / 10.0)+" 0 0 cm\n";
 					}
 					else
@@ -5934,10 +5935,10 @@ bool PDFLibCore::setTextCh(PageItem *ite, uint PNr, double x, double y, uint d, 
 					{
 						if (ite->reversed())
 						{
-							double wid = style.font().charWidth(chstr, style.fontSize()) * (glyphs.scaleH);
+//							double wid = style.font().charWidth(chstr, style.fontSize()) * (glyphs.scaleH);
 							tmp2 += "1 0 0 1 "+FToStr(x+ glyphs.xoffset)+" "+FToStr((y+ glyphs.yoffset - (tsz / 10.0)) * -1 + ((tsz / 10.0) * (style.baselineOffset() / 1000.0)))+" cm\n";
 							tmp2 += "-1 0 0 1 0 0 cm\n";
-							tmp2 += "1 0 0 1 "+FToStr(-wid)+" 0 cm\n";
+                            tmp2 += "1 0 0 1 "+FToStr(-glyphs.xadvance)+" 0 cm\n";
 							tmp2 += FToStr(tsz / 10.0)+" 0 0 "+FToStr(tsz / 10.0)+" 0 0 cm\n";
 						}
 						else
@@ -6023,7 +6024,7 @@ bool PDFLibCore::setTextCh(PageItem *ite, uint PNr, double x, double y, uint d, 
 				}
 			}
 		}
-		if ((style.effects() & ScStyle_Strikethrough) && (chstr != SpecialChars::PARSEP))
+        if (style.effects() & ScStyle_Strikethrough) //&& (chstr != SpecialChars::PARSEP))
 		{
 			//		double Ulen = style.font().charWidth(chstr, style.fontSize()) * (hl->glyph.scaleH);
 			double Ulen = glyphs.xadvance;

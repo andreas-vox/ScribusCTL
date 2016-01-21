@@ -51,7 +51,7 @@ PageItem_Symbol::PageItem_Symbol(ScribusDoc *pa, double x, double y, double w, d
 {
 }
 
-void PageItem_Symbol::DrawObj_Item(ScPainter *p, QRectF /*e*/)
+void PageItem_Symbol::DrawObj_Item(ScreenPainter *p, QRectF /*e*/)
 {
 	if (m_Doc->RePos)
 		return;
@@ -147,7 +147,7 @@ void PageItem_Symbol::DrawObj_Item(ScPainter *p, QRectF /*e*/)
 	if (m_Doc->layerOutline(LayerID))
 	{
 		p->setPen(m_Doc->layerMarker(LayerID), 1, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
-		p->setFillMode(ScPainter::None);
+		p->setFillMode(ScreenPainter::None);
 		p->setBrushOpacity(1.0);
 		p->setPenOpacity(1.0);
 		p->setupPolygon(&PoLine);

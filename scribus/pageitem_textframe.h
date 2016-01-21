@@ -33,7 +33,7 @@ for which a new license (GPL+exception) is in place.
 #include "notesstyles.h"
 #include <util_math.h>
 class PageItem_NoteFrame;
-class ScPainter;
+class ScreenPainter;
 class ScribusDoc;
 
 typedef QMap<PageItem_NoteFrame*, QList<TextNote *> > NotesInFrameMap;
@@ -124,18 +124,18 @@ public:
 protected:
 	QRegion calcAvailableRegion();
 	QRegion m_availableRegion;
-	virtual void DrawObj_Item(ScPainter *p, QRectF e);
-	virtual void DrawObj_Post(ScPainter *p);
-	virtual void DrawObj_Decoration(ScPainter *p);
+	virtual void DrawObj_Item(ScreenPainter *p, QRectF e);
+	virtual void DrawObj_Post(ScreenPainter *p);
+	virtual void DrawObj_Decoration(ScreenPainter *p);
 	//void drawOverflowMarker(ScPainter *p);
-	void drawUnderflowMarker(ScPainter *p);
-	void drawColumnBorders(ScPainter *p);
+	void drawUnderflowMarker(ScreenPainter *p);
+	void drawColumnBorders(ScreenPainter *p);
 	
 	bool unicodeTextEditMode;
 	int unicodeInputCount;
 	QString unicodeInputString;
 
-	void drawNoteIcon(ScPainter *p);
+	void drawNoteIcon(ScreenPainter *p);
 	virtual bool createInfoGroup(QFrame *, QGridLayout *);
 	virtual void applicableActions(QStringList& actionList);
 	virtual QString infoDescription();

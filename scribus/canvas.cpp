@@ -987,9 +987,9 @@ void Canvas::drawContents(QPainter *psx, int clipx, int clipy, int clipw, int cl
 //	tim.start();
 // 	qDebug() << "Canvas::drawContents" << clipx << clipy << clipw << cliph<<m_viewMode.forceRedraw<<m_viewMode.operItemSelecting;
 	uint docPagesCount=m_doc->Pages->count();
-	ScPainter *painter=0;
+	ScreenPainter *painter=0;
 	QImage img = QImage(clipw, cliph, QImage::Format_ARGB32_Premultiplied);
-	painter = new ScPainter(&img, img.width(), img.height(), 1.0, 0);
+	painter = new ScreenPainter(&img, img.width(), img.height(), 1.0, 0);
 	painter->clear(palette().color(QPalette::Window));
 	painter->newPath();
 	painter->moveTo(0, 0);
@@ -1002,7 +1002,7 @@ void Canvas::drawContents(QPainter *psx, int clipx, int clipy, int clipw, int cl
 	painter->setZoomFactor(m_viewMode.scale);
 	painter->translate(-m_doc->minCanvasCoordinate.x(), -m_doc->minCanvasCoordinate.y());
 	painter->setLineWidth(1);
-	painter->setFillMode(ScPainter::Solid);
+	painter->setFillMode(ScreenPainter::Solid);
 
 	ScLayer layer;
 	layer.isViewable = false;
@@ -1394,7 +1394,7 @@ void Canvas::drawControlsFreehandLine(QPainter* pp)
 /**
   draws masterpage items of a specific layer
  */
-void Canvas::DrawMasterItems(ScPainter *painter, ScPage *page, ScLayer& layer, QRect clip)
+void Canvas::DrawMasterItems(ScreenPainter *painter, ScPage *page, ScLayer& layer, QRect clip)
 {
 	if ((m_viewMode.previewMode) && (!layer.isPrintable))
 		return;
@@ -1472,7 +1472,7 @@ void Canvas::DrawMasterItems(ScPainter *painter, ScPage *page, ScLayer& layer, Q
 /**
   draws page items contained in a specific Layer
  */
-void Canvas::DrawPageItems(ScPainter *painter, ScLayer& layer, QRect clip, bool notesFramesPass)
+void Canvas::DrawPageItems(ScreenPainter *painter, ScLayer& layer, QRect clip, bool notesFramesPass)
 {
 	if ((m_viewMode.previewMode) && (!layer.isPrintable))
 		return;
@@ -1588,7 +1588,7 @@ void Canvas::DrawPageItems(ScPainter *painter, ScLayer& layer, QRect clip, bool 
 /**
   Draws the canvas background for masterpages, incl. bleeds
  */
-void Canvas::drawBackgroundMasterpage(ScPainter* painter, int clipx, int clipy, int clipw, int cliph)
+void Canvas::drawBackgroundMasterpage(ScreenPainter* painter, int clipx, int clipy, int clipw, int cliph)
 {
 	double x = m_doc->scratch()->left() * m_viewMode.scale;
 	double y = m_doc->scratch()->top() * m_viewMode.scale;
@@ -1598,7 +1598,7 @@ void Canvas::drawBackgroundMasterpage(ScPainter* painter, int clipx, int clipy, 
 	drawRect.translate(-m_doc->minCanvasCoordinate.x(), -m_doc->minCanvasCoordinate.y());
 	if (drawRect.intersects(QRectF(clipx, clipy, clipw, cliph)))
 	{
-		painter->setFillMode(ScPainter::Solid);
+		painter->setFillMode(ScreenPainter::Solid);
 		painter->setBrush(QColor(128,128,128));
 		MarginStruct pageBleeds;
 		m_doc->getBleeds(m_doc->currentPage(), pageBleeds);
@@ -1627,7 +1627,7 @@ void Canvas::drawBackgroundMasterpage(ScPainter* painter, int clipx, int clipy, 
 /**
   draws the page outlines on canvas, including bleed area
  */
-void Canvas::drawBackgroundPageOutlines(ScPainter* painter, int clipx, int clipy, int clipw, int cliph)
+void Canvas::drawBackgroundPageOutlines(ScreenPainter* painter, int clipx, int clipy, int clipw, int cliph)
 {
 	uint docPagesCount=m_doc->Pages->count();
 	if (PrefsManager::instance()->appPrefs.displayPrefs.showPageShadow)
@@ -1652,7 +1652,7 @@ void Canvas::drawBackgroundPageOutlines(ScPainter* painter, int clipx, int clipy
 			drawRect.translate(-m_doc->minCanvasCoordinate.x() * m_viewMode.scale, -m_doc->minCanvasCoordinate.y() * m_viewMode.scale);
 			if (drawRect.intersects(QRectF(clipx, clipy, clipw, cliph)))
 			{
-				painter->setFillMode(ScPainter::Solid);
+				painter->setFillMode(ScreenPainter::Solid);
 				double blx2 = actPg->xOffset();
 				double bly2 = actPg->yOffset();
 				double blw2 = actPg->width();
@@ -1667,7 +1667,7 @@ void Canvas::drawBackgroundPageOutlines(ScPainter* painter, int clipx, int clipy
 				painter->drawRect(blx2 + 5, bly2 + 5, blw2, blh2);
 				if (!m_doc->bleeds()->isNull() && m_doc->guidesPrefs().showBleed)
 				{
-					painter->setFillMode(ScPainter::None);
+					painter->setFillMode(ScreenPainter::None);
 					painter->setPen(Qt::black, 1.0 / m_viewMode.scale, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
 					painter->drawRect(blx2 - 1 / m_viewMode.scale, bly2 - 1 / m_viewMode.scale, blw2 + 2 / m_viewMode.scale, blh2 + 2 / m_viewMode.scale);
 				}
@@ -1675,7 +1675,7 @@ void Canvas::drawBackgroundPageOutlines(ScPainter* painter, int clipx, int clipy
 		}
 		painter->setAntialiasing(true);
 	}
-	painter->setFillMode(ScPainter::Solid);
+	painter->setFillMode(ScreenPainter::Solid);
 	ScPage *actPg;
 	MarginStruct pageBleeds;
 	for (int a = 0; a < static_cast<int>(docPagesCount); ++a)
@@ -1702,7 +1702,7 @@ void Canvas::drawBackgroundPageOutlines(ScPainter* painter, int clipx, int clipy
 		drawRect.translate(-m_doc->minCanvasCoordinate.x() * m_viewMode.scale, -m_doc->minCanvasCoordinate.y() * m_viewMode.scale);
 		if (drawRect.intersects(QRectF(clipx, clipy, clipw, cliph)))
 		{
-			painter->setFillMode(ScPainter::Solid);
+			painter->setFillMode(ScreenPainter::Solid);
 			painter->setPen(Qt::black, 0, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
 			painter->setAntialiasing(false);
 			painter->setLineWidth(0.0);
@@ -1757,7 +1757,7 @@ void Canvas::getClipPathForPages(FPointArray* PoLine)
 /**
   draws page border
   */
-void Canvas::DrawPageBorderSub(ScPainter *p, ScPage *page)
+void Canvas::DrawPageBorderSub(ScreenPainter *p, ScPage *page)
 {
 	p->save();
 	p->setAntialiasing(false);
@@ -1765,15 +1765,15 @@ void Canvas::DrawPageBorderSub(ScPainter *p, ScPage *page)
 	double lineWidth = 1.0 / m_viewMode.scale;
 	double pageHeight = page->height();
 	double pageWidth = page->width();
-	p->setFillMode(ScPainter::None);
-	p->setStrokeMode(ScPainter::Solid);
+	p->setFillMode(ScreenPainter::None);
+	p->setStrokeMode(ScreenPainter::Solid);
 	p->setPen(Qt::black, lineWidth, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
 	p->drawRect(0, 0, pageWidth, pageHeight);
 	p->setAntialiasing(true);
 	p->restore();
 }
 
-void Canvas::DrawPageBorder(ScPainter *p, QRectF clip, bool master)
+void Canvas::DrawPageBorder(ScreenPainter *p, QRectF clip, bool master)
 {
 	if (master)
 	{
@@ -1804,7 +1804,7 @@ void Canvas::DrawPageBorder(ScPainter *p, QRectF clip, bool master)
 /**
   draws margins
  */
-void Canvas::DrawPageMarginsGridSub(ScPainter *p, ScPage *page)
+void Canvas::DrawPageMarginsGridSub(ScreenPainter *p, ScPage *page)
 {
 	p->save();
 	p->setAntialiasing(false);
@@ -1812,30 +1812,30 @@ void Canvas::DrawPageMarginsGridSub(ScPainter *p, ScPage *page)
 	double lineWidth = 1.0 / m_viewMode.scale;
 	double pageHeight = page->height();
 	double pageWidth = page->width();
-	p->setFillMode(ScPainter::None);
-	p->setStrokeMode(ScPainter::Solid);
+	p->setFillMode(ScreenPainter::None);
+	p->setStrokeMode(ScreenPainter::Solid);
 	p->setPen(Qt::black, lineWidth, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
 	if (m_doc->guidesPrefs().marginsShown)
 	{
 		p->setPen(m_doc->guidesPrefs().marginColor);
 		if (m_doc->marginColored())
 		{
-			p->setFillMode(ScPainter::Solid);
+			p->setFillMode(ScreenPainter::Solid);
 			p->setBrush(m_doc->guidesPrefs().marginColor);
 			p->drawRect(0, 0, pageWidth, page->Margins.top());
 			p->drawRect(0, page->Margins.top(), page->Margins.left(), pageHeight - page->Margins.top());
 			p->drawRect(page->Margins.left(), pageHeight - page->Margins.bottom(), pageWidth - page->Margins.right() - page->Margins.left(), page->Margins.bottom());
 			p->drawRect(pageWidth - page->Margins.right(), page->Margins.top(), page->Margins.right(), pageHeight-page->Margins.top());
-			p->setFillMode(ScPainter::None);
+			p->setFillMode(ScreenPainter::None);
 		}
-		p->setFillMode(ScPainter::None);
+		p->setFillMode(ScreenPainter::None);
 		p->drawRect(page->Margins.left(), page->Margins.top(), pageWidth - page->Margins.left() - page->Margins.right(), pageHeight - page->Margins.top() - page->Margins.bottom());
 	}
 	p->setAntialiasing(true);
 	p->restore();
 }
 
-void Canvas::DrawPageMargins(ScPainter *p, QRectF clip, bool master)
+void Canvas::DrawPageMargins(ScreenPainter *p, QRectF clip, bool master)
 {
 	if (master)
 	{
@@ -1866,7 +1866,7 @@ void Canvas::DrawPageMargins(ScPainter *p, QRectF clip, bool master)
 /**
   draws baseline grid
  */
-void Canvas::DrawPageBaselineGridSub(ScPainter *p, ScPage *page)
+void Canvas::DrawPageBaselineGridSub(ScreenPainter *p, ScPage *page)
 {
 	p->save();
 	p->setAntialiasing(false);
@@ -1874,8 +1874,8 @@ void Canvas::DrawPageBaselineGridSub(ScPainter *p, ScPage *page)
 	double lineWidth = 1.0 / m_viewMode.scale;
 	double pageHeight = page->height();
 	double pageWidth = page->width();
-	p->setFillMode(ScPainter::None);
-	p->setStrokeMode(ScPainter::Solid);
+	p->setFillMode(ScreenPainter::None);
+	p->setStrokeMode(ScreenPainter::Solid);
 	p->setPen(Qt::black, lineWidth, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
 	if (m_doc->guidesPrefs().baselineGridShown)
 	{
@@ -1887,7 +1887,7 @@ void Canvas::DrawPageBaselineGridSub(ScPainter *p, ScPage *page)
 	p->restore();
 }
 
-void Canvas::DrawPageBaselineGrid(ScPainter *p, QRectF clip, bool master)
+void Canvas::DrawPageBaselineGrid(ScreenPainter *p, QRectF clip, bool master)
 {
 	if (master)
 	{
@@ -1918,7 +1918,7 @@ void Canvas::DrawPageBaselineGrid(ScPainter *p, QRectF clip, bool master)
 /**
   draws grid
  */
-void Canvas::DrawPageGridSub(ScPainter *p, ScPage *page, QRectF clip)
+void Canvas::DrawPageGridSub(ScreenPainter *p, ScPage *page, QRectF clip)
 {
 	p->save();
 	FPointArray PoLine;
@@ -1929,8 +1929,8 @@ void Canvas::DrawPageGridSub(ScPainter *p, ScPage *page, QRectF clip)
 	double lineWidth = 1.0 / m_viewMode.scale;
 	double pageHeight = page->height();
 	double pageWidth = page->width();
-	p->setFillMode(ScPainter::None);
-	p->setStrokeMode(ScPainter::Solid);
+	p->setFillMode(ScreenPainter::None);
+	p->setStrokeMode(ScreenPainter::Solid);
 	p->setPen(Qt::black, lineWidth, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
 	if (m_doc->guidesPrefs().gridShown)
 	{
@@ -2010,7 +2010,7 @@ void Canvas::DrawPageGridSub(ScPainter *p, ScPage *page, QRectF clip)
 	p->restore();
 }
 
-void Canvas::DrawPageGrid(ScPainter *p, QRectF clip, bool master)
+void Canvas::DrawPageGrid(ScreenPainter *p, QRectF clip, bool master)
 {
 	if (master)
 	{
@@ -2041,14 +2041,14 @@ void Canvas::DrawPageGrid(ScPainter *p, QRectF clip, bool master)
 /**
   draws guides
  */
-void Canvas::DrawPageGuidesSub(ScPainter *p, ScPage *page)
+void Canvas::DrawPageGuidesSub(ScreenPainter *p, ScPage *page)
 {
 	p->save();
 	p->setAntialiasing(false);
 	p->translate(page->xOffset(), page->yOffset());
 	double lineWidth = 1.0 / m_viewMode.scale;
-	p->setFillMode(ScPainter::None);
-	p->setStrokeMode(ScPainter::Solid);
+	p->setFillMode(ScreenPainter::None);
+	p->setStrokeMode(ScreenPainter::Solid);
 	p->setPen(Qt::black, lineWidth, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
 	if (m_doc->guidesPrefs().guidesShown)
 		page->guides.drawPage(p, m_doc, lineWidth);
@@ -2056,7 +2056,7 @@ void Canvas::DrawPageGuidesSub(ScPainter *p, ScPage *page)
 	p->restore();
 }
 
-void Canvas::DrawPageGuides(ScPainter *p, QRectF clip, bool master)
+void Canvas::DrawPageGuides(ScreenPainter *p, QRectF clip, bool master)
 {
 	if (master)
 	{
@@ -2087,7 +2087,7 @@ void Canvas::DrawPageGuides(ScPainter *p, QRectF clip, bool master)
 /**
   draws actual page indicator frame
  */
-void Canvas::DrawPageIndicatorSub(ScPainter *p, ScPage *page)
+void Canvas::DrawPageIndicatorSub(ScreenPainter *p, ScPage *page)
 {
 	p->save();
 	p->setAntialiasing(false);
@@ -2095,8 +2095,8 @@ void Canvas::DrawPageIndicatorSub(ScPainter *p, ScPage *page)
 	double lineWidth = 1.0 / m_viewMode.scale;
 	double pageHeight = page->height();
 	double pageWidth = page->width();
-	p->setFillMode(ScPainter::None);
-	p->setStrokeMode(ScPainter::Solid);
+	p->setFillMode(ScreenPainter::None);
+	p->setStrokeMode(ScreenPainter::Solid);
 	p->setPen(Qt::black, lineWidth, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
 	p->setPen(PrefsManager::instance()->appPrefs.displayPrefs.pageBorderColor, 1 / m_viewMode.scale, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
 	p->drawRect(0, 0, pageWidth, pageHeight);
@@ -2104,7 +2104,7 @@ void Canvas::DrawPageIndicatorSub(ScPainter *p, ScPage *page)
 	p->restore();
 }
 
-void Canvas::DrawPageIndicator(ScPainter *p, QRectF clip, bool master)
+void Canvas::DrawPageIndicator(ScreenPainter *p, QRectF clip, bool master)
 {
 	if (master)
 	{
@@ -2139,7 +2139,7 @@ void Canvas::DrawPageIndicator(ScPainter *p, QRectF clip, bool master)
   draws the links between textframe chains.
   needs the list of visible textframes in m_viewMode.linkedFramesToShow
  */
-void Canvas::drawFrameLinks(ScPainter* painter)
+void Canvas::drawFrameLinks(ScreenPainter* painter)
 {
 	painter->save();
 	PageItem *currItem;
@@ -2204,7 +2204,7 @@ void Canvas::drawFrameLinks(ScPainter* painter)
 /**
   draws one linkline between textframes
   */
-void Canvas::drawLinkFrameLine(ScPainter* painter, FPoint &start, FPoint &end)
+void Canvas::drawLinkFrameLine(ScreenPainter* painter, FPoint &start, FPoint &end)
 {
 	//CB FIXME Add some checking that the painter is setup?
 	Q_ASSERT(painter!=NULL);
@@ -2227,7 +2227,7 @@ void Canvas::drawLinkFrameLine(ScPainter* painter, FPoint &start, FPoint &end)
 	painter->setBrush(painter->pen());
 	painter->setBrushOpacity(1.0);
 	painter->setLineWidth(0);
-	painter->setFillMode(ScPainter::Solid);
+	painter->setFillMode(ScreenPainter::Solid);
 	painter->setupPolygon(&arrow);
 	painter->fillPath();
 }

@@ -476,7 +476,7 @@ void GuideManagerCore::copy(GuideManagerCore *target, GuideType type)
 	}
 }
 
-void GuideManagerCore::drawPage(ScPainter *p, ScribusDoc *doc, double lineWidth)
+void GuideManagerCore::drawPage(ScreenPainter *p, ScribusDoc *doc, double lineWidth)
 {
 	Guides::iterator it;
 	QColor color(doc->guidesPrefs().guideColor);
