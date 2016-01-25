@@ -226,6 +226,7 @@ struct LineControl {
         line.naturalWidth = breakXPos - line.x;
         line.width = endX - line.x;
         maxShrink = maxStretch = 0;
+
     }
 
     int restartRow(bool recalcY)
@@ -533,8 +534,16 @@ struct LineControl {
         result->setFirstChar(line.firstChar);
         result->setLastChar(line.lastChar);
         qreal pos = line.colLeft;
-        int runCount = line.lastChar - line.firstChar;
-        for (int i = 0; i < runCount+1; ++i)
+//		int runCount = line.lastChar - line.firstChar;
+		int runCount = 0;
+		foreach (GlyphRun run, glyphRuns)
+		{
+			++runCount;
+			if (run.lastChar() == line.lastChar)
+				break;
+		}
+
+		for (int i = 0; i < runCount; ++i)
         {
 			GlyphBox* glyphbox = createGlyphBox(glyphRuns.at(i));
 			glyphbox->moveBy(pos, 0);
@@ -982,102 +991,115 @@ static bool implicitBreak(QChar f, QChar s) {
 static void justifyLine(const ParagraphStyle& style, LineControl& curr)
 {
 
-    double glyphNatural = 0;
-    double spaceNatural = 0;
-    double glyphExtension;
-    double spaceExtension;
-    int spaceInsertion = 0;
-    double imSpace = -1;
+	double glyphNatural = 0;
+	double spaceNatural = 0;
+	double glyphExtension;
+	double spaceExtension;
+	int spaceInsertion = 0;
+	double imSpace = -1;
 
-    //	const ParagraphStyle& style(itemText.paragraphStyle(line.firstChar));
+	//	const ParagraphStyle& style(itemText.paragraphStyle(line.firstChar));
+	int runCount = 0;
+	foreach (GlyphRun run, curr.glyphRuns)
+	{
+		++runCount;
+		if (run.lastChar() == curr.line.lastChar)
+			break;
+	}
 
-    // measure natural widths for glyphs and spaces
-	for (int i = 0; i < curr.glyphRuns.count(); ++i)
+	for (int i = 0; i < runCount; ++i)
 	{
 		GlyphRun run(curr.glyphRuns[i]);
 		if (!run.hasFlag(ScLayout_ExpandingSpace))
-        {
+		{
 			glyphNatural += run.width();
-        }
+		}
 		else if (!run.hasFlag(ScLayout_SuppressSpace) )
-        {
+		{
 			spaceNatural += run.width();
 			if (imSpace < 0.0 || imSpace > run.width())
 				imSpace = run.width();
 		}
 		if (i != 0 && run.hasFlag(ScLayout_ImplicitSpace))
-            //implicitSpace(itemText.text(sof - 1), ch))
-        {
-            spaceInsertion += 1;
-        }
-    }
+			//implicitSpace(itemText.text(sof - 1), ch))
+		{
+			spaceInsertion += 1;
+		}
+	}
 
-    imSpace /= 2;
+	imSpace /= 2;
 
-    // decision: prio 1: stretch glyph;  prio 2: insert spaces;  prio 3: stretch spaces
+	// decision: prio 1: stretch glyph;  prio 2: insert spaces;  prio 3: stretch spaces
 
-    if (curr.line.width < spaceNatural + glyphNatural * style.minGlyphExtension() && spaceNatural > 0)
-    {
-        glyphExtension = style.minGlyphExtension() - 1;
-        spaceExtension = (curr.line.width - glyphNatural * (1+glyphExtension) ) / spaceNatural  - 1;
-        imSpace = 0;
-    }
-    else if (curr.line.width < spaceNatural + glyphNatural * style.maxGlyphExtension() && glyphNatural > 0)
-    {
-        spaceExtension = 0;
-        glyphExtension = (curr.line.width - spaceNatural) / glyphNatural  - 1;
-        imSpace = 0;
-    }
-    else
-    {
-        glyphExtension = style.maxGlyphExtension() - 1;
-        if (spaceInsertion) {
-            double remaining = curr.line.width - glyphNatural * (1 + glyphExtension) - spaceNatural;
-            if (imSpace > 0) {
-                if (remaining / spaceInsertion < imSpace) {
-                    imSpace = remaining / spaceInsertion;
-                    spaceExtension = 0;
-                } else {
-                    spaceExtension = (remaining + spaceNatural) / (spaceNatural + spaceInsertion * imSpace) - 1;
-                    imSpace *= spaceExtension + 1;
-                }
-            } else {
-                imSpace = remaining / spaceInsertion;
-                spaceExtension = 0;
-            }
-        } else {
-            if (spaceNatural > 0)
-                spaceExtension = (curr.line.width - glyphNatural * (1+glyphExtension) ) / spaceNatural  - 1;
-            else
-                spaceExtension = 0;
-        }
-    }
+	if (curr.line.width < spaceNatural + glyphNatural * style.minGlyphExtension() && spaceNatural > 0)
+	{
+		glyphExtension = style.minGlyphExtension() - 1;
+		spaceExtension = (curr.line.width - glyphNatural * (1+glyphExtension) ) / spaceNatural  - 1;
+		imSpace = 0;
+	}
+	else if (curr.line.width < spaceNatural + glyphNatural * style.maxGlyphExtension() && glyphNatural > 0)
+	{
+		spaceExtension = 0;
+		glyphExtension = (curr.line.width - spaceNatural) / glyphNatural  - 1;
+		imSpace = 0;
+	}
+	else
+	{
+		glyphExtension = style.maxGlyphExtension() - 1;
+		if (spaceInsertion) {
+			double remaining = curr.line.width - glyphNatural * (1 + glyphExtension) - spaceNatural;
+			if (imSpace > 0) {
+				if (remaining / spaceInsertion < imSpace) {
+					imSpace = remaining / spaceInsertion;
+					spaceExtension = 0;
+				} else {
+					spaceExtension = (remaining + spaceNatural) / (spaceNatural + spaceInsertion * imSpace) - 1;
+					imSpace *= spaceExtension + 1;
+				}
+			} else {
+				imSpace = remaining / spaceInsertion;
+				spaceExtension = 0;
+			}
+		} else {
+			if (spaceNatural > 0)
+				spaceExtension = (curr.line.width - glyphNatural * (1+glyphExtension) ) / spaceNatural  - 1;
+			else
+				spaceExtension = 0;
+		}
+	}
 
-    double glyphScale = 1 + glyphExtension;
+	double glyphScale = 1 + glyphExtension;
 
-    /*
-    qDebug() << QString("justify: line = %7 natural = %1 + %2 = %3 (%4); spaces + %5%%; min=%8; glyphs + %6%%; min=%9")
-           .arg(spaceNatural).arg(glyphNatural).arg(spaceNatural+glyphNatural).arg(line.naturalWidth)
-           .arg(spaceExtension).arg(glyphExtension).arg(line.width)
-           .arg(style.minWordTracking()).arg(style.minGlyphExtension());
-    */
+	/*
+	qDebug() << QString("justify: line = %7 natural = %1 + %2 = %3 (%4); spaces + %5%%; min=%8; glyphs + %6%%; min=%9")
+		   .arg(spaceNatural).arg(glyphNatural).arg(spaceNatural+glyphNatural).arg(line.naturalWidth)
+		   .arg(spaceExtension).arg(glyphExtension).arg(line.width)
+		   .arg(style.minWordTracking()).arg(style.minGlyphExtension());
+	*/
 
-    int startItem = curr.line.firstChar;
-    if (curr.glyphRuns[startItem + curr.glFirstChar].hasFlag(ScLayout_DropCap))
-        startItem++;
-    // distribute whitespace on spaces and glyphs
+	int startItem = 0;
+	if (curr.glyphRuns[startItem].hasFlag(ScLayout_DropCap))
+		startItem++;
+	// distribute whitespace on spaces and glyphs
+	runCount = 0;
+	foreach (GlyphRun run, curr.glyphRuns)
+	{
+		++runCount;
+		if (run.lastChar() == curr.line.lastChar)
+			break;
+	}
 
-	for (int i = 0; i < curr.glyphRuns.count(); ++i)
-    {
+	for (int i = startItem; i < runCount; ++i)
+	{
 		GlyphRun& run(curr.glyphRuns[i]);
 		if (i != 0 && run.hasFlag(ScLayout_ImplicitSpace))
-        {
+		{
 			GlyphRun& lastRun(curr.glyphRuns[i-1]);
 			lastRun.glyphs().last().xadvance += imSpace;
-        }
+		}
 		double wide = run.width();
 		if (!run.hasFlag(ScLayout_ExpandingSpace))
-        {
+		{
 			for (int j = 0; j < run.glyphs().count(); ++j)
 			{
 				GlyphLayout& glyph = run.glyphs()[j];
@@ -1085,14 +1107,14 @@ static void justifyLine(const ParagraphStyle& style, LineControl& curr)
 				glyph.xoffset *= glyphScale;
 				glyph.scaleH *= glyphScale;
 			}
-        }
+		}
 		else if (!run.hasFlag(ScLayout_SuppressSpace))
 		{
 			GlyphLayout& glyph = run.glyphs().last();
 			glyph.xadvance += wide * spaceExtension;
 
-        }
-    }
+		}
+	}
 }
 
 
@@ -2878,6 +2900,7 @@ void PageItem_TextFrame::layout()
                         }
                         fillInTabLeaders(current);
                         //if right margin is set we temporally save line, not append it
+
                         textLayout.appendLine(current.createLineBox());
                         setMaxY(maxYDesc);
                         current.restartIndex = current.line.lastChar +1;
@@ -3080,7 +3103,6 @@ void PageItem_TextFrame::layout()
             fillInTabLeaders(current);
             current.startOfCol = false;
             goNextColumn = false;
-
             textLayout.appendLine(current.createLineBox());
             setMaxY(maxYDesc);
             current.startOfCol = false;
