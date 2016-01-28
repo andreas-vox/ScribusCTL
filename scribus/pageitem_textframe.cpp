@@ -1790,7 +1790,7 @@ void PageItem_TextFrame::layout()
             // find charsize factors
             if (DropCmode)
             {
-                //				DropCapDrop = calculateLineSpacing (style, this) * (DropLines - 1);
+				//				DropCapDrop = calculateLineSpacing (style, this) * (DropLines - 1);
 
                 // FIXME : we should ensure that fonts are loaded before calls to layout()
                 // ScFace::realCharHeight()/Ascent() ensure font is loaded thanks to an indirect call to char2CMap()
@@ -1804,16 +1804,16 @@ void PageItem_TextFrame::layout()
                     realCharHeight = qMax(realCharHeight, font.realCharHeight(chstr[i], 1));
                     realCharAscent = qMax(realCharAscent, font.realCharAscent(chstr[i], 1));
                 }
-                double fontAscent = font.ascent(style.charStyle().fontSize() / 10.0);
+				double fontAscent = font.ascent(style.charStyle().fontSize() / 10.0);
                 if (realCharHeight == 0.0)
                     realCharHeight = font.height(style.charStyle().fontSize() / 10.0);
                 if (realCharAscent == 0.0)
                     realCharAscent = fontAscent;
                 chsd = (10 * ((DropCapDrop + fontAscent) / realCharHeight));
                 chs  = (10 * ((DropCapDrop + fontAscent) / realCharAscent));
-                current.glyphRuns.last().setFlag(ScLayout_DropCap);
-                current.glyphRuns.last().glyphs()[0].yoffset -= DropCapDrop;
-                if (HasObject)
+				current.glyphRuns.last().setFlag(ScLayout_DropCap);
+				current.glyphRuns.last().setYOffset(-DropCapDrop);
+				if (HasObject)
                 {
                     chs = qRound((currentObject->height() + currentObject->lineWidth()) * 10);
                     chsd = qRound((currentObject->height() + currentObject->lineWidth()) * 10);
@@ -1963,8 +1963,8 @@ void PageItem_TextFrame::layout()
                     wide = 0.0; realAsce = 0.0;
                     for (int i = 0; i < chstrLen; ++i)
                     {
-                        realCharHeight = qMax(realCharHeight, font.realCharHeight(chstr[i], charStyle.fontSize() / 10.0));
-                        realAsce = qMax(realAsce, font.realCharHeight(chstr[i], chsd / 10.0));
+						realCharHeight = qMax(realCharHeight, font.realCharHeight(chstr[i], charStyle.fontSize() / 10.0));
+						realAsce = qMax(realAsce, font.realCharHeight(chstr[i], chsd / 10.0));
                         wide += font.realCharWidth(chstr[i], chsd / 10.0);
                     }
                     wide = (wide* scaleH) + (1 - scaleH);
@@ -2077,8 +2077,8 @@ void PageItem_TextFrame::layout()
                         else
                             current.yPos += style.lineSpacing();
                     }
-                    if (DropCmode)
-                        current.yPos += DropCapDrop;
+					if (DropCmode)
+						current.yPos += DropCapDrop;
                 }
                 //set left indentation
                 current.leftIndent = 0.0;
@@ -2269,6 +2269,8 @@ void PageItem_TextFrame::layout()
                 }
                 current.line.x = current.restartX = current.xPos;
                 current.line.y = current.yPos;
+				if (current.glyphRuns.first().hasFlag(ScLayout_DropCap))
+					current.line.y -= DropCapDrop;
             }
 
             //check if line must start at new Y position due to current glyph height or previous line descent
@@ -2278,21 +2280,21 @@ void PageItem_TextFrame::layout()
                     && currentCh != SpecialChars::TAB)
             {
                 double diff = 0;
-                if (current.startOfCol || DropCmode)
+				if (current.startOfCol || DropCmode)
                     diff = realAsce - (current.yPos - lastLineY);
                 else if (style.lineSpacingMode() != ParagraphStyle::FixedLineSpacing)
                 {
                     if (HasObject)
                         diff = (currentObject->height() + currentObject->lineWidth()) * scaleV + offset - (current.yPos - lastLineY);
                     else
-                        diff = font.realCharAscent(QChar('l'), hlcsize10) * scaleV + offset - (current.yPos - lastLineY);
+						diff = font.realCharAscent(QChar('l'), hlcsize10) * scaleV + offset - (current.yPos - lastLineY);
                 }
                 else
                 {
                     if (HasObject)
                         diff = (currentObject->height() + currentObject->lineWidth()) * scaleV + offset - (current.yPos - lastLineY);
-                }
-                if (diff >= 1 || (!DropCmode && diff > 0))
+				}
+				if (diff >= 1 || (!DropCmode && diff > 0))
                 {
                     if (current.hasDropCap && DropLinesCount == 0)
                     {
@@ -2311,8 +2313,8 @@ void PageItem_TextFrame::layout()
                     {
                         //FIX ME - that is ugly hack I must made, because simply expression
                         //current.yPos += diff; stop working, dont know why (compiler bug?)
-                        float YPOS = (float) current.yPos + (float) diff + 0.01;
-                        current.yPos = (double) YPOS;
+						float YPOS = (float) current.yPos + (float) diff + 0.01;
+						current.yPos = (double) YPOS;
                         if (current.hasDropCap && diff > DropCapDrop)
                         {
                             current.hasDropCap = false;
@@ -2401,9 +2403,9 @@ void PageItem_TextFrame::layout()
             // remember y pos
             if (DropCmode)
             {
-                double yoffset = 0.0;
-                for (int i = 0; i < chstrLen; ++i)
-                    yoffset = qMax(yoffset, font.realCharHeight(chstr[i], chsd / 10.0) - font.realCharAscent(chstr[i], chsd / 10.0));
+				double yoffset = 0.0;
+				for (int i = 0; i < chstrLen; ++i)
+					yoffset = qMax(yoffset, font.realCharHeight(chstr[i], chsd / 10.0) - font.realCharAscent(chstr[i], chsd / 10.0));
 				firstGlyph.yoffset -= yoffset;
             }
             // remember x pos
@@ -2894,9 +2896,9 @@ void PageItem_TextFrame::layout()
                         if (itemText.charStyle(current.line.firstChar).effects() & ScLayout_DropCap)
                         {
                             // put line back to top
-                            current.line.y -= DropCapDrop;
-                            //itemText.getGlyphs(current.line.firstChar)->yoffset += DropCapDrop;
-                            current.glyphRuns[0].glyphs()[0].yoffset += DropCapDrop;
+							current.line.y -= DropCapDrop;
+							//itemText.getGlyphs(current.line.firstChar)->yoffset += DropCapDrop;
+							current.glyphRuns.first().setYOffset(DropCapDrop);
                         }
                         fillInTabLeaders(current);
                         //if right margin is set we temporally save line, not append it
@@ -3019,7 +3021,7 @@ void PageItem_TextFrame::layout()
                     else
                         current.breakLine(itemText, style, firstLineOffset(),a);
                 }
-            }
+			}
         }
         if (goNoRoom)
         {
@@ -3098,7 +3100,7 @@ void PageItem_TextFrame::layout()
                 // put line back to top
                 current.line.y -= DropCapDrop;
                 //itemText.getGlyphs(current.line.firstChar)->yoffset += DropCapDrop;
-                current.glyphRuns[0].glyphs()[0].yoffset += DropCapDrop;
+				current.glyphRuns.first().setYOffset(DropCapDrop);
             }
             fillInTabLeaders(current);
             current.startOfCol = false;
