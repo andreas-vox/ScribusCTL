@@ -1636,14 +1636,13 @@ void PageItem_TextFrame::layout()
                     if (mark == NULL || !mark->isType(MARKBullNumType))
                     {
                         current.glyphRuns.last().setFlag(ScLayout_BulletNum);
-#if 0
-                        TODO
-                                BulNumMark* bnMark = new BulNumMark();
+
+						BulNumMark* bnMark = new BulNumMark();
                         itemText.insertMark(bnMark,a);
                         a--;
                         itLen = itemText.length();
                         continue;
-#endif
+
                     }
                     if (style.hasBullet())
                         mark->setString(style.bulletStr());
