@@ -449,11 +449,11 @@ struct LineControl {
     void updateHeightMetrics(const StoryText& itemText)
     {
 		const CharStyle& cStyle(itemText.charStyle(line.firstChar));
-		double scaleV = cStyle.scaleV() / 1000.0;
-		double offset = (cStyle.fontSize() / 10) * (cStyle.baselineOffset() / 1000.0);
-		line.ascent = cStyle.font().ascent(cStyle.fontSize()/10.00) * scaleV + offset;
-		line.descent = cStyle.font().descent(cStyle.fontSize()/10.00) * scaleV - offset;
-#if 0
+//		double scaleV = cStyle.scaleV() / 1000.0;
+//		double offset = (cStyle.fontSize() / 10) * (cStyle.baselineOffset() / 1000.0);
+//		line.ascent = cStyle.font().ascent(cStyle.fontSize()/10.00) * scaleV + offset;
+//		line.descent = cStyle.font().descent(cStyle.fontSize()/10.00) * scaleV - offset;
+
 		double asce, desc;
         for (int zc = 0; zc < charsInLine; ++zc)
         {
@@ -479,7 +479,7 @@ struct LineControl {
             line.ascent  = qMax(line.ascent, asce);
             line.descent = qMax(line.descent, desc);
         }
-#endif
+
     }
 
 // yPos should not be changed when all line is already calculated - at new y position there can be overflow!!!
