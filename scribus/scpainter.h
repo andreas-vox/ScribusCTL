@@ -188,7 +188,7 @@ public:
 	 void setMaskMode( int mask );
 	 void setGradientMask( VGradient::VGradientType mode, FPoint orig, FPoint vec, FPoint foc, double scale, double skew);
 	 void setPatternMask(ScPattern *pattern, double scaleX, double scaleY, double offsetX, double offsetY, double rotation, double skewX, double skewY, bool mirrorX, bool mirrorY);
-
+	 int strokeMode() { return m_strokeMode; }
 	 void set4ColorGeometry(FPoint p1, FPoint p2, FPoint p3, FPoint p4, FPoint c1, FPoint c2, FPoint c3, FPoint c4);
 	 void set4ColorColors(QColor col1, QColor col2, QColor col3, QColor col4);
 	 void setDiamondGeometry(FPoint p1, FPoint p2, FPoint p3, FPoint p4, FPoint c1, FPoint c2, FPoint c3, FPoint c4, FPoint c5);
@@ -333,7 +333,7 @@ private:
 	QColor m_stroke;
 	double stroke_trans;
 	double LineWidth;
-	int strokeMode;				// 0 = none, 1 = solid, 2 = gradient 3 = pattern
+	int m_strokeMode;				// 0 = none, 1 = solid, 2 = gradient 3 = pattern
 	int maskMode;				// 0 = none, 1 = gradient 2 = pattern
 	double mask_patternScaleX;
 	double mask_patternScaleY;
