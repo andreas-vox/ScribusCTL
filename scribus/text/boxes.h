@@ -142,7 +142,10 @@ public:
 	GlyphRun glyphs;
 	QList <GlyphLayout> m_glyphs;
 	int pointToPosition(FPoint coord) const;
-	FRect boundingBox(int pos, uint len = 1) const { return bbox(); }
+	FRect boundingBox(int pos, uint len = 1) const
+	{
+		return bbox();
+	}
 //	QList<const Box*> pathForPos(int pos) const;
 	void render(ScreenPainter* p, const StoryText& text);
 	void setQColor(QColor *tmp, QString colorName, double shad);
@@ -153,6 +156,7 @@ class LineBox : public GroupBox
 {
 public:	
 	LineBox();
+	void render(ScreenPainter* p, const StoryText& text);
 //	void justify(const ParagraphStyle& style);
 	qreal colLeft;
 };
