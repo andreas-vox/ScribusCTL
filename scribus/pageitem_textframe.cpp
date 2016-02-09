@@ -550,8 +550,8 @@ struct LineControl {
         {
 			GlyphBox* glyphbox = createGlyphBox(glyphRuns.at(i));
 			glyphbox->moveBy(pos, 0);
-			glyphbox->setAscent(result->ascent());
-			glyphbox->setDescent(result->descent());
+			glyphbox->setAscent(result->ascent() * glyphRuns.at(i).glyphs()[0].scaleV);
+			glyphbox->setDescent(result->descent() * glyphRuns.at(i).glyphs()[0].scaleV);
             pos += (glyphbox->width());
 			result->addBox(glyphbox);
 
@@ -1727,7 +1727,6 @@ void PageItem_TextFrame::layout()
 
             current.glyphRuns.last().clearFlag(ScLayout_DropCap);
             current.glyphRuns.last().clearFlag(ScLayout_SoftHyphenVisible);
-
             // No space at begin of line,
             if (legacy)
             {
