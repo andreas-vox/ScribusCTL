@@ -550,8 +550,8 @@ struct LineControl {
         {
 			GlyphBox* glyphbox = createGlyphBox(glyphRuns.at(i));
 			glyphbox->moveBy(pos, 0);
-			glyphbox->setAscent(result->ascent() * glyphRuns.at(i).glyphs()[0].scaleV);
-			glyphbox->setDescent(result->descent() * glyphRuns.at(i).glyphs()[0].scaleV);
+			glyphbox->setAscent(result->ascent());
+			glyphbox->setDescent(result->descent());
             pos += (glyphbox->width());
 			result->addBox(glyphbox);
 
@@ -1643,9 +1643,9 @@ void PageItem_TextFrame::layout()
 
 						BulNumMark* bnMark = new BulNumMark();
                         itemText.insertMark(bnMark,a);
-                        a--;
+						a--;
                         itLen = itemText.length();
-                        continue;
+						continue;
 
                     }
                     if (style.hasBullet())
@@ -1655,18 +1655,19 @@ void PageItem_TextFrame::layout()
                         if (mark->getString().isEmpty())
                         {
                             mark->setString("?");
-                            m_Doc->flag_Renumber = true;
+							m_Doc->flag_Renumber = true;
                         }
-                    }
-                }
+					}
+				}
             }
-            if (!BulNumMode && mark && mark->isType(MARKBullNumType))
-            {
-                itemText.removeChars(a,1);
-                a--;
-                itLen = itemText.length();
-                continue;
-            }
+			if (!BulNumMode && mark && mark->isType(MARKBullNumType))
+			{
+				itemText.removeChars(a,1);
+				a--;
+				itLen = itemText.length();
+				current.glyphRuns.removeLast();
+				continue;
+			}
             if (current.charsInLine == 0)
                 opticalMargins = style.opticalMargins();
             CharStyle charStyle = ((itemText.text(a) != SpecialChars::PARSEP) ? itemText.charStyle(a) : style.charStyle());
@@ -1710,7 +1711,7 @@ void PageItem_TextFrame::layout()
             // find out about par gap and dropcap
             if (a == firstInFrame())
             {
-                if (a == 0 || itemText.text(a-1) == SpecialChars::PARSEP)
+				if (a == 0 || itemText.text(a-1) == SpecialChars::PARSEP)
                 {
                     if (currentCh != SpecialChars::PARSEP)
                     {
