@@ -3,7 +3,8 @@
 This is a branch of Scribus 1.5.1svn aimed at implementing complex text layout in Scribus.
 
 NOTE: work has proceeded on the HOST_Oman repo: https://github.com/HOST-Oman/scribus BRANCH "ctl"
-Items 1-5 are basically done and the final version will be merged with 1.5.3svn.
+
+Items 1-5 below are basically done and the final version will be merged with 1.5.3svn.
 
 The following phases are planned right now:
 
