@@ -208,7 +208,7 @@ FPointArray traceGlyph(FT_Face face, ScFace::gid_type glyphIndex, int chs, qreal
 	QTransform ma;
 	ma.scale(0.01, -0.01);
 	pts.map(ma);
-	pts.translate(0, chs);
+//	pts.translate(0, chs);
 	pts2.putPoints(0, pts.size()-2, pts, 0);
 
 	return pts2;
@@ -259,7 +259,7 @@ QPixmap FontSample(const ScFace& fnt, int s, QString ts, QColor back, bool force
 	QImage pm(w, h, QImage::Format_ARGB32_Premultiplied);
 	pen_x = 0;
 	ymax = 0.0;
-	ScPainter *p = new ScPainter(&pm, pm.width(), pm.height());
+	ScreenPainter *p = new ScreenPainter(&pm, pm.width(), pm.height());
 	p->clear(back);
 	p->setFillMode(1);
 	p->setLineWidth(0.0);

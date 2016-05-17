@@ -22,7 +22,7 @@ for which a new license (GPL+exception) is in place.
 #include "tablecell.h"
 #include "tablehandle.h"
 
-class ScPainter;
+class ScreenPainter;
 class ScribusDoc;
 class TablePainter;
 
@@ -487,7 +487,7 @@ private slots:
 
 protected:
 	/// Paints this item.
-	virtual void DrawObj_Item(ScPainter *p, QRectF clipRect);
+	virtual void DrawObj_Item(ScreenPainter *p, QRectF clipRect);
 
 private:
 	/// Enum describing types of changes on a table. For internal use.

@@ -23,7 +23,7 @@ public:
 	virtual bool loadPicture(const QString& fn, int page, int res, bool thumbnail);
 protected:
 	void initSupportedFormatList();
-	void parseStackXML(QDomElement &elem, ScPainter *painter, ScZipHandler *uz);
+	void parseStackXML(QDomElement &elem, ScreenPainter *painter, ScZipHandler *uz);
 	int blendModeToInt(QString compositeOp);
 	QString blendModeToString(QString compositeOp);
 	int inSubLayer;

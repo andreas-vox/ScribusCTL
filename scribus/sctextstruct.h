@@ -116,21 +116,53 @@ class GlyphRun
 	const CharStyle* m_style;
 	LayoutFlags m_flags;
 	QList<GlyphLayout> m_glyphs;
+	int m_firstChar;
+	int m_lastChar;
+	float m_xoffset;
+	float m_yoffset;
+	float m_xadvance;
+
 	
 public:
-	GlyphRun(const CharStyle* style, LayoutFlags flags) : m_style(style), m_flags(flags) {}
-	GlyphRun(const GlyphRun& other) : m_style(other.m_style), m_flags(other.m_flags), m_glyphs(other.m_glyphs) {}
-	
+	GlyphRun(const CharStyle* style, LayoutFlags flags) :
+		m_style(style),
+		m_flags(flags),
+		m_firstChar(0),
+		m_lastChar(0),
+		m_xoffset(0),
+		m_yoffset(0),
+		m_xadvance(0)
+	{}
+
+	GlyphRun(const GlyphRun& other) :
+		m_style(other.m_style),
+		m_flags(other.m_flags),
+		m_glyphs(other.m_glyphs),
+		m_firstChar(other.m_firstChar),
+		m_lastChar(other.m_lastChar),
+		m_xoffset(other.m_xoffset),
+		m_yoffset(other.m_yoffset)
+	{}
+
 	const CharStyle&         style()  const { return *m_style; }
 	const LayoutFlags&       flags()  const { return m_flags; }
 	LayoutFlags&             flags()        { return m_flags; }
 	bool       hasFlag(LayoutFlags f) const { return (m_flags & f) == f; }
 	void       setFlag(LayoutFlags f)       { m_flags = static_cast<LayoutFlags>(m_flags | f); }
 	void     clearFlag(LayoutFlags f)       { m_flags = static_cast<LayoutFlags>(m_flags & ~f); }
-	
-	QList<GlyphLayout>       glyphs()       { return m_glyphs; }
+
+	QList<GlyphLayout>&      glyphs()       { return m_glyphs; }
 	const QList<GlyphLayout> glyphs() const { return m_glyphs; }
-	
+	void setFirstChar(int x)				{  m_firstChar = x; }
+	void setLastChar(int x)					{  m_lastChar = x; }
+	int firstChar()					const	{ return m_firstChar; }
+	int lastChar()					const	{ return m_lastChar; }
+	void setXOffset(float x)				{ m_xoffset = x; }
+	void setYOffset(float x)				{ m_yoffset = x; }
+	float xoffset()					const	{ return m_xoffset; }
+	float yoffset()					const	{ return m_yoffset; }
+	void setXAdvance(float x)				{ m_xadvance = x; }
+	float xAdvance()				const	{return m_xadvance; }
 	qreal width() const;
 	void insertSoftHyphen();
 	void removeSoftHyphen();

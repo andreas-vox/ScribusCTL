@@ -15,7 +15,7 @@ for which a new license (GPL+exception) is in place.
 
 class QColor;
 class ScPage;
-class ScPainter;
+class ScreenPainter;
 class UndoManager;
 class ScribusDoc;
 typedef QList<double> Guides;
@@ -65,7 +65,7 @@ public:
 	void copy(GuideManagerCore *target);
 	void copy(GuideManagerCore *target, GuideType type);
 
-	void drawPage(ScPainter *p, ScribusDoc *doc, double lineWidth);
+	void drawPage(ScreenPainter *p, ScribusDoc *doc, double lineWidth);
 
 	int isMouseOnHorizontal(double low, double high, GuideType type);
 	int isMouseOnVertical(double low, double high, GuideType type);

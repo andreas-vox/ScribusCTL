@@ -61,7 +61,7 @@ void PageItem_PathText::layout()
 {
 	QImage pgPix(10, 10, QImage::Format_ARGB32_Premultiplied);
 	QRectF rd; // = QRect(0,0,9,9);
-	ScPainter *painter = new ScPainter(&pgPix, pgPix.width(), pgPix.height());	
+	ScreenPainter *painter = new ScreenPainter(&pgPix, pgPix.width(), pgPix.height());	
 	DrawObj(painter, rd);
 	painter->end();
 	delete painter;
@@ -69,7 +69,7 @@ void PageItem_PathText::layout()
 }
 
 
-void PageItem_PathText::DrawObj_Item(ScPainter *p, QRectF cullingArea)
+void PageItem_PathText::DrawObj_Item(ScreenPainter *p, QRectF cullingArea)
 {
 #if 0
 	itemText.invalidateAll();

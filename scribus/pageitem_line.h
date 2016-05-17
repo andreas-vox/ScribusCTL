@@ -28,7 +28,7 @@ for which a new license (GPL+exception) is in place.
 
 #include "scribusapi.h"
 #include "pageitem.h"
-class ScPainter;
+class ScreenPainter;
 class ScribusDoc;
 
 class SCRIBUS_API PageItem_Line : public PageItem
@@ -53,7 +53,7 @@ public:
 	virtual void getVisualBoundingRect(double *x1, double *y1, double *x2, double *y2) const;
 	
 protected:
-	virtual void DrawObj_Item(ScPainter *p, QRectF e);
+	virtual void DrawObj_Item(ScreenPainter *p, QRectF e);
 
 };
 

@@ -16,7 +16,7 @@ for which a new license (GPL+exception) is in place.
 
 class PageItem_Table;
 class TableCell;
-class ScPainter;
+class ScreenPainter;
 
 /**
  * CollapsedTablePainter is a table painter for painting a table using the collapsed border model.
@@ -28,21 +28,21 @@ public:
 	explicit CollapsedTablePainter(PageItem_Table* table) : TablePainter(table) {}
 
 	/// Paints the table using @a p and returns the table offset.
-	virtual void paintTable(ScPainter* p);
+	virtual void paintTable(ScreenPainter* p);
 
 private:
 	/// Paints the fill of the table.
-	void paintTableFill(ScPainter* p) const;
+	void paintTableFill(ScreenPainter* p) const;
 	/// Paints all of the borders along the left side of @a cell.
-	void paintCellLeftBorders(const TableCell& cell, ScPainter* p) const;
+	void paintCellLeftBorders(const TableCell& cell, ScreenPainter* p) const;
 	/// Paints all of the borders along the right side of @a cell.
-	void paintCellRightBorders(const TableCell& cell, ScPainter* p) const;
+	void paintCellRightBorders(const TableCell& cell, ScreenPainter* p) const;
 	/// Paints all of the borders along the top side of @a cell.
-	void paintCellTopBorders(const TableCell& cell, ScPainter* p) const;
+	void paintCellTopBorders(const TableCell& cell, ScreenPainter* p) const;
 	/// Paints all of the borders along the bottom side of @a cell.
-	void paintCellBottomBorders(const TableCell& cell, ScPainter* p) const;
+	void paintCellBottomBorders(const TableCell& cell, ScreenPainter* p) const;
 	/// Paints the fill of @a cell.
-	void paintCellFill(const TableCell& cell, ScPainter* p) const;
+	void paintCellFill(const TableCell& cell, ScreenPainter* p) const;
 
 	/**
 	 * Paints @a border from @a start to @a end.
@@ -52,10 +52,10 @@ private:
 	 * their own width multiplied by these factors before being painted.
 	 */
 	void paintBorder(const TableBorder& border, const QPointF& start, const QPointF& end,
-		const QPointF& startOffsetFactors, const QPointF& endOffsetFactors, ScPainter *p) const;
+		const QPointF& startOffsetFactors, const QPointF& endOffsetFactors, ScreenPainter *p) const;
 
 	/// Paints a decorative thin blue line from @a start to @a end.
-	void paintGridLine(const QPointF& start, const QPointF& end, ScPainter *p) const;
+	void paintGridLine(const QPointF& start, const QPointF& end, ScreenPainter *p) const;
 
 };
 

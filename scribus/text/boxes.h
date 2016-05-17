@@ -12,8 +12,10 @@
 #include "fpoint.h"
 #include "frect.h"
 #include "sctextstruct.h"
+#include "scpainter.h"
 
-
+//class ScribusDoc;
+class StoryText;
 
 /**
  class Box has a similar role as TeX's boxes. Scribus packs glyph runs into GlyphBoxes, GlyphBoxes and InlineBoxes into LineBoxes and LineBoxes into GroupBox(T_Block). (and in the future: math atoms, tables & table cells, ...)
@@ -36,12 +38,19 @@ protected:
 	qreal m_width;
 	qreal m_descent;
 	qreal m_ascent;
-	QList<Box*> m_boxes;
-	int m_firstChar;
-	int m_lastChar;
-	
+    QList<Box*> m_boxes;
+    int m_firstChar;
+    int m_lastChar;
+	ScribusDoc* m_Doc;
 public:
-	Box() { m_type = T_Invalid; m_x = m_y = m_width = m_ascent = m_descent = 0; }
+	Box()
+	{
+		m_type = T_Invalid;
+		m_x = m_y = m_width = m_ascent = m_descent = 0;
+		m_firstChar = 0;
+		m_lastChar = 0;
+		m_Doc = NULL;
+	}
 	virtual ~Box() {}
 	
 	//	virtual GlyphBox* asGlyphBox() { return NULL; }
@@ -56,32 +65,33 @@ public:
 	qreal width() const { return m_width; }
 	void addWidth(double w) { m_width += w; }
 	void setWidth(double w) { m_width = w; }
-	qreal height() const { return m_ascent + m_descent; }
+	qreal height() const { return m_ascent - m_descent; }
 	void setHeight(double h, double vBase) { m_ascent = h * (1-vBase); m_descent = h * vBase; }
 	qreal ascent() const { return m_ascent; }
 	qreal descent() const { return m_descent; }
-	void setAscent(double a) { m_ascent = a; }
-	void setDescent(double d) { m_descent = d; }
-	FRect bbox() const { return FRect(m_x, m_y - m_ascent, m_width, height()); }
+    void setAscent(double a) { m_ascent = a; }
+    void setDescent(double d) { m_descent = d; }
+	FRect bbox() const { return FRect(m_x, m_y, m_width, height()); }
 	bool containsPoint(FPoint coord) const { return bbox().contains(coord); }
-
 	int firstChar() const { return m_firstChar; }
+    void setFirstChar(int c){ m_firstChar = c;}
 	int lastChar() const { return m_lastChar; }
+    void setLastChar(int c){ m_lastChar = c;}
 	bool containsPos(int pos) const { return m_firstChar <= pos && pos <= m_lastChar;}
-	
+	void setDoc(ScribusDoc* doc) { m_Doc = doc; }
 	/// returns a char position for the point coord + (m_x, m_y)
 	virtual int pointToPosition(FPoint coord) const = 0;
 	/// returns the bounding box relative to (m_x, m_y)
 	virtual FRect boundingBox(int pos, uint len = 1) const = 0;
 	//	virtual double ascent(int pos) const = 0;
 //	virtual QList<const Box*> pathForPos(int pos) const = 0;
-	int screenToPosition (FPoint coord) const{return 1;} // fix me
-	
+//	virtual void justify(const ParagraphStyle& style) {}
 	QList<Box*>& boxes() { return m_boxes; }
 	const QList<const Box*>& boxes() const {
 		return reinterpret_cast<const QList<const Box*> & > (m_boxes);
 	}
 	
+	virtual void render(ScreenPainter* p, const StoryText& text) = 0;
 	//	virtual void render(ScPainter* p, const RenderOptions& renderOptions) const = 0;
 	//	virtual qreal naturalWidth() const { return width(); }
 	//	virtual qreal naturalHeight() const { return height(); }
@@ -111,6 +121,8 @@ public:
 	void addBox(const Box* box);
 	Box* addBox(uint i);
 	Box* removeBox(uint i);
+	void render(ScreenPainter* p, const StoryText& text);
+//	void justify(const ParagraphStyle& style);
 };
 
 
@@ -119,12 +131,24 @@ class GlyphBox : public Box
 	
 public:
 	GlyphBox(const CharStyle* style, LayoutFlags flags) : glyphs(style, flags) {m_type = T_Glyphs;}
-	GlyphBox(const GlyphRun& glyphrun) : glyphs(glyphrun) {m_type = T_Glyphs;}
+	GlyphBox(const GlyphRun& glyphrun)
+		: glyphs(glyphrun)
+		, m_glyphs(glyphrun.glyphs())
+	{
+		m_type = T_Glyphs;
+		m_firstChar = glyphrun.firstChar();
+		m_lastChar = glyphrun.lastChar();
+	}
 	GlyphRun glyphs;
-	
+	QList <GlyphLayout> m_glyphs;
 	int pointToPosition(FPoint coord) const;
-	FRect boundingBox(int pos, uint len = 1) const;
+	FRect boundingBox(int pos, uint len = 1) const
+	{
+		return bbox();
+	}
 //	QList<const Box*> pathForPos(int pos) const;
+	void render(ScreenPainter* p, const StoryText& text);
+	void setQColor(QColor *tmp, QString colorName, double shad);
 };
 
 
@@ -132,7 +156,8 @@ class LineBox : public GroupBox
 {
 public:	
 	LineBox();
-	
+	void render(ScreenPainter* p, const StoryText& text);
+//	void justify(const ParagraphStyle& style);
 	qreal colLeft;
 };
 

@@ -66,7 +66,7 @@ PageItem_ImageFrame::~PageItem_ImageFrame()
 	}
 }
 
-void PageItem_ImageFrame::DrawObj_Item(ScPainter *p, QRectF /*e*/)
+void PageItem_ImageFrame::DrawObj_Item(ScreenPainter *p, QRectF /*e*/)
 {
 	if (m_Doc->RePos)
 		return;

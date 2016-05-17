@@ -10,7 +10,7 @@ for which a new license (GPL+exception) is in place.
 #define TABLEPAINTER_H
 
 class PageItem_Table;
-class ScPainter;
+class ScreenPainter;
 
 /**
  * The TablePainter class is an abstract base class for table painters.
@@ -26,7 +26,7 @@ public:
 	virtual ~TablePainter() {};
 
 	/// Paints the table using @a p.
-	virtual void paintTable(ScPainter* p) = 0;
+	virtual void paintTable(ScreenPainter* p) = 0;
 
 	/// Returns the table this table painter is configured to paint.
 	PageItem_Table* table() const { return m_table; };

@@ -22,7 +22,7 @@ for which a new license (GPL+exception) is in place.
 
 using namespace TableUtils;
 
-void CollapsedTablePainter::paintTable(ScPainter* p)
+void CollapsedTablePainter::paintTable(ScreenPainter* p)
 {
 	p->save();
 	p->translate(table()->gridOffset());
@@ -136,7 +136,7 @@ void CollapsedTablePainter::paintTable(ScPainter* p)
 	p->restore();
 }
 
-void CollapsedTablePainter::paintTableFill(ScPainter* p) const
+void CollapsedTablePainter::paintTableFill(ScreenPainter* p) const
 {
 	QString colorName = table()->fillColor();
 
@@ -156,14 +156,14 @@ void CollapsedTablePainter::paintTableFill(ScPainter* p) const
 	QColor color;
 	table()->SetQColor(&color, colorName, table()->fillShade());
 	p->setBrush(color);
-	p->setFillMode(ScPainter::Solid);
-	p->setStrokeMode(ScPainter::None);
+	p->setFillMode(ScreenPainter::Solid);
+	p->setStrokeMode(ScreenPainter::None);
 	p->drawRect(x, y, width, height);
 
 	p->restore();
 }
 
-void CollapsedTablePainter::paintCellLeftBorders(const TableCell& cell, ScPainter* p) const
+void CollapsedTablePainter::paintCellLeftBorders(const TableCell& cell, ScreenPainter* p) const
 {
 	/*
 	 * We are going to paint the border marked # in the following setup.
@@ -238,7 +238,7 @@ void CollapsedTablePainter::paintCellLeftBorders(const TableCell& cell, ScPainte
 	}
 }
 
-void CollapsedTablePainter::paintCellRightBorders(const TableCell& cell, ScPainter* p) const
+void CollapsedTablePainter::paintCellRightBorders(const TableCell& cell, ScreenPainter* p) const
 {
 	/*
 	 * We are going to paint the border marked # in the following setup.
@@ -313,7 +313,7 @@ void CollapsedTablePainter::paintCellRightBorders(const TableCell& cell, ScPaint
 	}
 }
 
-void CollapsedTablePainter::paintCellTopBorders(const TableCell& cell, ScPainter* p) const
+void CollapsedTablePainter::paintCellTopBorders(const TableCell& cell, ScreenPainter* p) const
 {
 	/*
 	 * We are going to paint the border marked # in the following setup.
@@ -381,7 +381,7 @@ void CollapsedTablePainter::paintCellTopBorders(const TableCell& cell, ScPainter
 	}
 }
 
-void CollapsedTablePainter::paintCellBottomBorders(const TableCell& cell, ScPainter* p) const
+void CollapsedTablePainter::paintCellBottomBorders(const TableCell& cell, ScreenPainter* p) const
 {
 	/*
 	 * We are going to paint the border marked # in the following setup.
@@ -449,7 +449,7 @@ void CollapsedTablePainter::paintCellBottomBorders(const TableCell& cell, ScPain
 	}
 }
 
-void CollapsedTablePainter::paintCellFill(const TableCell& cell, ScPainter* p) const
+void CollapsedTablePainter::paintCellFill(const TableCell& cell, ScreenPainter* p) const
 {
 	QString colorName = cell.fillColor();
 
@@ -461,8 +461,8 @@ void CollapsedTablePainter::paintCellFill(const TableCell& cell, ScPainter* p) c
 	QColor color;
 	table()->SetQColor(&color, colorName, cell.fillShade());
 	p->setBrush(color);
-	p->setFillMode(ScPainter::Solid);
-	p->setStrokeMode(ScPainter::None);
+	p->setFillMode(ScreenPainter::Solid);
+	p->setStrokeMode(ScreenPainter::None);
 
 	int row = cell.row();
 	int col = cell.column();
@@ -480,11 +480,11 @@ void CollapsedTablePainter::paintCellFill(const TableCell& cell, ScPainter* p) c
 
 void CollapsedTablePainter::paintBorder(const TableBorder& border, const QPointF& start, const QPointF& end,
 										const QPointF& startOffsetFactors, const QPointF& endOffsetFactors,
-										ScPainter *p) const
+										ScreenPainter *p) const
 {
 	p->save();
-	p->setStrokeMode(ScPainter::Solid);
-	p->setFillMode(ScPainter::None);
+	p->setStrokeMode(ScreenPainter::Solid);
+	p->setFillMode(ScreenPainter::None);
 
 	QColor lineColor;
 	QPointF lineStart, lineEnd;
@@ -507,12 +507,12 @@ void CollapsedTablePainter::paintBorder(const TableBorder& border, const QPointF
 	p->restore();
 }
 
-void CollapsedTablePainter::paintGridLine(const QPointF& start, const QPointF& end, ScPainter *p) const
+void CollapsedTablePainter::paintGridLine(const QPointF& start, const QPointF& end, ScreenPainter *p) const
 {
 	p->save();
 	p->setPen(PrefsManager::instance()->appPrefs.displayPrefs.frameNormColor,
 		0.2 / qMax(p->zoomFactor(), 1.0), Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
-	p->setStrokeMode(ScPainter::Solid);
+	p->setStrokeMode(ScreenPainter::Solid);
 	p->drawLine(start, end);
 	p->restore();
 }

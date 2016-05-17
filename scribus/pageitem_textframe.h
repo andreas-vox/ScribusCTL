@@ -26,14 +26,14 @@ for which a new license (GPL+exception) is in place.
 #include <QRectF>
 #include <QString>
 #include <QKeyEvent>
-
+#include <text/boxes.h>
 #include "scribusapi.h"
 #include "pageitem.h"
 #include "marks.h"
 #include "notesstyles.h"
-
+#include <util_math.h>
 class PageItem_NoteFrame;
-class ScPainter;
+class ScreenPainter;
 class ScribusDoc;
 
 typedef QMap<PageItem_NoteFrame*, QList<TextNote *> > NotesInFrameMap;
@@ -41,6 +41,42 @@ typedef QMap<PageItem_NoteFrame*, QList<TextNote *> > NotesInFrameMap;
 
 //cezaryece: I remove static statement and made it public as this function is used also by PageItem_NoteFrame
 double calculateLineSpacing (const ParagraphStyle &style, PageItem *item);
+
+static const bool legacy = true;
+enum TabStatus {
+	TabNONE    = 0,
+	TabLEFT    = TabNONE,
+	TabRIGHT   = 1,
+	TabPOINT   = 2,
+	TabCOMMA   = 3,
+	TabCENTER  = 4
+};
+
+
+/**
+fields which describe what type of tab is currently active
+ */
+struct TabControl {
+	bool         active;
+	int          status;
+	double       xPos;
+	QChar        fillChar;
+	GlyphLayout* tabGlyph;
+};
+
+struct LineSpec
+{
+	qreal x;
+	qreal y;
+	qreal width;
+	qreal ascent;
+	qreal descent;
+	qreal colLeft;
+
+	int firstChar;
+	int lastChar;
+	qreal naturalWidth;
+};
 
 class SCRIBUS_API PageItem_TextFrame : public PageItem
 {
@@ -56,7 +92,7 @@ public:
 	
 	virtual void clearContents();
 	virtual void truncateContents();
-	
+	const GlyphBox* m_gb;
 	/**
 	* \brief Handle keyboard interaction with the text frame while in edit mode
 	* @param k key event
@@ -88,18 +124,18 @@ public:
 protected:
 	QRegion calcAvailableRegion();
 	QRegion m_availableRegion;
-	virtual void DrawObj_Item(ScPainter *p, QRectF e);
-	virtual void DrawObj_Post(ScPainter *p);
-	virtual void DrawObj_Decoration(ScPainter *p);
+	virtual void DrawObj_Item(ScreenPainter *p, QRectF e);
+	virtual void DrawObj_Post(ScreenPainter *p);
+	virtual void DrawObj_Decoration(ScreenPainter *p);
 	//void drawOverflowMarker(ScPainter *p);
-	void drawUnderflowMarker(ScPainter *p);
-	void drawColumnBorders(ScPainter *p);
+	void drawUnderflowMarker(ScreenPainter *p);
+	void drawColumnBorders(ScreenPainter *p);
 	
 	bool unicodeTextEditMode;
 	int unicodeInputCount;
 	QString unicodeInputString;
 
-	void drawNoteIcon(ScPainter *p);
+	void drawNoteIcon(ScreenPainter *p);
 	virtual bool createInfoGroup(QFrame *, QGridLayout *);
 	virtual void applicableActions(QStringList& actionList);
 	virtual QString infoDescription();
@@ -120,6 +156,13 @@ private:
 	QMap<QString,StoryText> shadows;
 	bool checkKeyIsShortcut(QKeyEvent *k);
 	QRectF m_origAnnotPos;
+public:
+    bool isOpj(int i);
+    bool isPar(int i);
+    bool isBre(int i);
+    bool isSpe(int i);
+    double chWid(int i);
+    bool isTab(int i);
 	
 private slots:
 	void slotInvalidateLayout();

@@ -42,7 +42,7 @@ scribusview.h  -  description
 class ScPage;
 class PageItem;
 class ScLayer;
-class ScPainter;
+class ScreenPainter;
 class ScribusDoc;
 class ScribusView;
 
@@ -196,9 +196,9 @@ public:
 	int previewVisual() const { return m_viewMode.previewVisual; }
 	void setPreviewVisual(int mode);
 	
-	void DrawMasterItems(ScPainter *painter, ScPage *page, ScLayer& layer, QRect clip);
+	void DrawMasterItems(ScreenPainter *painter, ScPage *page, ScLayer& layer, QRect clip);
 	//notesFramesPass determine if notes frames are drawed or not
-	void DrawPageItems(ScPainter *painter, ScLayer& layer, QRect clip, bool notesFramesPass);
+	void DrawPageItems(ScreenPainter *painter, ScLayer& layer, QRect clip, bool notesFramesPass);
 	virtual void paintEvent ( QPaintEvent * p );
 	void displayXYHUD(QPoint m);
 	void displayCorrectedXYHUD(QPoint m, double x, double y);
@@ -217,19 +217,19 @@ public:
 	void setupEditHRuler(PageItem * item, bool forceAndReset = false);
 	
 private:
-	void DrawPageBorderSub(ScPainter *p, ScPage *page);
-	void DrawPageBorder(ScPainter *p, QRectF clip, bool master = false);
-	void DrawPageMarginsGridSub(ScPainter *p, ScPage *page);
-	void DrawPageMargins(ScPainter *p, QRectF clip, bool master = false);
-	void DrawPageBaselineGridSub(ScPainter *p, ScPage *page);
-	void DrawPageBaselineGrid(ScPainter *p, QRectF clip, bool master = false);
-	void DrawPageGridSub(ScPainter *p, ScPage *page, QRectF clip);
-	void DrawPageGrid(ScPainter *p, QRectF clip, bool master = false);
-	void DrawPageGuidesSub(ScPainter *p, ScPage *page);
-	void DrawPageGuides(ScPainter *p, QRectF clip, bool master = false);
-	void DrawPageIndicatorSub(ScPainter *p, ScPage *page);
-	void DrawPageIndicator(ScPainter *p, QRectF clip, bool master = false);
-	void drawLinkFrameLine(ScPainter* painter, FPoint &start, FPoint &end);
+	void DrawPageBorderSub(ScreenPainter *p, ScPage *page);
+	void DrawPageBorder(ScreenPainter *p, QRectF clip, bool master = false);
+	void DrawPageMarginsGridSub(ScreenPainter *p, ScPage *page);
+	void DrawPageMargins(ScreenPainter *p, QRectF clip, bool master = false);
+	void DrawPageBaselineGridSub(ScreenPainter *p, ScPage *page);
+	void DrawPageBaselineGrid(ScreenPainter *p, QRectF clip, bool master = false);
+	void DrawPageGridSub(ScreenPainter *p, ScPage *page, QRectF clip);
+	void DrawPageGrid(ScreenPainter *p, QRectF clip, bool master = false);
+	void DrawPageGuidesSub(ScreenPainter *p, ScPage *page);
+	void DrawPageGuides(ScreenPainter *p, QRectF clip, bool master = false);
+	void DrawPageIndicatorSub(ScreenPainter *p, ScPage *page);
+	void DrawPageIndicator(ScreenPainter *p, QRectF clip, bool master = false);
+	void drawLinkFrameLine(ScreenPainter* painter, FPoint &start, FPoint &end);
 	void PaintSizeRect(QRect neu);
 	void PaintSizeRect(QPolygon neu);
 	void Transform(PageItem *currItem, QPainter *p);
@@ -247,9 +247,9 @@ private:
 	 */
 	void fillBuffer(QPaintDevice* buffer, QPoint bufferOrigin, QRect clipRect);
 	void drawContents(QPainter *p, int clipx, int clipy, int clipw, int cliph);
-	void drawBackgroundMasterpage(ScPainter* painter, int clipx, int clipy, int clipw, int cliph);
-	void drawBackgroundPageOutlines(ScPainter* painter, int clipx, int clipy, int clipw, int cliph);
-	void drawFrameLinks(ScPainter* painter);
+	void drawBackgroundMasterpage(ScreenPainter* painter, int clipx, int clipy, int clipw, int cliph);
+	void drawBackgroundPageOutlines(ScreenPainter* painter, int clipx, int clipy, int clipw, int cliph);
+	void drawFrameLinks(ScreenPainter* painter);
 	void drawControls(QPainter* p);
 	void drawControlsMovingItemsRect(QPainter* pp);
 	void drawControlsBezierCurve(QPainter* pp, PageItem* currItem);

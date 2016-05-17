@@ -900,7 +900,7 @@ void PageItem_Table::applicableActions(QStringList& actionList)
 	actionList << "tableAdjustTableToFrame";
 }
 
-void PageItem_Table::DrawObj_Item(ScPainter *p, QRectF /*e*/)
+void PageItem_Table::DrawObj_Item(ScreenPainter *p, QRectF /*e*/)
 {
 	if (m_Doc->RePos)
 		return;

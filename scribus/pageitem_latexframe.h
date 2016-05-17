@@ -92,7 +92,7 @@ class SCRIBUS_API PageItem_LatexFrame : public PageItem_ImageFrame
 
 		QMap<QString,QString> editorProperties;
 	protected:
-		virtual void DrawObj_Item(ScPainter *p, QRectF e);
+		virtual void DrawObj_Item(ScreenPainter *p, QRectF e);
 		double lastWidth, lastHeight;
 		
 		QString formulaText;

@@ -744,11 +744,11 @@ QPixmap AutoformButtonGroup::getIconPixmap(int nr, int pixmapSize)
 		Path.addPoint(x1, y1);
 		Path.addPoint(x2, y2);
 	}
-	ScPainter *painter = new ScPainter(&Ico, 32, 32);
+	ScreenPainter *painter = new ScreenPainter(&Ico, 32, 32);
 	painter->setBrush(qRgb(238, 238, 236));
 	painter->setPen(qRgb(137, 139, 134), 2.0, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
-	painter->setFillMode(ScPainter::Solid);
-	painter->setStrokeMode(ScPainter::Solid);
+	painter->setFillMode(ScreenPainter::Solid);
+	painter->setStrokeMode(ScreenPainter::Solid);
 	painter->translate(2.0, 2.0);
 	painter->setupPolygon(&Path);
 	painter->drawPolygon();

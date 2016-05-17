@@ -93,7 +93,7 @@ void ScPattern::createPreview()
 	m_doc->guidesPrefs().framesShown = false;
 	pattern = QImage(qRound(width * sc), qRound(height * sc), QImage::Format_ARGB32_Premultiplied);
 	pattern.fill( qRgba(0, 0, 0, 0) );
-	ScPainter *painter = new ScPainter(&pattern, pattern.width(), pattern.height(), 1, 0);
+	ScreenPainter *painter = new ScreenPainter(&pattern, pattern.width(), pattern.height(), 1, 0);
 	painter->setZoomFactor(sc);
 	for (int em = 0; em < items.count(); ++em)
 	{

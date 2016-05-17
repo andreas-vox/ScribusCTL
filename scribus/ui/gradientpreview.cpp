@@ -85,7 +85,7 @@ void GradientPreview::paintEvent(QPaintEvent *e)
 	pb.begin(&pixm);
 	pb.fillRect(0, 0, pixm.width(), pixm.height(), b);
 	pb.end();
-	ScPainter *p = new ScPainter(&pixm, width()-20, 37);
+	ScreenPainter *p = new ScreenPainter(&pixm, width()-20, 37);
 //	p->clear(Qt::white);
 	p->setPen(Qt::black, 1, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
 	p->setFillMode(2);

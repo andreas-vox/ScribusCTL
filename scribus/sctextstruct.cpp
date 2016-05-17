@@ -16,8 +16,13 @@ for which a new license (GPL+exception) is in place.
 
 qreal GlyphRun::width() const
 {
-	TODO
-	return 42;
+    qreal width=0;
+    for (int i=0; i<m_glyphs.count();i++)
+    {
+        GlyphLayout gl = m_glyphs[i];
+		width += gl.xadvance;
+    }
+    return width;
 }
 
 void GlyphRun::insertSoftHyphen()
@@ -35,12 +40,12 @@ void GlyphRun::removeSoftHyphen()
 ScText::~ScText() 
 {
 	// delete the linked list if present
-	GlyphLayout * more = glyph.more;
+	/*GlyphLayout  more = glyph.more;
 	while (more) {
 		glyph.more = glyph.more->more;
 		delete more;
 		more = glyph.more;
-	}
+	}*/
 	if (parstyle)
 		delete parstyle;
 	parstyle = NULL;

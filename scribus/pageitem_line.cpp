@@ -51,7 +51,7 @@ PageItem_Line::PageItem_Line(ScribusDoc *pa, double x, double y, double w, doubl
 {
 }
 
-void PageItem_Line::DrawObj_Item(ScPainter *p, QRectF /*e*/)
+void PageItem_Line::DrawObj_Item(ScreenPainter *p, QRectF /*e*/)
 {
 	if (m_Doc->RePos)
 		return;
@@ -74,7 +74,7 @@ void PageItem_Line::DrawObj_Item(ScPainter *p, QRectF /*e*/)
 				else
 				{
 					p->setPattern(&m_Doc->docPatterns[patternStrokeVal], patternStrokeScaleX, patternStrokeScaleY, patternStrokeOffsetX, patternStrokeOffsetY, patternStrokeRotation, patternStrokeSkewX, patternStrokeSkewY, patternStrokeMirrorX, patternStrokeMirrorY);
-					p->setStrokeMode(ScPainter::Pattern);
+					p->setStrokeMode(ScreenPainter::Pattern);
 					p->drawLine(FPoint(0, 0), FPoint(m_width, 0));
 				}
 			}
@@ -89,17 +89,17 @@ void PageItem_Line::DrawObj_Item(ScPainter *p, QRectF /*e*/)
 					if (lineColor() != CommonStrings::None)
 					{
 						p->setBrush(strokeQColor);
-						p->setStrokeMode(ScPainter::Solid);
+						p->setStrokeMode(ScreenPainter::Solid);
 					}
 					else
 					{
 						no_stroke = true;
-						p->setStrokeMode(ScPainter::None);
+						p->setStrokeMode(ScreenPainter::None);
 					}
 				}
 				else
 				{
-					p->setStrokeMode(ScPainter::Gradient);
+					p->setStrokeMode(ScreenPainter::Gradient);
 					p->stroke_gradient = stroke_gradient;
 					if (GrTypeStroke == 6)
 						p->setGradient(VGradient::linear, FPoint(GrStrokeStartX, GrStrokeStartY), FPoint(GrStrokeEndX, GrStrokeEndY), FPoint(GrStrokeStartX, GrStrokeStartY), GrStrokeScale, GrStrokeSkew);
@@ -110,7 +110,7 @@ void PageItem_Line::DrawObj_Item(ScPainter *p, QRectF /*e*/)
 			}
 			else if (lineColor() != CommonStrings::None)
 			{
-				p->setStrokeMode(ScPainter::Solid);
+				p->setStrokeMode(ScreenPainter::Solid);
 				p->drawLine(FPoint(0, 0), FPoint(m_width, 0));
 			}
 			else
@@ -118,7 +118,7 @@ void PageItem_Line::DrawObj_Item(ScPainter *p, QRectF /*e*/)
 		}
 		else
 		{
-			p->setStrokeMode(ScPainter::Solid);
+			p->setStrokeMode(ScreenPainter::Solid);
 			multiLine ml = m_Doc->MLineStyles[NamedLStyle];
 			QColor tmp;
 			for (int it = ml.size()-1; it > -1; it--)
