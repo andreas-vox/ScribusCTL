@@ -35,7 +35,7 @@ TextLayout::TextLayout(StoryText* text, PageItem* frame)
 	m_magicX = 0.0;
 	m_lastMagicPos = -1;
 	
-	m_lines = new GroupBox();
+	m_lines = text->m_LBox;
 }
 
 TextLayout::~TextLayout()
@@ -43,10 +43,26 @@ TextLayout::~TextLayout()
 	delete m_lines;
 }
 
+void TextLayout::initBoxes(int i)
+{
+	m_lines->removeBox(i);
+	m_lines->addBox(i);
+	GlyphBox* glBox;
+	glBox->boundingBox(i);
+}
 
 uint TextLayout::lines() const
 {
 	return m_lines->boxes().count();
+}
+
+void TextLayout::render(ScPainter *p)
+{
+
+	 p->save();
+
+	 m_lines->render(painter);
+	 p->restore();
 }
 
 const LineBox* TextLayout::line(uint i) const
@@ -89,7 +105,7 @@ void TextLayout::removeLastLine ()
 void TextLayout::clear() 
 {
 	delete m_lines;
-	m_lines = new GroupBox();
+	m_lines = new LineBox();
 	m_path.clear();
 	if (m_frame->asPathText() != NULL)
 		m_path.resize(story()->length());

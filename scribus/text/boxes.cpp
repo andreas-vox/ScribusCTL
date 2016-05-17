@@ -31,6 +31,66 @@ int GroupBox::pointToPosition(FPoint coord) const
 	return -1;
 }
 
+GroupBox::render(ScPainter *p)
+{
+	p->moveTo(x(),y());
+ foreach (Box b , boxes())
+ {
+	 b->render(p);
+ }
+	p->moveTo(-x(),-y());
+}
+GlyphBox::render(ScPainter *p)
+{
+	p->save();
+	const CharStyle& style(glyphs.style());
+	const ScFace font = style.font();
+	for (int i = 0; i < glyphs.glyphs().count(); ++i)
+	{
+		const GlyphLayout& glyphLayout(glyphs.glyphs().at(i));
+		uint glyph = glyphLayout.glyph;
+		FPointArray gly = font.glyphOutline(glyph);
+		if (gly.size() > 3)
+		{
+			p->translate(glyphLayout.xoffset, glyphLayout.yoffset - ((style.fontSize() / 10.0) * glyphLayout.scaleV));
+			if (style.baselineOffset() != 0)
+				p->translate(0, -(style.fontSize() / 10.0) * (style.baselineOffset() / 1000.0));
+			double glxSc = glyphLayout.scaleH * style.fontSize() / 100.00;
+			double glySc = glyphLayout.scaleV * style.fontSize() / 100.0;
+			p->scale(glxSc, glySc);
+			bool fr = p->fillRule();
+			p->setFillRule(false);
+			p->setupPolygon(&gly, true);
+			if (glyph == 0)
+			{
+				p->setPen(PrefsManager::instance()->appPrefs.displayPrefs.controlCharColor, 1, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
+				p->setLineWidth(style.fontSize() * glyphLayout.scaleV * style.outlineWidth() * 2 / 10000.0);
+				p->strokePath();
+			}
+			else if ((font.isStroked()) && (style.strokeColor() != CommonStrings::None) && ((style.fontSize() * glyphLayout.scaleV * style.outlineWidth() / 10000.0) != 0))
+			{
+				QColor tmp = p->brush();
+				p->setPen(tmp, 1, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
+				p->setLineWidth(style.fontSize() * glyphLayout.scaleV * style.outlineWidth() / 10000.0);
+				p->strokePath();
+			}
+			else
+			{
+				if (style.fillColor() != CommonStrings::None)
+					p->fillPath();
+				if ((style.effects() & ScStyle_Outline) && (style.strokeColor() != CommonStrings::None) && ((style.fontSize() * glyphLayout.scaleV * style.outlineWidth() / 10000.0) != 0))
+				{
+					p->setLineWidth((style.fontSize() * glyphLayout.scaleV * style.outlineWidth() / 10000.0) / glySc);
+					p->strokePath();
+				}
+			}
+			p->setFillRule(fr);
+		}
+		p->moveBy( glyph[i].xAdvance, glyph[i].yAdvance);
+	}
+	p->restore();
+
+}
 
 FRect GroupBox::boundingBox(int pos, uint len) const
 {
@@ -70,6 +130,10 @@ void GroupBox::addBox(const Box* box)
 	m_width = newRect.width();
 	m_descent = newRect.height() - m_ascent;
 }
+Box* GroupBox::removeBox(uint i)
+{
+	delete m_lines->boxes().at(i);
+}
 
 Box* GroupBox::addBox(uint i)
 {	m_boxes.removeAt(i);
@@ -99,9 +163,9 @@ int GlyphBox::pointToPosition(FPoint coord) const
 {
 	qreal relX = coord.x() - m_x;
 	qreal xPos = 0.0;
-	for (int i = 0; i < m_gylphs.length(); ++i)
+	for (int i = 0; i < m_glyphs.length(); ++i)
 	{
-		qreal width = m_glyphs[i].xadvance;
+		qreal width = m_glyphs.at(i).xadvance;
 		if (xPos <= relX && relX <= xPos + width)
 		{
 			return m_firstChar + i; // FIXME: use clusters
@@ -114,7 +178,7 @@ int GlyphBox::pointToPosition(FPoint coord) const
 
 FRect GlyphBox::boundingBox(int pos, uint len) const
 {
-	int relPos = firstChar - pos;
+	int relPos = firstChar() - pos;
 	qreal xPos1 = m_x;
 	for (int i = 0; i < relPos - 1; ++i)
 	{
@@ -126,7 +190,7 @@ FRect GlyphBox::boundingBox(int pos, uint len) const
 	{
 		xPos2 += m_glyphs[i].xadvance;
 	}
-	return FRect(xPos1, -descent, xPos2 - xPos1, ascent);
+	return FRect(xPos1, -descent(), xPos2 - xPos1, ascent());
 }
 
 
@@ -134,6 +198,4 @@ LineBox::LineBox()
 {
 	m_type = T_Line;
 }
-
-
 
